@@ -1,20 +1,23 @@
 package br.edu.ifpb.veritas.models;
 
-import java.util.List;
+import java.util.ArrayList;
+
+import org.hibernate.annotations.DiscriminatorOptions;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = false)
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @DiscriminatorValue("PROFESSOR")
 public class Professor extends User {
-   private String department;
-
-   @OneToMany(mappedBy = "rapporteur")
-   private List<AcademicCase> cases;
+   private ArrayList<Process> forwardedProcesses;
 }

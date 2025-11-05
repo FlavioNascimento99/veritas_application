@@ -1,22 +1,20 @@
 package br.edu.ifpb.veritas.models;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = false)
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @DiscriminatorValue("STUDENT")
 public class Student extends User {
-   private String registrationNumber;
-   private String course;
-
-   @OneToMany(mappedBy = "author")
-   private List<AcademicCase> academicCases;
-   
+   private ArrayList<Process> createdProcesses;
 }
