@@ -23,7 +23,7 @@ public class ProcessListDTO {
    public ProcessListDTO(Process process) {
       this.processId          = process.getId();
       this.processTitle       = process.getTitle();
-      this.processStatus      = process.getStatusProcess();
+      this.processStatus      = process.getStatus();
       this.studentName        = process.getStudent().getName();
       this.subjectTitle       = process.getSubject().getTitle();
       this.professorName      = process.getProfessor().getName() != null ? process.getProfessor().getName() : null; // Novamente verificação para caso o processo ainda não tenha sido anexado a nenhum professor.

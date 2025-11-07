@@ -1,4 +1,4 @@
-package br.edu.ifpb.veritas.controllers;
+package br.edu.ifpb.veritas.controllers.api;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequestMapping("/api/processos")
 @RequiredArgsConstructor
-public class ProcessController {
+public class ProcessAPIController {
    private final ProcessService processService;
 
    /**

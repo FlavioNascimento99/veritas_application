@@ -23,6 +23,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "tb_processes")
 public class Process {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,7 +42,7 @@ public class Process {
    private Professor professor;
 
    @Enumerated(EnumType.STRING)
-   private StatusProcess statusProcess;
+   private StatusProcess status;
 
    private String title;
    private String technicalOpinion;

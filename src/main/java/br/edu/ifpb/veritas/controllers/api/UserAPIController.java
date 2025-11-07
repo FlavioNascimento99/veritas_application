@@ -1,4 +1,4 @@
-package br.edu.ifpb.veritas.controllers;
+package br.edu.ifpb.veritas.controllers.api;
 
 import br.edu.ifpb.veritas.DTOs.userDTO.UserCreateDTO;
 import br.edu.ifpb.veritas.DTOs.userDTO.UserDTO;
@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserAPIController {
 
     private final UserService userService;
 

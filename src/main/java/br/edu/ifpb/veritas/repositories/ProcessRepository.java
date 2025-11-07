@@ -13,7 +13,6 @@ import br.edu.ifpb.veritas.models.Process;
 public interface ProcessRepository extends JpaRepository<Process, Long> {
    List<Process> findByStudentId(Long studentId);
    List<Process> findByProfessorId(Long professorId);
-   List<Process> findByStatus(StatusProcess status);
    List<Process> findBySubjectId(Long subjectId);
 
    /**
@@ -33,14 +32,12 @@ public interface ProcessRepository extends JpaRepository<Process, Long> {
    @Query("SELECT p FROM Process p WHERE p.status IN ('WAITING', 'UNDER_ANALISYS')")
    List<Process> findPendingProcesses();
    
-   @Query("SELECT COUNT(p) FROM Process p WHERE p.professor.id = :professorId" + 
-   "AND p.status IN ('APPROVED', 'REJECTED')")
+   @Query("SELECT COUNT(p) FROM Process p WHERE p.professor.id = :professorId AND p.status IN ('APPROVED', 'REJECTED')")
    Long countProcessesFinishedByProfessor(@Param("professorId") Long professorId);
 
    @Query("SELECT p FROM Process p WHERE p.student.id = :professorId " +
    "ORDER BY p.createdAt DESC")
    List<Process> findLastProcessesFromStudent(@Param("studentId") Long professorId);
-
 
    // Contadores (Interessante posteriomente para Relatórios)
    Long countByStatus(StatusProcess status);

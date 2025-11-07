@@ -40,7 +40,7 @@ public class ProcessService {
         process.setSubject(subject);
         process.setTitle(dto.getTitle());
         process.setDescription(dto.getDescription());
-        process.setStatusProcess(StatusProcess.WAITING);
+        process.setStatus(StatusProcess.WAITING);
         process.setCreatedAt(LocalDateTime.now());
 
         Process savedProcess = processRepository.save(process);
@@ -73,13 +73,13 @@ public class ProcessService {
         Professor professor = (Professor) user;
 
         // opcional: checar estado atual do processo
-        if (process.getStatusProcess() != StatusProcess.WAITING) {
+        if (process.getStatus() != StatusProcess.WAITING) {
             // lançar exceção ou registrar e continuar conforme regra de negócio
             // throw new IllegalStateException("Processo não está em estado passível de distribuição");
         }
 
         process.setProfessor(professor);
-        process.setStatusProcess(StatusProcess.UNDER_ANALISYS);
+        process.setStatus(StatusProcess.UNDER_ANALISYS);
         process.setDistributedAt(LocalDateTime.now());
 
         Process updatedProcess = processRepository.save(process);
