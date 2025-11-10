@@ -25,6 +25,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "tb_processes")
 public class Process {
+   
+   
+   // Relationship props
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private Long id;
@@ -41,15 +44,22 @@ public class Process {
    @JoinColumn(name = "professor_id")
    private Professor professor;
 
+
+   // Process properties
    @Enumerated(EnumType.STRING)
    private StatusProcess status;
 
    private String title;
-   private String technicalOpinion;
-
+   
    @Column(columnDefinition = "TEXT")
    private String description;
 
+
+   // Professor's return about Process came from Coordinator
+   private String technicalOpinion;
+
+
+   // Timestamp properties
    private LocalDateTime createdAt;
    private LocalDateTime distributedAt;
    private LocalDateTime solvedAt;

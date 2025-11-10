@@ -1,0 +1,58 @@
+<div th:fragment="content" class="bg-white dark:bg-gray-900">
+
+    <!-- Hero Section -->
+    <section class="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100">
+        <div class="container mx-auto flex flex-col items-center px-4 py-16 text-center md:py-32 md:px-10 lg:px-32 xl:max-w-3xl">
+            <h1 class="text-4xl font-bold leading-none sm:text-5xl">
+                Bem-vindo ao <span class="text-indigo-600 dark:text-indigo-400">Veritas</span>
+            </h1>
+            <p class="px-8 mt-8 mb-12 text-lg">
+                Uma aplicação moderna e intuitiva para gerenciar seus processos acadêmicos com eficiência e estilo.
+            </p>
+            <div class="flex flex-wrap justify-center">
+                <a th:href="@{/login}" class="px-8 py-3 m-2 text-lg font-semibold rounded bg-indigo-600 text-gray-50 hover:bg-indigo-700">Comece Agora</a>
+                <a th:href="@{/about}" class="px-8 py-3 m-2 text-lg border rounded dark:text-gray-100 dark:border-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">Saiba Mais</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Presentation Section -->
+    <section class="py-20">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-800 dark:text-white">Funcionalidades Principais</h2>
+                <p class="text-gray-600 dark:text-gray-400 mt-4">Descubra o que o Veritas pode fazer por você.</p>
+            </div>
+
+            <div class="flex flex-wrap -mx-4">
+                <!-- Feature 1 -->
+                <div class="w-full md:w-1/3 px-4 mb-8">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
+                        <i class="fas fa-cogs text-4xl text-indigo-600 dark:text-indigo-400 mb-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Gerenciamento de Processos</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Crie, distribua e avalie processos de forma centralizada e organizada.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="w-full md:w-1/3 px-4 mb-8">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
+                        <i class="fas fa-users text-4xl text-indigo-600 dark:text-indigo-400 mb-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Controle de Usuários</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Gerencie diferentes perfis de usuários com permissões específicas.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="w-full md:w-1/3 px-4 mb-8">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
+                        <i class="fas fa-book text-4xl text-indigo-600 dark:text-indigo-400 mb-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Gestão de Disciplinas</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Organize e gerencie as disciplinas oferecidas em sua instituição.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
