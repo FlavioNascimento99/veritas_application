@@ -31,18 +31,18 @@ import java.util.List;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "user_type")
 public class User implements UserDetails {
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-   private String name;
-   private String email;
-   private String password;
-   private String registration;
+    private String name;
+    private String email;
+    private String password;
 
-   @Enumerated(EnumType.STRING)
-   private UserRole role;
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
+    
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.getAuthority()));
@@ -53,20 +53,6 @@ public class User implements UserDetails {
         return email;
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
 
     @Override
     public boolean isEnabled() {
