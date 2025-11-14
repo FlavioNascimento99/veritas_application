@@ -42,7 +42,6 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.getAuthority()));
@@ -52,7 +51,6 @@ public class User implements UserDetails {
     public String getUsername() {
         return email;
     }
-
 
     @Override
     public boolean isEnabled() {

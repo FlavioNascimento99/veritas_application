@@ -9,16 +9,22 @@
    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body>
-   <div th:replace="fragments/header :: header"></div>
+   <header>
+      <!-- Example of permanent header of application-->
+      <div th:replace="fragments/header"></div>
+   </header>
 
    <!-- Rotative content -->
    <main role="main">
+      <!-- Initial Application Load starts here. -->
       <div th:replace="__${mainContent}__">
-         <!-- Initial Application Load starts here. -->
       </div>
    </main>
 
-   <div th:replace="fragments/footer :: footer"></div>
-   <!-- <div th:replace="fragments/scripts :: scripts"></div> -->
+   <footer>
+      <!-- Example between insert and replace -->
+      <div th:replace="footer"></div>
+      <!-- <div th:replace="fragments/scripts :: scripts"></div> -->
+   </footer>
 </body>
 </html>
