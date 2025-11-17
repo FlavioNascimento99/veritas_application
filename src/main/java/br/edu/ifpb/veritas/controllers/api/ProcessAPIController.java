@@ -9,6 +9,7 @@ import br.edu.ifpb.veritas.DTOs.processDTO.ProcessDistributeDTO;
 import br.edu.ifpb.veritas.DTOs.processDTO.ProcessListDTO;
 import br.edu.ifpb.veritas.DTOs.processDTO.ProcessResponseDTO;
 import br.edu.ifpb.veritas.models.User;
+import br.edu.ifpb.veritas.repositories.ProcessRepository;
 import br.edu.ifpb.veritas.services.ProcessService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,10 +42,10 @@ public class ProcessAPIController {
     */
    @PostMapping
    @PreAuthorize("hasRole('STUDENT')")
-   public ResponseEntity<ProcessResponseDTO> create(@Valid @RequestBody ProcessCreateDTO dto, Authentication auth, UriComponentsBuilder uriBuilder) {
+   public ResponseEntity<ProcessRepository> create(@Valid @RequestBody ProcessRepository repository, Authentication auth, UriComponentsBuilder uriBuilder) {
       User student = (User) auth.getPrincipal();
       Long studentId = student.getId();
-      ProcessResponseDTO process = processService.create(dto, studentId);
+      ProcessRepository process = processService.create(repository, studentId);
       var uri = uriBuilder.path("/api/processos/{id}").buildAndExpand(process.getId()).toUri();
       return ResponseEntity.created(uri).body(process);
    }

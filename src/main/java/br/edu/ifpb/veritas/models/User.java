@@ -30,30 +30,22 @@ import java.util.List;
 @Table(name = "tb_users")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "user_type")
-public class User implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class User {
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private String name;
-    private String email;
-    private String password;
+  /**
+   * Criado uma prop de Registro para uma 
+   * maneira mais apropriada de buscar por
+   * determinados usuários dentro da Aplicação
+   */
+  private String register;
+  private String name;
+  private String login;
+  private String password;
 
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
+  @Enumerated(EnumType.STRING)
+  private UserRole role;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.getAuthority()));
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }

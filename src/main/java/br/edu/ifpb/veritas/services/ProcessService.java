@@ -29,17 +29,17 @@ public class ProcessService {
     private final SubjectRepository subjectRepository;
 
     @Transactional
-    public ProcessResponseDTO create(ProcessCreateDTO dto, Long studentId) {
+    public ProcessRepository create(ProcessRepository repository, Long studentId) {
         Student student = (Student) userRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudante não encontrado."));
-        Subject subject = subjectRepository.findById(dto.getSubjectId())
+        Subject subject = subjectRepository.findById(repository.getReferenceById())
                 .orElseThrow(() -> new ResourceNotFoundException("Disciplina não encontrada."));
 
         Process process = new Process();
         process.setStudent(student);
         process.setSubject(subject);
-        process.setTitle(dto.getTitle());
-        process.setDescription(dto.getDescription());
+        process.setTitle(repository.sa());
+        process.setDescription(repository.getDescription());
         process.setStatus(StatusProcess.WAITING);
         process.setCreatedAt(LocalDateTime.now());
 

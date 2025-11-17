@@ -19,5 +19,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @DiscriminatorValue("PROFESSOR")
 public class Professor extends User {
-   private ArrayList<Process> forwardedProcesses;
+
+  private ArrayList<Process> forwardedProcesses;
+
 }

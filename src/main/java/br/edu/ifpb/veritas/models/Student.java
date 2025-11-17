@@ -16,5 +16,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @DiscriminatorValue("STUDENT")
 public class Student extends User {
-   private ArrayList<Process> createdProcesses;
+  // Listagem de processos do mesmo poderá ser salvo dentro deste atributo.
+  // (Incerto da necessidade)
+  private ArrayList<Process> createdProcesses;
+
 }

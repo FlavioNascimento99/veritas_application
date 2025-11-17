@@ -1,6 +1,5 @@
 package br.edu.ifpb.veritas.services;
 
-//import br.edu.ifpb.veritas.DTOs.subjectsDTO.SubjectDTO;
 import br.edu.ifpb.veritas.exceptions.ResourceNotFoundException;
 import br.edu.ifpb.veritas.models.Subject;
 import br.edu.ifpb.veritas.repositories.SubjectRepository;
