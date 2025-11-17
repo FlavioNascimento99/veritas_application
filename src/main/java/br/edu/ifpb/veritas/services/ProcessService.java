@@ -1,8 +1,8 @@
 package br.edu.ifpb.veritas.services;
 
-import br.edu.ifpb.veritas.DTOs.processDTO.ProcessCreateDTO;
-import br.edu.ifpb.veritas.DTOs.processDTO.ProcessListDTO;
-import br.edu.ifpb.veritas.DTOs.processDTO.ProcessResponseDTO;
+//import br.edu.ifpb.veritas.DTOs.processDTO.ProcessCreateDTO;
+//import br.edu.ifpb.veritas.DTOs.processDTO.ProcessListDTO;
+//import br.edu.ifpb.veritas.DTOs.processDTO.ProcessResponseDTO;
 import br.edu.ifpb.veritas.enums.StatusProcess;
 import br.edu.ifpb.veritas.exceptions.ResourceNotFoundException;
 import br.edu.ifpb.veritas.models.Process;
@@ -10,6 +10,7 @@ import br.edu.ifpb.veritas.models.Professor;
 import br.edu.ifpb.veritas.models.Student;
 import br.edu.ifpb.veritas.models.Subject;
 import br.edu.ifpb.veritas.repositories.ProcessRepository;
+import br.edu.ifpb.veritas.repositories.StudentRepository;
 import br.edu.ifpb.veritas.repositories.SubjectRepository;
 import br.edu.ifpb.veritas.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,62 +28,58 @@ public class ProcessService {
     private final ProcessRepository processRepository;
     private final UserRepository userRepository;
     private final SubjectRepository subjectRepository;
+    private final StudentRepository studentRepository;
 
     @Transactional
-    public ProcessRepository create(ProcessRepository repository, Long studentId) {
-        Student student = (Student) userRepository.findById(studentId)
+    public Process create(Process process, Long studentId) {
+        var user = userRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudante não encontrado."));
-        Subject subject = subjectRepository.findById(repository.getReferenceById())
+        if (!(user instanceof Student)) {
+            throw new ResourceNotFoundException("Usuário não é um estudante.");
+        }
+        Student student = (Student) user;
+
+        if (process.getSubject() == null || process.getSubject().getId() == null) {
+            throw new ResourceNotFoundException("Disciplina não informada.");
+        }
+        Subject subject = subjectRepository.findById(process.getSubject().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Disciplina não encontrada."));
 
-        Process process = new Process();
-        process.setStudent(student);
-        process.setSubject(subject);
-        process.setTitle(repository.sa());
-        process.setDescription(repository.getDescription());
-        process.setStatus(StatusProcess.WAITING);
-        process.setCreatedAt(LocalDateTime.now());
+        Process newProcess = new Process();
+        newProcess.setStudent(student);
+        newProcess.setSubject(subject);
+        newProcess.setTitle(process.getTitle());
+        newProcess.setDescription(process.getDescription());
+        newProcess.setStatus(StatusProcess.WAITING);
+        newProcess.setCreatedAt(LocalDateTime.now());
 
-        Process savedProcess = processRepository.save(process);
-        return new ProcessResponseDTO(savedProcess);
+        return processRepository.save(newProcess);
     }
 
-    public List<ProcessListDTO> listByStudent(Long studentId) {
-        return processRepository.findByStudentId(studentId).stream()
-                .map(ProcessListDTO::new)
-                .collect(Collectors.toList());
+    public List<Process> listByStudent(Long studentId) {
+        return processRepository.findByStudentId(studentId);
     }
 
-    public List<ProcessListDTO> listByProfessor(Long professorId) {
-        return processRepository.findByProfessorId(professorId).stream()
-                .map(ProcessListDTO::new)
-                .collect(Collectors.toList());
+    public List<Process> listByProfessor(Long professorId) {
+        return processRepository.findByProfessorId(professorId);
     }
 
     @Transactional
-    public ProcessResponseDTO distribute(Long processId, Long professorId) {
+    public Process distribute(Long processId, Long professorId) {
         Process process = processRepository.findById(processId)
                 .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado."));
 
         var user = userRepository.findById(professorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado."));
-
         if (!(user instanceof Professor)) {
             throw new ResourceNotFoundException("Usuário não é um professor.");
         }
         Professor professor = (Professor) user;
 
-        // opcional: checar estado atual do processo
-        if (process.getStatus() != StatusProcess.WAITING) {
-            // lançar exceção ou registrar e continuar conforme regra de negócio
-            // throw new IllegalStateException("Processo não está em estado passível de distribuição");
-        }
-
         process.setProfessor(professor);
         process.setStatus(StatusProcess.UNDER_ANALISYS);
         process.setDistributedAt(LocalDateTime.now());
 
-        Process updatedProcess = processRepository.save(process);
-        return new ProcessResponseDTO(updatedProcess);
+        return processRepository.save(process);
     }
 }
