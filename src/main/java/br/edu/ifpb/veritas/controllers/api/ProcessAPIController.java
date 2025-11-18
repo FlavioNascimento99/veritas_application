@@ -37,19 +37,10 @@ public class ProcessAPIController {
     2. Own Process Listing
 
     */
-//   @PostMapping
-//   @PreAuthorize("hasRole('STUDENT')")
-//   public ResponseEntity<ProcessRepository> create(@Valid @RequestBody ProcessRepository repository, Authentication auth, UriComponentsBuilder uriBuilder) {
-//      User student = (User) auth.getPrincipal();
-//      Long studentId = student.getId();
-//      ProcessRepository process = processService.create(repository, studentId);
-//      var uri = uriBuilder.path("/api/processos/{id}").buildAndExpand(process.getId()).toUri();
-//      return ResponseEntity.created(uri).body(process);
-//   }
 
    @PostMapping
    @PreAuthorize("hasRole('STUDENT')")
-   public ResponseEntity<br.edu.ifpb.veritas.models.Process> create(@RequestBody Process process, Authentication auth, UriComponentsBuilder uriBuilder) {
+   public ResponseEntity<Process> create(@RequestBody Process process, Authentication auth, UriComponentsBuilder uriBuilder) {
       User student = (User) auth.getPrincipal();
       Long studentId = student.getId();
       Process saved = processService.create(process, studentId);
