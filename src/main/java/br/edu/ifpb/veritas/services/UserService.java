@@ -4,8 +4,8 @@ import br.edu.ifpb.veritas.enums.UserRole;
 import br.edu.ifpb.veritas.exceptions.ResourceNotFoundException;
 import br.edu.ifpb.veritas.models.User;
 import br.edu.ifpb.veritas.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,15 +14,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-//    private final PasswordEncoder passwordEncoder;
 
-
+    @Transactional
     public User createUser(User user) {
         if (userRepository.findByLogin(user.getLogin()).isPresent()) {
             throw new ResourceNotFoundException("Login já cadastrado.");
         }
-
-//        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 

@@ -22,11 +22,10 @@ public class SubjectService {
         if (subjectRepository.findById(subject.getId()).isPresent()) {
             throw new ResourceNotFoundException("Disciplina já cadastrada.");
         };
-
         return subjectRepository.save(subject);
     }
 
-    public List<Subject> getAll() {
+    public List<Subject> listSubjects() {
         return subjectRepository.findAll();
     }
 
@@ -40,26 +39,6 @@ public class SubjectService {
         return subjectRepository.save(subject);
     }
 
-    public Optional<Subject> findByTittle(String tittle) {
-        return subjectRepository.findByTitle(tittle);
-    }
-
-//    public Subject create(SubjectDTO subjectDTO) {
-//        Subject subject = new Subject();
-//        subject.setTitle(subjectDTO.getTitle());
-//        subject.setDescription(subjectDTO.getDescription());
-//        return subjectRepository.save(subject);
-//    }
-//
-//    public Subject reload(Long id, SubjectDTO subjectDTO) {
-//        Subject subject = subjectRepository.findById(id)
-//                .orElseThrow(() -> new ResourceNotFoundException("Disciplina não encontrada."));
-//        subject.setTitle(subjectDTO.getTitle());
-//        subject.setDescription(subjectDTO.getDescription());
-//        subject.setModifiedAt(LocalDateTime.now());
-//        return subjectRepository.save(subject);
-//    }
-//
     @Transactional
     public void deactivate(Long id) {
         Subject subject = subjectRepository.findById(id)
@@ -67,5 +46,9 @@ public class SubjectService {
         subject.setActive(false);
         subject.setModifiedAt(LocalDateTime.now());
         subjectRepository.save(subject);
+    }
+
+    public Optional<Subject> findByTittle(String tittle) {
+        return subjectRepository.findByTitle(tittle);
     }
 }
