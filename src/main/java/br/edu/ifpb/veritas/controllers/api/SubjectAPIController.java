@@ -1,3 +1,11 @@
+/**
+ * Seguindo o padrão REST, este controller gerencia as operações CRUD para a entidade Subject.
+ * Inclui endpoints para criação, listagem, atualização e desativação de subjects.
+ * 
+ * POST, GET, PUT e DELETE são mapeados para os métodos HTTP correspondentes. @PostMapping cria um novo subject,
+ * @GetMapping lista todos os subjects, @PutMapping atualiza um subject existente e @DeleteMapping desativa um subject.
+ */
+
 package br.edu.ifpb.veritas.controllers.api;
 
 import java.util.List;
@@ -10,36 +18,52 @@ import br.edu.ifpb.veritas.models.Subject;
 import br.edu.ifpb.veritas.services.SubjectService;
 
 @Controller
-@RequestMapping("api/subjects")
+@RequestMapping("/api/subjects")
 public class SubjectAPIController {
 
    @Autowired
    private SubjectService subjectService;
 
+
+   /**
+    * Post feito para criação de novos 'Subject' da aplicação.
+    */
    @PostMapping
    public ResponseEntity<Subject> createSubject(@RequestBody Subject subject) {
       return ResponseEntity.ok(subjectService.createSubject(subject));
    }
 
+   /**
+    * Get feito para buscar todos os objeto/dado em banco.
+    */
    @GetMapping
    public ResponseEntity<List<Subject>> getSubjects() {
       return ResponseEntity.ok(subjectService.listSubjects());
    }
 
+   /**
+    * Put feito para alteração(Opicional) total do objeto/dado.
+    */
    @PutMapping("/{id}")
-   public ResponseEntity<Subject> reloadSubjects(@PathVariable Long id, @RequestBody Subject subject) {
-      return ResponseEntity.ok(subjectService.reload(id, subject));
+   public ResponseEntity<Subject> updateSubject(@PathVariable Long id, @RequestBody Subject subject) {
+      return ResponseEntity.ok(subjectService.update(id, subject));
    }
 
-   // Não remove o subject,
-   // apenas seta "active" pra false
-   @DeleteMapping("/{id}")
+   /**
+    * Patch feito para alteração de valor 'active' de Subject.
+    * 1. Ativa
+    * 2. Desativa
+    */
+   @PatchMapping("/{id}")
    public ResponseEntity<Subject> inactivateSubject(@PathVariable Long id) {
       subjectService.deactivate(id);
       return ResponseEntity.noContent().build();
    }
 
-   // Talvez seja interessante ser
-   // possível reativar o subject
+   @PatchMapping("/{id}")
+   public ResponseEntity<Subject> reactivateSubject(@PathVariable Long id) {
+      subjectService.reactivate(id);
+      return ResponseEntity.noContent().build();
+   } 
 
 }

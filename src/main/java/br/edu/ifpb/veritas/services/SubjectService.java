@@ -5,6 +5,8 @@ import br.edu.ifpb.veritas.models.Subject;
 import br.edu.ifpb.veritas.repositories.SubjectRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,6 +19,28 @@ public class SubjectService {
 
     private final SubjectRepository subjectRepository;
 
+
+    /**
+     * Consutáveis
+     * 
+     * Métodos que apenas buscam dados em Banco, sem necessidade 
+     * alreação me Banco
+     */
+    public List<Subject> listSubjects() {
+        return subjectRepository.findAll();
+    }
+
+    public Optional<Subject> findByTittle(String tittle) {
+        return subjectRepository.findByTitle(tittle);
+    }
+
+
+
+    /**
+     * Transacionais 
+     * 
+     * Métodos que necessitam operações de transações em Banco.
+     */
     @Transactional
     public Subject createSubject(Subject subject) {
         if (subjectRepository.findById(subject.getId()).isPresent()) {
@@ -25,12 +49,8 @@ public class SubjectService {
         return subjectRepository.save(subject);
     }
 
-    public List<Subject> listSubjects() {
-        return subjectRepository.findAll();
-    }
-
     @Transactional
-    public Subject reload(Long id, Subject updatedSubject) {
+    public Subject update(Long id, Subject updatedSubject) {
         Subject subject = subjectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Disciplina não encontrada."));
         subject.setTitle(updatedSubject.getTitle());
         subject.setDescription(updatedSubject.getDescription());
@@ -42,13 +62,20 @@ public class SubjectService {
     @Transactional
     public void deactivate(Long id) {
         Subject subject = subjectRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Disciplina não encontrada."));
+                .orElseThrow(() -> new ResourceNotFoundException("Assunto não fora encontrado."));
         subject.setActive(false);
         subject.setModifiedAt(LocalDateTime.now());
         subjectRepository.save(subject);
     }
 
-    public Optional<Subject> findByTittle(String tittle) {
-        return subjectRepository.findByTitle(tittle);
+    @Transactional
+    public void reactivate(Long id) {
+        Subject subject = subjectRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Assunto não fora encontrado"
+                ));
+        subject.setActive(true);
+        subject.setModifiedAt(LocalDateTime.now());
+        subjectRepository.save(subject);
     }
 }
