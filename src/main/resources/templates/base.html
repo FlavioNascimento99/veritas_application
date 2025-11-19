@@ -11,7 +11,7 @@
 <body>
    <header>
       <!-- Example of permanent header of application-->
-      <div th:replace="fragments/header"></div>
+      <div th:replace="~{fragments/header :: header}"></div>
    </header>
 
    <!-- Rotative content -->
@@ -23,7 +23,7 @@
 
    <footer>
       <!-- Example between insert and replace -->
-      <div th:replace="footer"></div>
+      <div th:replace="~{fragments/footer :: footer}"></div>
       <!-- <div th:replace="fragments/scripts :: scripts"></div> -->
    </footer>
 </body>

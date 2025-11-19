@@ -31,10 +31,7 @@ public class HomeController {
       model.addAttribute("pageTitle", "VERITAS - Aplicação de controle e gerenciamento institucional.");
       model.addAttribute("pageDescription", "A melhor aplicação para controle acadêmico ");
       model.addAttribute("activePage", "home");
-      model.addAttribute("mainContent", "pages/index :: content");
-      
-      // Dados Específicos da Homepage da aplicação.
-      // model.addAttributes();
+      model.addAttribute("mainContent", "pages/index :: mainContent");;
 
       // Dados para componentes
       model.addAttribute("heroTitle", "Chega de papelada administrativa...");

@@ -1,5 +1,7 @@
 package br.edu.ifpb.veritas.controllers.web;
 
+import org.springframework.stereotype.Controller;
+
 /**
  * Controlador responsável por controles Administrativos da aplicação.
  * 
@@ -8,7 +10,7 @@ package br.edu.ifpb.veritas.controllers.web;
  *  2. Temas/Assuntos
  *  3. [...] 
  */
-
+@Controller
 public class AdminController {
 
 }

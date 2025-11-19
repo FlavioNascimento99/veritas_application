@@ -54,13 +54,13 @@ public class SubjectAPIController {
     * 1. Ativa
     * 2. Desativa
     */
-   @PatchMapping("/{id}")
+   @PatchMapping("/{id}/inactivate")
    public ResponseEntity<Subject> inactivateSubject(@PathVariable Long id) {
       subjectService.deactivate(id);
       return ResponseEntity.noContent().build();
    }
 
-   @PatchMapping("/{id}")
+   @PatchMapping("/{id}/reactivate")
    public ResponseEntity<Subject> reactivateSubject(@PathVariable Long id) {
       subjectService.reactivate(id);
       return ResponseEntity.noContent().build();
