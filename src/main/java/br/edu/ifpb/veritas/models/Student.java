@@ -2,8 +2,7 @@ package br.edu.ifpb.veritas.models;
 
 import java.util.ArrayList;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +14,18 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @DiscriminatorValue("STUDENT")
-public class Student extends User {
+public class Student {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  private String name;
+  private String phoneNumber;
+  private String register;
+  private String login;
+  private String password;
+
   // Listagem de processos do mesmo poderá ser salvo dentro deste atributo.
   // (Incerto da necessidade)
   private ArrayList<Process> createdProcesses;

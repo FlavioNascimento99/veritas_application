@@ -2,24 +2,28 @@ package br.edu.ifpb.veritas.models;
 
 import java.util.ArrayList;
 
+import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.DiscriminatorOptions;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+@Data
 @Entity
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "tb_professors")
 @DiscriminatorValue("PROFESSOR")
-public class Professor extends User {
+public class Professor {
 
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+  private String name;
+  private String phoneNumber;
+  private String register;
+  private String login;
+  private String password;
+  private boolean isCoordinator;
+
+  // Lista de processos encaminhados pelo professor
   private ArrayList<Process> forwardedProcesses;
-
 }
