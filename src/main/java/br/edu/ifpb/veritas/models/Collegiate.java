@@ -3,34 +3,37 @@ package br.edu.ifpb.veritas.models;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
+@Data
 @Entity
-@Getter
-@Setter
 @AllArgsConstructor
-@Table(name = "collegiate_tb")
+@NoArgsConstructor
+@Table(name = "tb_collegiate")
 public class Collegiate {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long Id;
+  private Long id;
 
   /**
-   * Dentro desse contexto temos "rapporteur" como
-   * o Professor relator do Colegiado.
+   * Rapporteur é o Professor relator do Colegiado.
    */
+  @ManyToOne
+  @JoinColumn(name = "professor_id")
   private Professor rapporteur;
 
-  @ManyToOne
-  private List<Process> processes;
+  /**
+   * Lista de processos relacionados ao Colegiado.
+   * Unidirecional OneToMany com tabela de junção.
+   */
+  @OneToMany
+  @JoinTable(
+          name = "collegiate_processes",
+          joinColumns = @JoinColumn(name = "collegiate_id"),
+          inverseJoinColumns = @JoinColumn(name = "process_id")
+  )
+  private List<Process> processes = new ArrayList<>();
 
-  private LocalDateTime created_at;
+  private LocalDateTime createdAt;
 }

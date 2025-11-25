@@ -13,22 +13,20 @@ package br.edu.ifpb.veritas.models;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import br.edu.ifpb.veritas.enums.MeetingStatus;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "tb_meetings")
 public class Meeting {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;

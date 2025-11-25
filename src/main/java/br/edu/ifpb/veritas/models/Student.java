@@ -13,6 +13,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "tb_students")
 @DiscriminatorValue("STUDENT")
 public class Student {
 
@@ -22,6 +23,7 @@ public class Student {
 
   private String name;
   private String phoneNumber;
+  // Matrícula
   private String register;
   private String login;
   private String password;

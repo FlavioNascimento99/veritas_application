@@ -32,7 +32,6 @@ public class Process {
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private Long id;
 
-
    /**
     * 1. Estudante criador do Processo em questão
     * 2. "Categoria" do Processo
@@ -40,7 +39,6 @@ public class Process {
    @ManyToOne
    @JoinColumn(name = "student_id", nullable = false)
    private Student student;
-
 
    @ManyToOne
    @JoinColumn(name = "subject_id", nullable = false)
