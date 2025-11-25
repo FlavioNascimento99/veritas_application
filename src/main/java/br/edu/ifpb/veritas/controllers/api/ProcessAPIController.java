@@ -61,4 +61,6 @@ public class ProcessAPIController {
       Process updatedProcess = processService.distribute(processId, professorId);
       return ResponseEntity.ok(updatedProcess);
    }
+
+
 }

@@ -64,6 +64,9 @@ public class SubjectAPIController {
    public ResponseEntity<Subject> reactivateSubject(@PathVariable Long id) {
       subjectService.reactivate(id);
       return ResponseEntity.noContent().build();
-   } 
+   }
+
+   // A partir daqui iremos colocar
+   // os requisitos específicos do projeto
 
 }
