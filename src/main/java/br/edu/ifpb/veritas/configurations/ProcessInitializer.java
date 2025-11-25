@@ -27,7 +27,7 @@ import br.edu.ifpb.veritas.repositories.ProcessRepository;
 import br.edu.ifpb.veritas.repositories.ProfessorRepository;
 import br.edu.ifpb.veritas.repositories.StudentRepository;
 import br.edu.ifpb.veritas.repositories.SubjectRepository;
-import br.edu.ifpb.veritas.repositories.UserRepository;
+import br.edu.ifpb.veritas.repositories.AdminRepository;
 
 @Component
 public class ProcessInitializer implements CommandLineRunner {
@@ -35,8 +35,8 @@ public class ProcessInitializer implements CommandLineRunner {
   @Autowired
   private ProcessRepository processRepository;
 
-  @Autowired
-  private UserRepository userRepository;
+//  @Autowired
+//  private AdminRepository userRepository;
 
   @Autowired
   private ProfessorRepository professorRepository;
@@ -51,7 +51,6 @@ public class ProcessInitializer implements CommandLineRunner {
   public void run(String... args) throws Exception {
     processObjectExampleChecker();
   }
-
 
   /** 
    * Checa a existência da entidade exemplo dentro do Banco
@@ -91,7 +90,7 @@ public class ProcessInitializer implements CommandLineRunner {
           newStudent.setRegister("000000");
           newStudent.setLogin("student@veritas");
           newStudent.setPassword("senhasegura123");
-          newStudent.setRole(UserRole.ESTUDANTE);
+          // newStudent.setRole(UserRole.ESTUDANTE);
           
           return studentRepository.save(newStudent);
         });
@@ -102,7 +101,7 @@ public class ProcessInitializer implements CommandLineRunner {
           newProfessor.setName("Professor Exemplo");
           newProfessor.setRegister("000000");
           newProfessor.setLogin(title);
-          newProfessor.setRole(UserRole.PROFESSOR);
+          // newProfessor.setRole(UserRole.PROFESSOR);
 
           return professorRepository.save(newProfessor);
         });

@@ -13,19 +13,22 @@
 
 package br.edu.ifpb.veritas.configurations;
 
+import br.edu.ifpb.veritas.models.Administrator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import br.edu.ifpb.veritas.enums.UserRole;
 import br.edu.ifpb.veritas.models.User;
-import br.edu.ifpb.veritas.repositories.UserRepository;
+import br.edu.ifpb.veritas.repositories.AdminRepository;
 
 @Component
 public class AdminInitializer implements CommandLineRunner {
 
+  // @Autowired
+  // private UserRepository userRepository;
   @Autowired
-  private UserRepository userRepository;
+  private AdminRepository adminRepository;
 
   @Override
   public void run(String... args) throws Exception {
@@ -33,25 +36,25 @@ public class AdminInitializer implements CommandLineRunner {
   }
 
   private void adminObjectExampleChecker() {
-
     String adminLoginExample = "admin@veritas";
     
-    userRepository.findByLogin(adminLoginExample)
+    adminRepository.findByLogin(adminLoginExample)
         .ifPresentOrElse(
             user  -> System.out.println("Usuário Administrativo já existe!"),
             ()    -> adminObjectExampleChecker(adminLoginExample));
   }
 
   private void adminObjectExampleChecker(String adminLogin) {
-    User admin = new User();
+    // User admin = new User();
+    Administrator admin = new Administrator();
     
     admin.setName("Administrador Exemplo");
     admin.setLogin(adminLogin);
     admin.setRegister("010101");
     admin.setPassword("senhasegura123");
-    admin.setRole(UserRole.ADMIN);
+    // admin.setRole(UserRole.ADMIN);
 
-    userRepository.save(admin);
+    adminRepository.save(admin);
     System.out.println("Usuário Administrador fora criado [" + admin.getLogin() + "] - [" + admin.getPassword() + "]");
   }
 }
