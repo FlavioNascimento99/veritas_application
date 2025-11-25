@@ -9,16 +9,15 @@ import br.edu.ifpb.veritas.models.Process;
 import br.edu.ifpb.veritas.models.Professor;
 import br.edu.ifpb.veritas.models.Student;
 import br.edu.ifpb.veritas.models.Subject;
-import br.edu.ifpb.veritas.repositories.ProcessRepository;
-import br.edu.ifpb.veritas.repositories.StudentRepository;
-import br.edu.ifpb.veritas.repositories.SubjectRepository;
-import br.edu.ifpb.veritas.repositories.UserRepository;
+import br.edu.ifpb.veritas.repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,18 +25,15 @@ import java.util.stream.Collectors;
 public class ProcessService {
 
     private final ProcessRepository processRepository;
-    private final UserRepository userRepository;
     private final SubjectRepository subjectRepository;
     private final StudentRepository studentRepository;
+    private final ProfessorRepository professorRepository;
 
+    // REQFUNC 1?
     @Transactional
     public Process create(Process process, Long studentId) {
-        var user = userRepository.findById(studentId)
+        Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudante não encontrado."));
-        if (!(user instanceof Student)) {
-            throw new ResourceNotFoundException("Usuário não é um estudante.");
-        }
-        Student student = (Student) user;
 
         if (process.getSubject() == null || process.getSubject().getId() == null) {
             throw new ResourceNotFoundException("Disciplina não informada.");
@@ -69,12 +65,8 @@ public class ProcessService {
         Process process = processRepository.findById(processId)
                 .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado."));
 
-        var user = userRepository.findById(professorId)
+        Professor professor = professorRepository.findById(professorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado."));
-        if (!(user instanceof Professor)) {
-            throw new ResourceNotFoundException("Usuário não é um professor.");
-        }
-        Professor professor = (Professor) user;
 
         process.setProfessor(professor);
         process.setStatus(StatusProcess.UNDER_ANALISYS);
@@ -82,4 +74,40 @@ public class ProcessService {
 
         return processRepository.save(process);
     }
+
+    // Estava me questionando se faz
+    // mais sentido deixar aqui mesmo
+    // ou em StudentService
+    public List<Process> listByStudentFiltered(Long studentId, String status, Long subjectId, String sort) {
+        List<Process> list = processRepository.findByStudentId(studentId);
+
+        if (status != null && !status.isBlank()) {
+            final StatusProcess statusEnum;
+            try {
+                statusEnum = StatusProcess.valueOf(status.trim());
+            } catch (IllegalArgumentException ex) {
+                throw new ResourceNotFoundException("Status inválido.");
+            }
+            list = list.stream()
+                    .filter(p -> p.getStatus() == statusEnum)
+                    .collect(Collectors.toList());
+        }
+
+        if (subjectId != null) {
+            list = list.stream()
+                    .filter(p -> p.getSubject() != null && Objects.equals(p.getSubject().getId(), subjectId))
+                    .collect(Collectors.toList());
+        }
+
+        Comparator<Process> comp = Comparator.comparing(Process::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder()));
+        if (sort != null && sort.equalsIgnoreCase("asc")) {
+            list = list.stream().sorted(comp).collect(Collectors.toList());
+        } else {
+            // padrão desc
+            list = list.stream().sorted(comp.reversed()).collect(Collectors.toList());
+        }
+
+        return list;
+    }
+
 }
