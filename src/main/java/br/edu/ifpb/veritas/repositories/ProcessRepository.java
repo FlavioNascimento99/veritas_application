@@ -10,7 +10,9 @@ import org.springframework.data.repository.query.Param;
 
 import br.edu.ifpb.veritas.enums.StatusProcess;
 import br.edu.ifpb.veritas.models.Process;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface ProcessRepository extends JpaRepository<Process, Long> {
   List<Process> findByStudentId(Long studentId);
 
