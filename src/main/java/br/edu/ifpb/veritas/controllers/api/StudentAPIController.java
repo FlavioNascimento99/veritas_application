@@ -41,9 +41,15 @@ public class StudentAPIController {
         return ResponseEntity.ok(studentService.update(id, student));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        studentService.delete(id);
+    @PatchMapping("/{id}/desactivate")
+    public ResponseEntity<Void> desactivate(@PathVariable Long id) {
+        studentService.desactivate(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/reactivate")
+    public ResponseEntity<Void> reactivate(@PathVariable Long id) { 
+        studentService.reactivate(id);
         return ResponseEntity.noContent().build();
     }
 

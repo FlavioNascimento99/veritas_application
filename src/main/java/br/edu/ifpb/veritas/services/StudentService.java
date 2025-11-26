@@ -47,12 +47,30 @@ public class StudentService {
         return studentRepository.save(currentStudent);
     }
 
+
+    /**
+     * Não deletaremos nenhum tipo de informação, seja lá qual for.
+     * Todos os dados que irão compor o sistema deve ser considerado 
+     * 'sensível'.
+     * 
+     * Métodos de alteração de estado.
+     */
     @Transactional
-    public void delete(Long id) {
+    public void desactivate(Long id) {
         Student currentStudent = findById(id);
-        studentRepository.delete(currentStudent);
+        currentStudent.setIsActive(false);
+        studentRepository.save(currentStudent);
     }
 
+
+    @Transactional
+    public void reactivate(Long id) {
+        Student currentStudent = findById(id);
+        if (!currentStudent.getIsActive()) {
+            currentStudent.setIsActive(true);
+        }
+        studentRepository.save(currentStudent);
+    }
     // A partir daqui irei colocar
     // os requisitos específicos do projeto
 

@@ -31,5 +31,6 @@ public class Student {
   // Listagem de processos do mesmo poderá ser salvo dentro deste atributo.
   // (Incerto da necessidade)
   private ArrayList<Process> createdProcesses;
+  private Boolean isActive = true;
 
 }
