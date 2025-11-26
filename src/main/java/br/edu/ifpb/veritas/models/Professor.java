@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.DiscriminatorOptions;
+
 
 @Data
 @Entity

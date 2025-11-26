@@ -3,6 +3,7 @@ package br.edu.ifpb.veritas.models;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,6 +34,6 @@ public class Subject {
    @CreationTimestamp
    private LocalDateTime createdAt;
 
-   @CreationTimestamp
+   @UpdateTimestamp
    private LocalDateTime modifiedAt;
 }

@@ -18,7 +18,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import br.edu.ifpb.veritas.enums.StatusProcess;
-import br.edu.ifpb.veritas.enums.UserRole;
 import br.edu.ifpb.veritas.models.Process;
 import br.edu.ifpb.veritas.models.Professor;
 import br.edu.ifpb.veritas.models.Student;
@@ -27,7 +26,6 @@ import br.edu.ifpb.veritas.repositories.ProcessRepository;
 import br.edu.ifpb.veritas.repositories.ProfessorRepository;
 import br.edu.ifpb.veritas.repositories.StudentRepository;
 import br.edu.ifpb.veritas.repositories.SubjectRepository;
-import br.edu.ifpb.veritas.repositories.AdminRepository;
 
 @Component
 public class ProcessInitializer implements CommandLineRunner {

@@ -30,6 +30,7 @@ public class SubjectAPIController {
     */
    @PostMapping
    public ResponseEntity<Subject> createSubject(@RequestBody Subject subject) {
+      ResponseEntity.ok("All done folk");
       return ResponseEntity.ok(subjectService.createSubject(subject));
    }
 

@@ -6,7 +6,6 @@ import br.edu.ifpb.veritas.repositories.SubjectRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -43,7 +42,7 @@ public class SubjectService {
      */
     @Transactional
     public Subject createSubject(Subject subject) {
-        if (subjectRepository.findById(subject.getId()).isPresent()) {
+        if (subjectRepository.findByTitle(subject.getTitle()).isPresent()) {
             throw new ResourceNotFoundException("Disciplina já cadastrada.");
         };
         return subjectRepository.save(subject);

@@ -18,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import br.edu.ifpb.veritas.enums.UserRole;
-import br.edu.ifpb.veritas.models.User;
 import br.edu.ifpb.veritas.repositories.AdminRepository;
 
 @Component

@@ -11,9 +11,6 @@
 package br.edu.ifpb.veritas.models;
 
 import java.time.LocalDateTime;
-import java.util.List;
-
-import br.edu.ifpb.veritas.enums.MeetingStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
