@@ -23,6 +23,7 @@ public class Professor {
   private String login;
   private String password;
   private boolean isCoordinator;
+  private boolean isActive = true;
 
   // Lista de processos encaminhados pelo professor
   private ArrayList<Process> forwardedProcesses;

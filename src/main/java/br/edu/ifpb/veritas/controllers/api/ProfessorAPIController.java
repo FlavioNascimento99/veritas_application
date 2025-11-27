@@ -27,7 +27,7 @@ public class ProfessorAPIController {
     }
 
     @GetMapping
-    public ResponseEntity<java.util.List<Professor>> findAll() {
+    public ResponseEntity<List<Professor>> findAll() {
         return ResponseEntity.ok(professorService.findAll());
     }
 
@@ -41,9 +41,15 @@ public class ProfessorAPIController {
         return ResponseEntity.ok(professorService.update(id, professor));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        professorService.delete(id);
+    @PatchMapping("/{id}/deactivate")
+    public ResponseEntity<Void> deactivate(@PathVariable Long id) {
+        professorService.deactivate(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/reactivate")
+    public ResponseEntity<Void> reactivate(@PathVariable Long id) {
+        professorService.reactivate(id);
         return ResponseEntity.noContent().build();
     }
 
