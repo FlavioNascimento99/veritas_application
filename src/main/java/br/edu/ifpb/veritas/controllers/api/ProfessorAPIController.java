@@ -1,24 +1,43 @@
+/**
+ * Rest Controller de Professores
+ * 
+ * Rotas existentes, validadas e testadas:
+ *  1. Criação                          OK
+ *  2. Listagem Geral                   OK
+ *  3. Busca por unicidade              OK
+ *  4. Alteração de Propriedades        
+ *  5. Mudança de Estado
+ *      5.1. "Desativação" de Objeto
+ *      5.2. "Reativação" de Objeto
+ * 
+ *  6. Implementação de Requisito funcional
+*      Listagem de Processos anexados a determinado Professor.
+ */
+
 package br.edu.ifpb.veritas.controllers.api;
 
 import br.edu.ifpb.veritas.models.Process;
 import br.edu.ifpb.veritas.models.Professor;
 import br.edu.ifpb.veritas.services.ProcessService;
 import br.edu.ifpb.veritas.services.ProfessorService;
+import io.micrometer.core.ipc.http.HttpSender.Response;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/api/professors")
-@RequiredArgsConstructor
 public class ProfessorAPIController {
 
-    private final ProfessorService professorService;
-    private final ProcessService processService;
+    @Autowired
+    private ProfessorService professorService;
+    
+    @Autowired
+    private ProcessService processService;
 
     @PostMapping
     public ResponseEntity<Professor> create(@Valid @RequestBody Professor professor) {
@@ -41,22 +60,21 @@ public class ProfessorAPIController {
         return ResponseEntity.ok(professorService.update(id, professor));
     }
 
-    @PatchMapping("/{id}/deactivate")
+    @PatchMapping("/{id}/coordinatorState")
+    public ResponseEntity<Professor> setAsCoordinator(@PathVariable Long id) {
+        professorService.coordinatorStateChanger(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/activeState")
     public ResponseEntity<Void> deactivate(@PathVariable Long id) {
-        professorService.deactivate(id);
+        professorService.activeStateChanger(id);
         return ResponseEntity.noContent().build();
     }
-
-    @PatchMapping("/{id}/reactivate")
-    public ResponseEntity<Void> reactivate(@PathVariable Long id) {
-        professorService.reactivate(id);
-        return ResponseEntity.noContent().build();
-    }
-
 
     // REQFUNC 3: professor consulta todos os processos designados a ele
     @GetMapping("/{id}/processes")
-    public ResponseEntity<List<br.edu.ifpb.veritas.models.Process>> getAssignedProcesses(@PathVariable("id") Long professorId) {
+    public ResponseEntity<List<Process>> getAssignedProcesses(@PathVariable("id") Long professorId) {
         List<Process> processes = processService.listByProfessor(professorId);
         return ResponseEntity.ok(processes);
     }

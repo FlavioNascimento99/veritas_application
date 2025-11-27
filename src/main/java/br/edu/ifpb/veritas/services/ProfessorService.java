@@ -48,20 +48,16 @@ public class ProfessorService {
     }
 
     @Transactional
-    public void deactivate(Long id) {
+    public void activeStateChanger(Long id) {
         Professor currentProfessor = findById(id);
-        if(currentProfessor.isActive()) {
-            currentProfessor.setActive(false);
-        }
+        currentProfessor.setActive(!currentProfessor.isActive());
         professorRepository.save(currentProfessor);
     }
 
     @Transactional
-    public void reactivate(Long id) {
+    public void coordinatorStateChanger(Long id) {
         Professor currentProfessor = findById(id);
-        if (!currentProfessor.isActive()) {
-            currentProfessor.setActive(true);
-        }
+        currentProfessor.setCoordinator(!currentProfessor.isCoordinator());
         professorRepository.save(currentProfessor);
     }
 }

@@ -1,12 +1,13 @@
 package br.edu.ifpb.veritas.models;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 
-@Data
+@Setter
+@Getter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,6 +18,7 @@ public class Professor {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+  
   private String name;
   private String phoneNumber;
   private String register;
@@ -25,6 +27,14 @@ public class Professor {
   private boolean isCoordinator;
   private boolean isActive = true;
 
-  // Lista de processos encaminhados pelo professor
-  private ArrayList<Process> forwardedProcesses;
+  /**
+   * Listagem de Processos anexados ao professor. 
+   * 
+   * Nov Substituição de tipagem de ArrayList para List
+   * Spring tenta utilizar PersistentBag mas não consegue
+   * lidar com listas dinâmicas tão bem quanto listas de 
+   * tamanho pre-definido.
+   */
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Process> forwardedProcesses;
 }
