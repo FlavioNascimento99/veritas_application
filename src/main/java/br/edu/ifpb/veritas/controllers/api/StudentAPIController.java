@@ -5,20 +5,22 @@ import br.edu.ifpb.veritas.models.Student;
 import br.edu.ifpb.veritas.services.ProcessService;
 import br.edu.ifpb.veritas.services.StudentService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/api/students")
-@RequiredArgsConstructor
 public class StudentAPIController {
 
-    private final StudentService studentService;
-    private final ProcessService processService;
+    @Autowired
+    private StudentService studentService;
+    
+    @Autowired
+    private ProcessService processService;
 
     @PostMapping
     public ResponseEntity<Student> create(@Valid @RequestBody Student student) {

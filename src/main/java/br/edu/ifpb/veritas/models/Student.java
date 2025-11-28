@@ -1,6 +1,7 @@
 package br.edu.ifpb.veritas.models;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,7 +14,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "tb_students")
+@Table(name = "TB_STUDENT")
 @DiscriminatorValue("STUDENT")
 public class Student {
 
@@ -27,10 +28,14 @@ public class Student {
   private String register;
   private String login;
   private String password;
-
-  // Listagem de processos do mesmo poderá ser salvo dentro deste atributo.
-  // (Incerto da necessidade)
-  private ArrayList<Process> createdProcesses;
+  /** 
+   *    Necessário trocar de arraylist por list, vista o problema com valor       fixo entregue por arraylist 
+   *  Listagem de processos do mesmo poderá ser salvo dentro deste atributo.
+   *  (Incerto da necessidade)
+  */
+  @OneToMany
+  @JoinColumn(name="CREATED_PROCESSES")
+  private List<Process> createdProcesses;
   private Boolean isActive = true;
 
 }

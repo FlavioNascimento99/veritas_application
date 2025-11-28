@@ -10,30 +10,26 @@ import lombok.*;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "tb_collegiate")
+@Table(name = "TB_COLLEGIATE")
 public class Collegiate {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
+  
   /**
-   * Rapporteur é o Professor relator do Colegiado.
+   * Rapporteur é o Professor/Relator do Processo.
+   * Criada uma tabela com o ID do Professor em questão.
    */
   @ManyToOne
-  @JoinColumn(name = "professor_id")
+  @JoinColumn(name = "PROFESSOR_ID")
   private Professor rapporteur;
 
   /**
-   * Lista de processos relacionados ao Colegiado.
-   * Unidirecional OneToMany com tabela de junção.
+   * Listagem de processos sob análise pelo colegiado.
+   * mappedBy refere ao atributo de mesmo nome em Process
    */
-  @OneToMany
-  @JoinTable(
-          name = "collegiate_processes",
-          joinColumns = @JoinColumn(name = "collegiate_id"),
-          inverseJoinColumns = @JoinColumn(name = "process_id")
-  )
-  private List<Process> processes = new ArrayList<>();
+  @OneToMany(mappedBy="collegiate")
+  private List<Process> processes;
 
   private LocalDateTime createdAt;
 }

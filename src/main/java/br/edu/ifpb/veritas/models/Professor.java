@@ -19,13 +19,18 @@ public class Professor {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   
+  /**
+   * Required fields for Postman test
+   */
   private String name;
   private String phoneNumber;
   private String register;
   private String login;
   private String password;
-  private boolean isCoordinator;
-  private boolean isActive = true;
+
+
+  private boolean isCoordinator = false;
+  private boolean isActive      = true;
 
   /**
    * Listagem de Processos anexados ao professor. 

@@ -15,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,48 +34,65 @@ public class Process {
    private Long id;
 
    /**
-    * 1. Estudante criador do Processo em questão
-    * 2. "Categoria" do Processo
+    * Log 1: Estudante que criara o processo em questão.
+    * 
+    * O Processo poderá apenas ser criado por um único
+    * Estudante.
     */
-   @ManyToOne
-   @JoinColumn(name = "student_id", nullable = false)
+   @OneToOne
+   @JoinColumn(name = "PROCESS_STUDENT_ID", nullable = false)
    private Student student;
 
-   @ManyToOne
-   @JoinColumn(name = "subject_id", nullable = false)
+   /**
+    * Log 1: Assim como o estudante emissor do processo, 
+    * para o mesmo, será interessante que possua apenas
+    * um "tema".
+    * 
+    * Não existe processo de "N" tipos/temática.
+    */
+   @OneToOne
+   @JoinColumn(name = "PROCESS_SUBJECT_ID", nullable = false)
    private Subject subject;
 
 
    /**
-    * Professor dentro desse contexto trata-se
-    * de Relator, se sentirem necessidade de 
-    * alterar o identificador, tudo bem.
+    * Log 1: Seguinte, pra mim é "One-To-One", visto que,
+    * existirá, o que aqui refere-se, relator do processo.
+    * 
+    * O relator do processo será também único, porém, nullable
+    * já que no momento inicial, "não existirá".
     */
-   @ManyToOne
-   @JoinColumn(name = "professor_id")
+   @OneToOne
+   @JoinColumn(name = "PROCESS_RAPPORTEUR_ID", nullable=true)
    private Professor professor;
 
 
 
    /** 
-    * Criação de uma tabela intermediária    
-    * para listagem dos professores presentes
-    * no processo dentro de uma tabela.
+    * Relacionamento Many-To-One vem pelo fato de
+    * que teremos um Collegiate com N Processes.
     */
-   @OneToMany
-   @JoinTable(
-      name = "process_validation_committee",
-      joinColumns =  @JoinColumn(name = "process_id"),
-      inverseJoinColumns = @JoinColumn(name = "professor_id")
-   )
-   private List<Professor> validationCommittee;
+   @ManyToOne
+   @JoinColumn(name="COLLEGIATE_ID", nullable=true)
+   private Collegiate collegiate;
 
+
+   /**
+    * 
+    */
    @Enumerated(EnumType.STRING)
    private StatusProcess status;
-   private String title;
    
-   @Column(columnDefinition = "TEXT")
+   
+   /**
+    * Informações básicas estruturais da classe
+    */
+   private String title; 
    private String description;
+
+   /**
+    * 
+    */
    private String validation;
 
    private LocalDateTime createdAt;

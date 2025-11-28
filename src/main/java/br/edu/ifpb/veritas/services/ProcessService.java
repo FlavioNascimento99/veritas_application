@@ -31,16 +31,17 @@ public class ProcessService {
 
     // REQFUNC 1?
     @Transactional
-    public Process create(Process process, Long studentId) {
+    public Process create(Process process, Long studentId, Long subjectId) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudante não encontrado."));
 
-        if (process.getSubject() == null || process.getSubject().getId() == null) {
-            throw new ResourceNotFoundException("Disciplina não informada.");
-        }
-        Subject subject = subjectRepository.findById(process.getSubject().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Disciplina não encontrada."));
-
+        Subject subject = subjectRepository.findById(subjectId)
+            .orElseThrow(() -> new ResourceNotFoundException("Disciplina não encontrada."));
+            
+        // if (process.getSubject() == null || process.getSubject().getId() == null) {
+        //     throw new ResourceNotFoundException("Disciplina não informada.");
+        // }
+ 
         Process newProcess = new Process();
         newProcess.setStudent(student);
         newProcess.setSubject(subject);
