@@ -17,12 +17,10 @@ public class Collegiate {
   private Long id;
   
   /**
-   * Rapporteur é o Professor/Relator do Processo.
-   * Criada uma tabela com o ID do Professor em questão.
+   * Lista de professores que compõem o colegiado
    */
-  @ManyToOne
-  @JoinColumn(name = "PROFESSOR_ID")
-  private Professor rapporteur;
+  @ManyToMany
+  private List<Professor> professores;
 
   /**
    * Listagem de processos sob análise pelo colegiado.

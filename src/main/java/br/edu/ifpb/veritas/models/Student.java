@@ -1,3 +1,4 @@
+
 package br.edu.ifpb.veritas.models;
 
 import java.util.ArrayList;
