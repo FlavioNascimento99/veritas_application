@@ -11,13 +11,19 @@
 package br.edu.ifpb.veritas.models;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+import br.edu.ifpb.veritas.enums.MeetingStatus;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -37,13 +43,7 @@ public class Meeting {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  /**
-   * Deveríamos ter um título? pensando sobre
-   * poderíamos nomear, partindo do presuposto
-   * de que, podemos ou não buscar por determinadas
-   * reuniões, que não soa muito lógico pra mim
-   */
-
+  
   // private String title = LocalDateTime.now();
 
   @ManyToOne
@@ -56,6 +56,28 @@ public class Meeting {
    */
   @OneToMany(mappedBy="collegiate")
   private List<Process> processes;
+
+  // Professores participantes (subset dos membros do colegiado)
+  @ManyToMany
+  @JoinTable(
+        name = "reuniao_professores",
+        joinColumns = @JoinColumn(name = "reuniao_id"),
+        inverseJoinColumns = @JoinColumn(name = "professor_id")
+    )
+  private List<Professor> membrosPresentes = new ArrayList<>();
+
+  // Processos colocados na pauta da reunião
+  @ManyToMany
+  @JoinTable(
+        name = "reuniao_pauta",
+        joinColumns = @JoinColumn(name = "reuniao_id"),
+        inverseJoinColumns = @JoinColumn(name = "processo_id")
+    )
+  private List<Process> pauta = new ArrayList<>();
+
+  @Enumerated(EnumType.STRING)
+  private MeetingStatus status;
+
 
   private LocalDateTime createdAt;
   private LocalDateTime modifiedAt;
