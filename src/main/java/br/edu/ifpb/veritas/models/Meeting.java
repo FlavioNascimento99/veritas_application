@@ -11,7 +11,16 @@
 package br.edu.ifpb.veritas.models;
 
 import java.time.LocalDateTime;
-import jakarta.persistence.*;
+import java.util.List;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,9 +46,16 @@ public class Meeting {
 
   // private String title = LocalDateTime.now();
 
-  @OneToOne
+  @ManyToOne
   @JoinColumn(name = "collegiate_id")
   private Collegiate collegiate;
+
+  /**
+   * Listagem de processos sob análise pela Reunião.
+   * mappedBy refere ao atributo de mesmo nome em Process
+   */
+  @OneToMany(mappedBy="collegiate")
+  private List<Process> processes;
 
   private LocalDateTime createdAt;
   private LocalDateTime modifiedAt;

@@ -22,12 +22,7 @@ public class Collegiate {
   @ManyToMany
   private List<Professor> professores;
 
-  /**
-   * Listagem de processos sob análise pelo colegiado.
-   * mappedBy refere ao atributo de mesmo nome em Process
-   */
-  @OneToMany(mappedBy="collegiate")
-  private List<Process> processes;
+  
 
   private LocalDateTime createdAt;
 }
