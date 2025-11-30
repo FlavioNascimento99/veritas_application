@@ -88,7 +88,4 @@ public class Process {
 // @JoinColumn(name="COLLEGIATE_ID", nullable=true)
 // private Collegiate collegiate;
 
-   @ManyToMany(mappedBy = "processes")
-   private List<Meeting> meetings = new ArrayList<>();
-
 }
