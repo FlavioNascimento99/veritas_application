@@ -56,7 +56,7 @@ public class Process {
     *
     * Não existe processo de "N" tipos/temática.
     */
-   @OneToOne
+   @ManyToOne
    @JoinColumn(name = "PROCESS_SUBJECT_ID", nullable = false)
    private Subject subject;
 

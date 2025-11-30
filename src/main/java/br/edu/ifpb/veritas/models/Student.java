@@ -46,5 +46,5 @@ public class Student {
   private List<Process> interestedStudent; // interessado em processos
 
   @OneToOne(mappedBy = "representativeStudent")
-  private Collegiate representativeStudent;
+  private Collegiate representativeCollegiate;
 }

@@ -1,18 +1,14 @@
 package br.edu.ifpb.veritas.models;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,4 +35,7 @@ public class Subject {
 
    @UpdateTimestamp
    private LocalDateTime modifiedAt;
+
+   @OneToMany(mappedBy = "subject")
+   private List<Process> processes;
 }
