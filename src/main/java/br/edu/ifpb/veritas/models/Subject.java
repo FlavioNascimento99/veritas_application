@@ -2,6 +2,8 @@ package br.edu.ifpb.veritas.models;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -18,6 +20,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "tb_subjects")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Subject {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
