@@ -1,8 +1,10 @@
 package br.edu.ifpb.veritas.models;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+import br.edu.ifpb.veritas.enums.DecisionType;
 import br.edu.ifpb.veritas.enums.StatusProcess;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -39,6 +41,9 @@ public class Process {
    @Enumerated(EnumType.STRING)
    private StatusProcess status;
 
+   @Column(name = "rapporteurVote")
+   private DecisionType rapporteurVote;
+
    /**
     * Log 1: Estudante que criara o processo em questão.
     *
@@ -58,7 +63,7 @@ public class Process {
     */
    @ManyToOne
    @JoinColumn(name = "PROCESS_SUBJECT_ID", nullable = false)
-   private Subject subject;
+   private Subject subject ;
 
    /**
     * Log 1: Seguinte, pra mim é "One-To-One", visto que,
@@ -68,11 +73,11 @@ public class Process {
     * já que no momento inicial, "não existirá".
     */
    @ManyToOne
-   @JoinColumn(name = "professor_relator_id", nullable=true)
+   @JoinColumn(name = "professor_relator_id", nullable= true)
    private Professor professor; // professor relator
 
    @OneToMany(mappedBy = "process", cascade = CascadeType.ALL)
-   private List<Vote> votes; // Votos dos membros do colegiado neste process
+   private List<Vote> votes = new ArrayList<>(); // Votos dos membros do colegiado neste process
 
    /**
     * Relacionamento Many-To-One vem pelo fato de
@@ -82,5 +87,8 @@ public class Process {
 // @ManyToOne
 // @JoinColumn(name="COLLEGIATE_ID", nullable=true)
 // private Collegiate collegiate;
+
+   @ManyToMany(mappedBy = "processes")
+   private List<Meeting> meetings = new ArrayList<>();
 
 }
