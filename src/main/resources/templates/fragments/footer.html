@@ -1,0 +1,77 @@
+<footer class="bg-gray-800 text-white" th:fragment="footer">
+    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Brand -->
+            <div class="space-y-4">
+                <div class="flex items-center">
+                    <i class="fas fa-rocket text-2xl text-indigo-400 mr-2"></i>
+                    <span class="text-xl font-bold">VERITAS Application</span>
+                </div>
+                <p class="text-gray-300 text-sm">
+                    Transformando ideias em realidade digital desde 2025.
+                </p>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-300 hover:text-white transition duration-300">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="text-gray-300 hover:text-white transition duration-300">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-300 hover:text-white transition duration-300">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="text-gray-300 hover:text-white transition duration-300">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Links -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold">Links Rápidos</h3>
+                <ul class="space-y-2">
+                    <li>
+                        <a th:href="@{/}" class="text-gray-300 hover:text-white transition duration-300 text-sm">
+                            Home
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/about}" class="text-gray-300 hover:text-white transition duration-300 text-sm">
+                            Sobre Mim
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/contact}" class="text-gray-300 hover:text-white transition duration-300 text-sm">
+                            Contato
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Contato -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold">Contato</h3>
+                <div class="space-y-2 text-sm text-gray-300">
+                    <p class="flex items-center">
+                        <i class="fas fa-envelope mr-2 text-indigo-400"></i>
+                        contato.nascimento.dev@gmail.com
+                    </p>
+                    <p class="flex items-center">
+                        <i class="fas fa-phone mr-2 text-indigo-400"></i>
+                        (11) 99999-9999
+                    </p>
+                    <p class="flex items-center">
+                        <i class="fas fa-map-marker-alt mr-2 text-indigo-400"></i>
+                        João Pessoa, Paraíba - Brasil
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+            <p class="text-gray-300 text-sm">
+                &copy; <span th:text="${#dates.year(#dates.createNow())}">2025</span> Veritas App. Todos os direitos reservados.
+            </p>
+        </div>
+    </div>
+</footer>

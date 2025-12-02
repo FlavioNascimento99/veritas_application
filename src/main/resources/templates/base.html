@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title th:text="${pageTitle ?: 'Veritas Application'}">Veritas Application - Homepage</title>
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body>
+   <header>
+      <!-- Example of permanent header of application-->
+      <div th:replace="~{fragments/header :: header}"></div>
+   </header>
+
+   <!-- Rotative content -->
+   <main role="main">
+      <!-- Initial Application Load starts here. -->
+      <div th:replace="__${mainContent}__">
+      </div>
+   </main>
+
+   <footer>
+      <!-- Example between insert and replace -->
+      <div th:replace="~{fragments/footer :: footer}"></div>
+      <!-- <div th:replace="fragments/scripts :: scripts"></div> -->
+   </footer>
+</body>
+</html>

@@ -1,0 +1,82 @@
+/**
+ * Rest Controller de Professores
+ * 
+ * Rotas existentes, validadas e testadas:
+ *  1. Criação                          OK
+ *  2. Listagem Geral                   OK
+ *  3. Busca por unicidade              OK
+ *  4. Alteração de Propriedades        
+ *  5. Mudança de Estado
+ *      5.1. "Desativação" de Objeto
+ *      5.2. "Reativação" de Objeto
+ * 
+ *  6. Implementação de Requisito funcional
+*      Listagem de Processos anexados a determinado Professor.
+ */
+
+package br.edu.ifpb.veritas.controllers.api;
+
+import br.edu.ifpb.veritas.models.Process;
+import br.edu.ifpb.veritas.models.Professor;
+import br.edu.ifpb.veritas.services.ProcessService;
+import br.edu.ifpb.veritas.services.ProfessorService;
+import io.micrometer.core.ipc.http.HttpSender.Response;
+import jakarta.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/professors")
+public class ProfessorAPIController {
+
+    @Autowired
+    private ProfessorService professorService;
+    
+    @Autowired
+    private ProcessService processService;
+
+    @PostMapping
+    public ResponseEntity<Professor> create(@Valid @RequestBody Professor professor) {
+        professorService.create(professor);
+        return ResponseEntity.ok(professor);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Professor>> findAll() {
+        return ResponseEntity.ok(professorService.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Professor> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(professorService.findById(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Professor> update(@PathVariable Long id, @RequestBody Professor professor) {
+        return ResponseEntity.ok(professorService.update(id, professor));
+    }
+
+    @PatchMapping("/{id}/coordinatorState")
+    public ResponseEntity<Professor> setAsCoordinator(@PathVariable Long id) {
+        professorService.coordinatorStateChanger(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/activeState")
+    public ResponseEntity<Void> deactivate(@PathVariable Long id) {
+        professorService.activeStateChanger(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // REQFUNC 3: professor consulta todos os processos designados a ele
+    @GetMapping("/{id}/processes")
+    public ResponseEntity<List<Process>> getAssignedProcesses(@PathVariable("id") Long professorId) {
+        List<Process> processes = processService.listByProfessor(professorId);
+        return ResponseEntity.ok(processes);
+    }
+
+}
