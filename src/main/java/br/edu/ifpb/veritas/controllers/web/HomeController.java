@@ -39,7 +39,7 @@ public class HomeController {
       model.addAttribute("heroBtntext", "Entrar");
       model.addAttribute("heroBtnUrl", "/login");
 
-      return "base";
+      return "home";
    }
 
    @GetMapping("/login")
@@ -47,7 +47,7 @@ public class HomeController {
       model.addAttribute("pageTitle", "Login");
       model.addAttribute("activePage", "login");
       model.addAttribute("mainContent", "pages/login :: content");
-      return "base";
+      return "home";
    }
 
    @GetMapping("/contact")
@@ -55,7 +55,7 @@ public class HomeController {
       model.addAttribute("pageTitle", "Contato");
       model.addAttribute("activePage", "contact"); 
       model.addAttribute("mainContent", "pages/contact :: content");
-      return "base";
+      return "home";
    }
 
    @GetMapping("/about")
@@ -63,7 +63,7 @@ public class HomeController {
       model.addAttribute("pageTitle", "Sobre");
       model.addAttribute("activePage", "about");
       model.addAttribute("mainContent", "pages/about :: content");
-      return "base";
+      return "home";
    }
 }
 
