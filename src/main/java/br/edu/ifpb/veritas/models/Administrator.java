@@ -23,4 +23,7 @@ public class Administrator {
     private String register;
     private String login;
     private String password;
+
+    // Para não ter que excluir o admin
+    private Boolean isActive = true;
 }

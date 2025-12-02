@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,15 +24,14 @@ public class SubjectService {
      * Métodos que apenas buscam dados em Banco, sem necessidade 
      * alreação me Banco
      */
-    public List<Subject> listSubjects() {
+    public List<Subject> findAll() {
         return subjectRepository.findAll();
     }
 
-    public Optional<Subject> findByTittle(String tittle) {
-        return subjectRepository.findByTitle(tittle);
+    public Subject findById(Long id) {
+        return subjectRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Disciplina não encontrada."));
     }
-
-
 
     /**
      * Transacionais 
@@ -41,7 +39,7 @@ public class SubjectService {
      * Métodos que necessitam operações de transações em Banco.
      */
     @Transactional
-    public Subject createSubject(Subject subject) {
+    public Subject create(Subject subject) {
         if (subjectRepository.findByTitle(subject.getTitle()).isPresent()) {
             throw new ResourceNotFoundException("Disciplina já cadastrada.");
         };

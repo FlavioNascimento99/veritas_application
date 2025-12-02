@@ -70,4 +70,10 @@ public class CollegiateService {
         Collegiate collegiate = findById(id);
         return List.copyOf(collegiate.getMembers());
     }
+
+    @Transactional
+    public void delete(Long id) {
+        Collegiate current = findById(id);
+        collegiateRepository.delete(current);
+    }
 }

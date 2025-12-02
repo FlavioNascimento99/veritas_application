@@ -53,6 +53,10 @@ public class ProcessService {
         return processRepository.save(newProcess);
     }
 
+    public List<Process> listAll() {
+        return processRepository.findAll();
+    }
+
     public List<Process> listByStudent(Long studentId) {
         return processRepository.findByStudentId(studentId);
     }
