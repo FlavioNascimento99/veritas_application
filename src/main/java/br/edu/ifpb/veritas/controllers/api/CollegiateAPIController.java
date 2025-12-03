@@ -4,18 +4,17 @@ import br.edu.ifpb.veritas.models.Collegiate;
 import br.edu.ifpb.veritas.models.Professor;
 import br.edu.ifpb.veritas.services.CollegiateService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/collegiates")
 public class CollegiateAPIController {
-
-    @Autowired
-    private CollegiateService collegiateService;
+    private final CollegiateService collegiateService;
 
     @PostMapping
     public ResponseEntity<Collegiate> create(@Valid @RequestBody Collegiate collegiate) {

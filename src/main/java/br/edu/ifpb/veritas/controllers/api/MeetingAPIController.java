@@ -5,18 +5,17 @@ import br.edu.ifpb.veritas.enums.MeetingStatus;
 import br.edu.ifpb.veritas.models.Meeting;
 import br.edu.ifpb.veritas.services.MeetingService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/meetings")
 public class MeetingAPIController {
-
-    @Autowired
-    private MeetingService meetingService;
+    private final MeetingService meetingService;
 
     @PostMapping
     public ResponseEntity<Meeting> create(@Valid @RequestBody Meeting meeting) {

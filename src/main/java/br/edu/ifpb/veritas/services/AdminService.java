@@ -5,13 +5,14 @@ import br.edu.ifpb.veritas.models.*;
 import br.edu.ifpb.veritas.repositories.AdminRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 // Fiz um CRUD básico, mas precisa rever
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class AdminService {
 
     private final AdminRepository adminRepository;
@@ -19,6 +20,16 @@ public class AdminService {
     private final ProfessorService professorService;
     private final CollegiateService collegiateService;
     private final SubjectService subjectService;
+    private final PasswordEncoder passwordEncoder;
+
+
+    /**
+     * Implementação de Password Encoder ao atualizar
+     * 
+     * Com o Spring Security é necessário trabalharmos com essa API 
+     * para criptografar nossas senhas de ponta-a-ponta, afim de manter
+     * dados esperados. 
+     */
 
     // -------------------- CRUD da própria class admin --------------------
     @Transactional
@@ -29,6 +40,9 @@ public class AdminService {
         if (admin.getRegister() != null && adminRepository.findByRegister(admin.getRegister()).isPresent()) {
             throw new ResourceNotFoundException("Matrícula já cadastrada.");
         }
+
+        // Criptografa a senha antes de salvar
+        admin.setPassword(passwordEncoder.encode(admin.getPassword()));
         return adminRepository.save(admin);
     }
 
@@ -47,16 +61,14 @@ public class AdminService {
         current.setName(payload.getName());
         current.setPhoneNumber(payload.getPhoneNumber());
         current.setLogin(payload.getLogin());
-        current.setPassword(payload.getPassword());
         current.setRegister(payload.getRegister());
+
+        if (payload.getPassword() != null && !payload.getPassword().isEmpty()) {
+            current.setPassword(passwordEncoder.encode(payload.getPassword()));
+        }
+
         return adminRepository.save(current);
     }
-
-//    @Transactional
-//    public void delete(Long id) {
-//        Administrator current = findById(id);
-//        adminRepository.delete(current);
-//    }
 
     // Ao invés de excluir, apenas desativa o admin
     @Transactional

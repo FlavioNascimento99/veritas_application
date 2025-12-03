@@ -5,6 +5,7 @@ import br.edu.ifpb.veritas.models.Professor;
 import br.edu.ifpb.veritas.repositories.ProfessorRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
 public class ProfessorService {
 
     private final ProfessorRepository professorRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public Professor create(Professor professor) {
@@ -23,6 +25,7 @@ public class ProfessorService {
         if (professor.getRegister() != null && professorRepository.findByRegister(professor.getRegister()).isPresent()) {
             throw new ResourceNotFoundException("Matrícula já cadastrada.");
         }
+        professor.setPassword(passwordEncoder.encode(professor.getPassword()));
         return professorRepository.save(professor);
     }
 
@@ -41,9 +44,12 @@ public class ProfessorService {
         currentProfessor.setName(payload.getName());
         currentProfessor.setPhoneNumber(payload.getPhoneNumber());
         currentProfessor.setLogin(payload.getLogin());
-        currentProfessor.setPassword(payload.getPassword());
         currentProfessor.setRegister(payload.getRegister());
         currentProfessor.setCoordinator(payload.isCoordinator());
+
+        if (payload.getPassword() != null && !payload.getPassword().isEmpty()) {
+            currentProfessor.setPassword(passwordEncoder.encode(payload.getPassword()));
+        }
         return professorRepository.save(currentProfessor);
     }
 

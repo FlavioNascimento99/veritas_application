@@ -14,12 +14,13 @@
       <div th:replace="~{fragments/header :: header}"></div>
    </header>
 
+   
    <!-- Rotative content -->
    <main role="main">
       <!-- Initial Application Load starts here. -->
-      <div th:replace="__${mainContent}__">
-      </div>
+      <div th:replace="~{__${mainContent}__}"></div>
    </main>
+
 
    <footer>
       <!-- Example between insert and replace -->

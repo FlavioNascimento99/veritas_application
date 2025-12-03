@@ -4,6 +4,7 @@ import br.edu.ifpb.veritas.exceptions.ResourceNotFoundException;
 import br.edu.ifpb.veritas.models.Student;
 import br.edu.ifpb.veritas.repositories.StudentRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ import java.util.List;
 public class StudentService {
 
     private final StudentRepository studentRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public Student create(Student student) {
@@ -24,6 +26,7 @@ public class StudentService {
         if (student.getRegister() != null && studentRepository.findByRegister(student.getRegister()).isPresent()) {
             throw new ResourceNotFoundException("Matrícula já cadastrada.");
         }
+        student.setPassword(passwordEncoder.encode(student.getPassword()));
         return studentRepository.save(student);
     }
 
@@ -42,8 +45,11 @@ public class StudentService {
         currentStudent.setName(payload.getName());
         currentStudent.setPhoneNumber(payload.getPhoneNumber());
         currentStudent.setLogin(payload.getLogin());
-        currentStudent.setPassword(payload.getPassword());
         currentStudent.setRegister(payload.getRegister());
+
+        if (payload.getPassword() != null && !payload.getPassword().isEmpty()) {
+            currentStudent.setPassword(passwordEncoder.encode(payload.getPassword()));
+        }
         return studentRepository.save(currentStudent);
     }
 

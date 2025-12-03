@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 import org.springframework.ui.Model;
 import jakarta.servlet.http.HttpSession;
-
 /**
  * Controlador responsável por páginas: Login, Homepage da Aplicação e Login com sucesso.
  */
@@ -50,6 +49,14 @@ public class HomeController {
       return "home";
    }
 
+   @GetMapping("/dashboard")
+   public String dashboard(Model model) {
+      model.addAttribute("pageTitle", "Dashboard");
+      model.addAttribute("activePage", "dashboard");
+      model.addAttribute("mainContent", "pages/dashboard :: content");
+      return "home";
+   }
+
    @GetMapping("/contact")
    public String contact(Model model) {
       model.addAttribute("pageTitle", "Contato");
@@ -65,6 +72,5 @@ public class HomeController {
       model.addAttribute("mainContent", "pages/about :: content");
       return "home";
    }
+   
 }
-
-

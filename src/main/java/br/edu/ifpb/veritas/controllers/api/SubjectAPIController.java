@@ -10,18 +10,17 @@ package br.edu.ifpb.veritas.controllers.api;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import br.edu.ifpb.veritas.models.Subject;
 import br.edu.ifpb.veritas.services.SubjectService;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/subjects")
 public class SubjectAPIController {
-
-   @Autowired
-   private SubjectService subjectService;
+   private final SubjectService subjectService;
 
 
    /**

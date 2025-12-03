@@ -20,24 +20,20 @@ import br.edu.ifpb.veritas.models.Process;
 import br.edu.ifpb.veritas.models.Professor;
 import br.edu.ifpb.veritas.services.ProcessService;
 import br.edu.ifpb.veritas.services.ProfessorService;
-import io.micrometer.core.ipc.http.HttpSender.Response;
 import jakarta.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/professors")
 public class ProfessorAPIController {
-
-    @Autowired
-    private ProfessorService professorService;
-    
-    @Autowired
-    private ProcessService processService;
+    private final ProfessorService professorService;
+    private final ProcessService processService;
 
     @PostMapping
     public ResponseEntity<Professor> create(@Valid @RequestBody Professor professor) {

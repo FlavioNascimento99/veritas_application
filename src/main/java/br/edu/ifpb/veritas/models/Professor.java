@@ -33,8 +33,12 @@ public class Professor {
   private String register;
   private String login;
   private String password;
-  private boolean isCoordinator = false;
-  private boolean isActive      = true;
+
+  @Column(name = "coordinator", nullable = false)
+  private Boolean coordinator = false;
+  
+  @Column(name = "is_active", nullable = false)  
+  private Boolean isActive      = true;
 
   /**
    * Listagem de Processos anexados ao professor.
