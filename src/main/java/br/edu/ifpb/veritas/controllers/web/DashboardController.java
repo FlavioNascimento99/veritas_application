@@ -22,11 +22,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class DashboardController {
 
-    private final StudentService studentService;
-    private final ProfessorService professorService;
-    private final ProcessService processService;
-    private final SubjectService subjectService;
-    private final MeetingService meetingService;
+    private final StudentService    studentService;
+    private final ProfessorService  professorService;
+    private final ProcessService    processService;
+    private final SubjectService    subjectService;
+    private final MeetingService    meetingService;
 
     @GetMapping
     public String dashboard(Model model, Authentication authentication,
@@ -101,9 +101,10 @@ public class DashboardController {
             Student student = studentService.findByLogin(authentication.getName())
                     .orElseThrow(() -> new IllegalArgumentException("Estudante não encontrado."));
             model.addAttribute("student", student);
-            model.addAttribute("processes", processService.listByStudent(student.getId()));
+            model.addAttribute("processes", processService.listByStudentFiltered(student.getId(), status, null));
             model.addAttribute("subjects", subjectService.findAll());
             model.addAttribute("mainContent", "pages/dashboard-student :: content");
+            model.addAttribute("filterStatus", status);
         
         } else {
             /**

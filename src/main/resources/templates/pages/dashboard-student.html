@@ -17,6 +17,24 @@
     <div class="bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-2xl font-semibold text-gray-700 mb-4">Meus Processos</h2>
 
+        <!-- Filtro de Processos -->
+        <div class="mb-4">
+            <form th:action="@{/dashboard}" method="get" class="flex flex-wrap gap-3 items-end mb-4">
+                <div>
+                    <label for="statusFilter" class="text-sm text-gray-600 block">Filtrar por Status</label>
+                    <select id="statusFilter" name="status" class="rounded border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 px-2 py-1">
+                        <option value="">Todos</option>
+                        <option th:each="s : ${T(br.edu.ifpb.veritas.enums.StatusProcess).values()}"
+                                th:value="${s.name()}" th:text="${s.name()}"
+                                th:selected="${filterStatus != null and filterStatus.equals(s.name())}">
+                        </option>
+                    </select>
+                </div>
+                <button type="submit" class="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700">Filtrar</button>
+                <a th:href="@{/dashboard}" class="ml-2 text-sm text-gray-600 hover:underline">Limpar Filtro</a>
+            </form>
+        </div>
+
         <div th:if="${processes != null and #lists.isEmpty(processes) == false}" class="mb-4">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead>
