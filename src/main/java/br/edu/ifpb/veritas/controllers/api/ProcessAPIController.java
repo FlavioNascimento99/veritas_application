@@ -28,15 +28,13 @@ public class ProcessAPIController {
     *    4. Quanto ao Professor é desnecessário, porque o Processo não vai inicializar com um Relator(Professor), este será implementado a partir de um Coordenador
     */
    @PostMapping
-   public ResponseEntity<Process> create
-   ( 
+   public ResponseEntity<Process> create(
       @RequestBody Process process,
       @RequestParam("studentId") Long studentId,
       @RequestParam("subjectId") Long subjectId,
       UriComponentsBuilder uriBuilder
-   ) 
-   {
-      Process saved = processService.create(process, studentId, subjectId);
+   ) {
+      Process saved = processService.createProcess(process, studentId, subjectId);
       var uri = uriBuilder.path("/api/processes/{id}").buildAndExpand(saved.getId()).toUri();
       return ResponseEntity.created(uri).body(saved);
    }

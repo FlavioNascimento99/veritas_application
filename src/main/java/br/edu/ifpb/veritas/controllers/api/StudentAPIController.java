@@ -66,10 +66,9 @@ public class StudentAPIController {
     public ResponseEntity<List<br.edu.ifpb.veritas.models.Process>> listStudentProcesses(
             @PathVariable Long studentId,
             @RequestParam(value = "status", required = false) String status,
-            @RequestParam(value = "subjectId", required = false) Long subjectId,
-            @RequestParam(value = "sort", required = false) String sort) {
+            @RequestParam(value = "subjectId", required = false) Long subjectId) {
 
-        List<Process> processes = processService.listByStudentFiltered(studentId, status, subjectId, sort);
+        List<Process> processes = processService.listByStudentFiltered(studentId, status, subjectId);
         return ResponseEntity.ok(processes);
     }
 

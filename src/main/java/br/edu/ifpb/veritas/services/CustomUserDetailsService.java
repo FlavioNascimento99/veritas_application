@@ -31,6 +31,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             return User.builder()
                     .username(user.getLogin())
                     .password(user.getPassword())
+                    .disabled(!user.getIsActive())
                     .roles("ADMIN")
                     .build();
         }
@@ -38,17 +39,24 @@ public class CustomUserDetailsService implements UserDetailsService {
         Optional<Professor> professor = professorRepository.findByLogin(username);
         if (professor.isPresent()) {
             Professor user = professor.get();
-            return User.builder()
+            User.UserBuilder builder = User.builder()
                     .username(user.getLogin())
                     .password(user.getPassword())
-                    .roles("PROFESSOR")
-                    .build();
+                    .disabled(!user.getIsActive());
+
+            if (user.getCoordinator()) {
+                builder.roles("PROFESSOR", "COORDINATOR");
+            } else {
+                builder.roles("PROFESSOR");
+            }
+            return builder.build();
         }
 
         return studentRepository.findByLogin(username)
                 .map(student -> User.builder()
                         .username(student.getLogin())
                         .password(student.getPassword())
+                        .disabled(!student.getIsActive())
                         .roles("STUDENT")
                         .build())
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado com o login: " + username));

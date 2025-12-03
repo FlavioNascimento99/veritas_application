@@ -1,0 +1,39 @@
+<div th:fragment="content" class="container mx-auto p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Dashboard do Professor</h1>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                Sair (Logout)
+            </button>
+        </form>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-2xl font-semibold text-gray-700 mb-4">Processos para Análise</h2>
+        <div th:if="${processes != null}">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead>
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Número</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Criado Em</th>
+                    <th class="px-6 py-3"></th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                <tr th:each="process : ${processes}">
+                    <td class="px-6 py-4 whitespace-nowrap" th:text="${process.number}"></td>
+                    <td class="px-6 py-4 whitespace-nowrap" th:text="${process.title}"></td>
+                    <td class="px-6 py-4 whitespace-nowrap" th:text="${#dates.format(process.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <a th:href="@{'/processes/' + ${process.id}}" class="text-indigo-600 hover:text-indigo-900">Detalhes</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:if="${processes == null}">
+            <p class="text-gray-600">Nenhum processo atribuído.</p>
+        </div>
+    </div>
+</div>

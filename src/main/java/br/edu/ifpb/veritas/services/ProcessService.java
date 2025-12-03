@@ -1,78 +1,124 @@
 package br.edu.ifpb.veritas.services;
 
-//import br.edu.ifpb.veritas.DTOs.processDTO.ProcessCreateDTO;
-//import br.edu.ifpb.veritas.DTOs.processDTO.ProcessListDTO;
-//import br.edu.ifpb.veritas.DTOs.processDTO.ProcessResponseDTO;
 import br.edu.ifpb.veritas.enums.StatusProcess;
 import br.edu.ifpb.veritas.exceptions.ResourceNotFoundException;
 import br.edu.ifpb.veritas.models.Process;
-import br.edu.ifpb.veritas.models.Professor;
 import br.edu.ifpb.veritas.models.Student;
 import br.edu.ifpb.veritas.models.Subject;
-import br.edu.ifpb.veritas.repositories.*;
+import br.edu.ifpb.veritas.models.Professor;
+import br.edu.ifpb.veritas.repositories.ProfessorRepository;
+import br.edu.ifpb.veritas.repositories.ProcessRepository;
+import br.edu.ifpb.veritas.repositories.StudentRepository;
+import br.edu.ifpb.veritas.repositories.SubjectRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
+import java.time.Year;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ProcessService {
 
     private final ProcessRepository processRepository;
-    private final SubjectRepository subjectRepository;
     private final StudentRepository studentRepository;
+    private final SubjectRepository subjectRepository;
     private final ProfessorRepository professorRepository;
 
-    // REQFUNC 1?
     @Transactional
-    public Process create(Process process, Long studentId, Long subjectId) {
+    public Process createProcess(Process process, Long studentId, Long subjectId) {
+        if (studentId == null) {
+            throw new IllegalArgumentException("O ID do estudante não pode ser nulo.");
+        }
+        // ✅ Busca o estudante por ID
         Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Estudante não encontrado."));
-
+                .orElseThrow(() -> new ResourceNotFoundException("Estudante não encontrado com o ID: " + studentId));
+        
+        // ✅ Valida o subjectId
+        if (subjectId == null) {
+            throw new IllegalArgumentException("O ID do assunto não pode ser nulo.");
+        }
+        
+        // ✅ Busca o assunto
         Subject subject = subjectRepository.findById(subjectId)
-            .orElseThrow(() -> new ResourceNotFoundException("Disciplina não encontrada."));
-            
-        // if (process.getSubject() == null || process.getSubject().getId() == null) {
-        //     throw new ResourceNotFoundException("Disciplina não informada.");
-        // }
- 
-        Process newProcess = new Process();
-        newProcess.setStudent(student);
-        newProcess.setSubject(subject);
-        newProcess.setTitle(process.getTitle());
-        newProcess.setDescription(process.getDescription());
-        newProcess.setStatus(StatusProcess.WAITING);
-        newProcess.setCreatedAt(LocalDateTime.now());
+                .orElseThrow(() -> new ResourceNotFoundException("Assunto não encontrado com o ID: " + subjectId));
 
-        return processRepository.save(newProcess);
-    }
+        // ✅ Configura o processo
+        process.setStudent(student);
+        process.setSubject(subject);
+        process.setCreatedAt(LocalDateTime.now());
+        process.setStatus(StatusProcess.WAITING);
+        process.setNumber(generateProcessNumber());
 
-    public List<Process> listAll() {
-        return processRepository.findAll();
+        // ✅ Salva
+        return processRepository.save(process);
     }
 
     public List<Process> listByStudent(Long studentId) {
         return processRepository.findByStudentId(studentId);
     }
 
+    public List<Process> findAllProcesses() {
+        return processRepository.findAll();
+    }
+
+    public List<Process> findWaitingProcesses() {
+        return processRepository.findByStatus(StatusProcess.WAITING);
+    }
+
     public List<Process> listByProfessor(Long professorId) {
         return processRepository.findByProfessorId(professorId);
     }
 
+    public List<Process> listByStudentFiltered(Long studentId, String status, Long subjectId) {
+        if (studentId == null) {
+            throw new IllegalArgumentException("O ID do estudante não pode ser nulo para filtrar os processos.");
+        }
+        // Garante que o estudante existe antes de prosseguir
+        studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Estudante não encontrado com o ID: " + studentId));
+
+        Specification<Process> spec = Specification.where((root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("student").get("id"), studentId));
+
+        if (status != null && !status.isBlank()) {
+            try {
+                StatusProcess statusEnum = StatusProcess.valueOf(status.toUpperCase());
+                spec = spec.and((root, query, criteriaBuilder) ->
+                        criteriaBuilder.equal(root.get("status"), statusEnum));
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Status inválido: " + status);
+            }
+        }
+
+        if (subjectId != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("subject").get("id"), subjectId));
+        }
+
+        return processRepository.findAll(spec);
+    }
+
     @Transactional
     public Process distribute(Long processId, Long professorId) {
+        // 1. Busca o processo
         Process process = processRepository.findById(processId)
-                .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado com o ID: " + processId));
 
+        // 2. Busca o professor (relator)
         Professor professor = professorRepository.findById(professorId)
-                .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com o ID: " + professorId));
 
+        // 3. Valida se o processo está aguardando distribuição
+        if (process.getStatus() != StatusProcess.WAITING) {
+            throw new IllegalStateException("O processo não pode ser distribuído pois seu status é: " + process.getStatus());
+        }
+
+        // 4. Atribui o professor, atualiza o status e a data de distribuição
         process.setProfessor(professor);
         process.setStatus(StatusProcess.UNDER_ANALISYS);
         process.setDistributedAt(LocalDateTime.now());
@@ -80,39 +126,10 @@ public class ProcessService {
         return processRepository.save(process);
     }
 
-    // Estava me questionando se faz
-    // mais sentido deixar aqui mesmo
-    // ou em StudentService
-    public List<Process> listByStudentFiltered(Long studentId, String status, Long subjectId, String sort) {
-        List<Process> list = processRepository.findByStudentId(studentId);
-
-        if (status != null && !status.isBlank()) {
-            final StatusProcess statusEnum;
-            try {
-                statusEnum = StatusProcess.valueOf(status.trim());
-            } catch (IllegalArgumentException ex) {
-                throw new ResourceNotFoundException("Status inválido.");
-            }
-            list = list.stream()
-                    .filter(p -> p.getStatus() == statusEnum)
-                    .collect(Collectors.toList());
-        }
-
-        if (subjectId != null) {
-            list = list.stream()
-                    .filter(p -> p.getSubject() != null && Objects.equals(p.getSubject().getId(), subjectId))
-                    .collect(Collectors.toList());
-        }
-
-        Comparator<Process> comp = Comparator.comparing(Process::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder()));
-        if (sort != null && sort.equalsIgnoreCase("asc")) {
-            list = list.stream().sorted(comp).collect(Collectors.toList());
-        } else {
-            // padrão desc
-            list = list.stream().sorted(comp.reversed()).collect(Collectors.toList());
-        }
-
-        return list;
+    private String generateProcessNumber() {
+        // Use the current year and a 5-digit sequence derived from the current time
+        int seq = (int) (System.currentTimeMillis() % 100000);
+        return String.format("%d-%05d", Year.now().getValue(), seq);
     }
 
 }

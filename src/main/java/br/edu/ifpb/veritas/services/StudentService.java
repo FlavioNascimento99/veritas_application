@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -38,6 +39,8 @@ public class StudentService {
         return studentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudante não encontrado."));
     }
+
+
 
     @Transactional
     public Student update(Long id, Student payload) {
@@ -80,4 +83,13 @@ public class StudentService {
     // A partir daqui irei colocar
     // os requisitos específicos do projeto
 
+
+    /**
+     * @param id
+     * @return Se existente, retorna um dos usuários por meio de seu Login.
+     */
+    @Transactional
+    public Optional<Student> findByLogin(String login) {
+        return studentRepository.findByLogin(login);
+    }
 }

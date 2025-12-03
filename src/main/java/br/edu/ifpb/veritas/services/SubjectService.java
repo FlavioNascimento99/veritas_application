@@ -28,6 +28,10 @@ public class SubjectService {
         return subjectRepository.findAll();
     }
 
+    public List<Subject> findByActiveSubjects() {
+        return subjectRepository.findByActive(true);
+    }
+
     public Subject findById(Long id) {
         return subjectRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Disciplina não encontrada."));

@@ -1,0 +1,196 @@
+garanta que <!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="content">
+    <div class="container mt-5">
+        <h2 class="mb-4">Gerenciamento de Usuários</h2>
+
+        <!-- Mensagens de sucesso/erro -->
+        <div th:if="${successMessage}" class="alert alert-success" role="alert" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
+
+        <!-- Tabela de Professores -->
+        <div class="card shadow-sm mb-5">
+            <div class="card-header">
+                <h3>Professores</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Matrícula</th>
+                            <th>Login</th>
+                            <th>Telefone</th>
+                            <th>Status</th>
+                            <th>Coordenador</th>
+                            <th>Ações</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="professor : ${professors}">
+                            <td th:text="${professor.name}"></td>
+                            <td th:text="${professor.register}"></td>
+                            <td th:text="${professor.login}"></td>
+                            <td th:text="${professor.phoneNumber}"></td>
+                            <td>
+                                <span th:if="${professor.isActive}" class="badge bg-success">Ativo</span>
+                                <span th:unless="${professor.isActive}" class="badge bg-danger">Inativo</span>
+                            </td>
+                            <td>
+                                <span th:if="${professor.coordinator}" class="badge bg-primary">Sim</span>
+                                <span th:unless="${professor.coordinator}" class="badge bg-secondary">Não</span>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" th:data-bs-target="'#editProfessorModal-' + ${professor.id}">
+                                    Editar
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela de Estudantes -->
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h3>Estudantes</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Matrícula</th>
+                            <th>Login</th>
+                            <th>Telefone</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="student : ${students}">
+                            <td th:text="${student.name}"></td>
+                            <td th:text="${student.register}"></td>
+                            <td th:text="${student.login}"></td>
+                            <td th:text="${student.phoneNumber}"></td>
+                            <td>
+                                <span th:if="${student.isActive}" class="badge bg-success">Ativo</span>
+                                <span th:unless="${student.isActive}" class="badge bg-danger">Inativo</span>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" th:data-bs-target="'#editStudentModal-' + ${student.id}">
+                                    Editar
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modais de Edição de Professor -->
+    <div th:each="professor : ${professors}">
+        <div class="modal fade" th:id="'editProfessorModal-' + ${professor.id}" tabindex="-1" aria-labelledby="editProfessorModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form th:action="@{/admin/professors/{id}/update(id=${professor.id})}" th:object="${professor}" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editProfessorModalLabel">Editar Professor</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Nome Completo</label>
+                                <input type="text" class="form-control" id="name" name="name" th:value="${professor.name}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="register" class="form-label">Matrícula</label>
+                                <input type="text" class="form-control" id="register" name="register" th:value="${professor.register}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="login" class="form-label">Login (Email)</label>
+                                <input type="email" class="form-control" id="login" name="login" th:value="${professor.login}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="phoneNumber" class="form-label">Telefone</label>
+                                <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" th:value="${professor.phoneNumber}">
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="isActive" name="isActive" th:checked="${professor.isActive}">
+                                <label class="form-check-label" for="isActive">Ativo</label>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="isCoordinator" name="coordinator" th:checked="${professor.coordinator}">
+                                <label class="form-check-label" for="isCoordinator">Coordenador</label>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Nova Senha (deixe em branco para não alterar)</label>
+                                <input type="password" class="form-control" id="password" name="password">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modais de Edição de Estudante -->
+    <div th:each="student : ${students}">
+        <div class="modal fade" th:id="'editStudentModal-' + ${student.id}" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form th:action="@{/admin/students/{id}/update(id=${student.id})}" th:object="${student}" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editStudentModalLabel">Editar Estudante</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="student-name" class="form-label">Nome Completo</label>
+                                <input type="text" class="form-control" id="student-name" name="name" th:value="${student.name}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="student-register" class="form-label">Matrícula</label>
+                                <input type="text" class="form-control" id="student-register" name="register" th:value="${student.register}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="student-login" class="form-label">Login (Email)</label>
+                                <input type="email" class="form-control" id="student-login" name="login" th:value="${student.login}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="student-phoneNumber" class="form-label">Telefone</label>
+                                <input type="text" class="form-control" id="student-phoneNumber" name="phoneNumber" th:value="${student.phoneNumber}">
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="student-isActive" name="isActive" th:checked="${student.isActive}">
+                                <label class="form-check-label" for="student-isActive">Ativo</label>
+                            </div>
+                            <div class="mb-3">
+                                <label for="student-password" class="form-label">Nova Senha (deixe em branco para não alterar)</label>
+                                <input type="password" class="form-control" id="student-password" name="password">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

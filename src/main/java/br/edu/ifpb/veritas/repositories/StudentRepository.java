@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Long> {
-   Optional<Student> findByLogin(String login);
-   Optional<Student> findByRegister(String register);
+   Optional <Student> findByLogin      (String login);
+   Optional <Student> findByRegister   (String register);
 }

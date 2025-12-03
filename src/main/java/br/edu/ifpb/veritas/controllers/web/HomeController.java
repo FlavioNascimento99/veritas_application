@@ -2,9 +2,14 @@ package br.edu.ifpb.veritas.controllers.web;
 
 import java.time.Year;
 
+import br.edu.ifpb.veritas.services.SubjectService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import org.springframework.ui.Model;
 import jakarta.servlet.http.HttpSession;
@@ -13,7 +18,10 @@ import jakarta.servlet.http.HttpSession;
  */
 
 @Controller
+@RequiredArgsConstructor
 public class HomeController {
+
+   private final SubjectService subjectService;
 
    @ModelAttribute
    public void addCommonAttribute(Model model, HttpSession http) {
@@ -49,14 +57,6 @@ public class HomeController {
       return "home";
    }
 
-   @GetMapping("/dashboard")
-   public String dashboard(Model model) {
-      model.addAttribute("pageTitle", "Dashboard");
-      model.addAttribute("activePage", "dashboard");
-      model.addAttribute("mainContent", "pages/dashboard :: content");
-      return "home";
-   }
-
    @GetMapping("/contact")
    public String contact(Model model) {
       model.addAttribute("pageTitle", "Contato");
@@ -71,6 +71,13 @@ public class HomeController {
       model.addAttribute("activePage", "about");
       model.addAttribute("mainContent", "pages/about :: content");
       return "home";
+   }
+
+   // Adicionado para evitar erros 404 de favicon.ico no log
+   @GetMapping("favicon.ico")
+   @ResponseBody
+   void returnNoFavicon() {
+      // Método vazio para retornar uma resposta 200 OK sem corpo
    }
    
 }

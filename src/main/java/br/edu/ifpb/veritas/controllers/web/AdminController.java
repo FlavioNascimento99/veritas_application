@@ -1,6 +1,7 @@
 package br.edu.ifpb.veritas.controllers.web;
 
 import br.edu.ifpb.veritas.models.Professor;
+import br.edu.ifpb.veritas.exceptions.ResourceNotFoundException;
 import br.edu.ifpb.veritas.models.Student;
 import br.edu.ifpb.veritas.models.Subject;
 import br.edu.ifpb.veritas.services.ProfessorService;
@@ -32,8 +33,13 @@ public class AdminController {
 
     @PostMapping("/students")
     public String createStudent(@ModelAttribute Student student, RedirectAttributes redirectAttributes) {
-        studentService.create(student);
-        redirectAttributes.addFlashAttribute("successMessage", "Estudante cadastrado com sucesso!");
+        try {
+            studentService.create(student);
+            redirectAttributes.addFlashAttribute("successMessage", "Estudante cadastrado com sucesso!");
+        } catch (ResourceNotFoundException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/admin/students/new";
+        }
         return "redirect:/dashboard";
     }
 
@@ -48,9 +54,42 @@ public class AdminController {
 
     @PostMapping("/professors")
     public String createProfessor(@ModelAttribute Professor professor, RedirectAttributes redirectAttributes) {
-        professorService.create(professor);
-        redirectAttributes.addFlashAttribute("successMessage", "Professor cadastrado com sucesso!");
+        try {
+            professorService.create(professor);
+            redirectAttributes.addFlashAttribute("successMessage", "Professor cadastrado com sucesso!");
+        } catch (ResourceNotFoundException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/admin/professors/new";
+        }
         return "redirect:/dashboard";
+    }
+
+    // --- GERENCIAMENTO DE USUÁRIOS ---
+    @GetMapping("/users")
+    public String showUserManagementPage(Model model) {
+        model.addAttribute("professors", professorService.findAll());
+        model.addAttribute("students", studentService.findAll());
+        model.addAttribute("pageTitle", "Gerenciamento de Usuários");
+        model.addAttribute("mainContent", "pages/admin/manage-users :: content");
+        return "home";
+    }
+
+    @PostMapping("/professors/{id}/update")
+    public String updateProfessor(@PathVariable Long id, @ModelAttribute Professor professor, RedirectAttributes redirectAttributes) {
+        try {
+            professorService.update(id, professor);
+            redirectAttributes.addFlashAttribute("successMessage", "Professor atualizado com sucesso!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Erro ao atualizar professor: " + e.getMessage());
+        }
+        return "redirect:/admin/users";
+    }
+
+    @PostMapping("/students/{id}/update")
+    public String updateStudent(@PathVariable Long id, @ModelAttribute Student student, RedirectAttributes redirectAttributes) {
+        studentService.update(id, student);
+        redirectAttributes.addFlashAttribute("successMessage", "Estudante atualizado com sucesso!");
+        return "redirect:/admin/users";
     }
 
     // --- GERENCIAMENTO DE ASSUNTOS ---

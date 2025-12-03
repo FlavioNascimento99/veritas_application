@@ -45,7 +45,7 @@ public class ProfessorService {
         currentProfessor.setPhoneNumber(payload.getPhoneNumber());
         currentProfessor.setLogin(payload.getLogin());
         currentProfessor.setRegister(payload.getRegister());
-        currentProfessor.setCoordinator(payload.isCoordinator());
+        currentProfessor.setCoordinator(payload.getCoordinator());
 
         if (payload.getPassword() != null && !payload.getPassword().isEmpty()) {
             currentProfessor.setPassword(passwordEncoder.encode(payload.getPassword()));
@@ -53,17 +53,21 @@ public class ProfessorService {
         return professorRepository.save(currentProfessor);
     }
 
+    public java.util.Optional<Professor> findByLogin(String login) {
+        return professorRepository.findByLogin(login);
+    }
+
     @Transactional
     public void activeStateChanger(Long id) {
         Professor currentProfessor = findById(id);
-        currentProfessor.setActive(!currentProfessor.isActive());
+        currentProfessor.setIsActive(!currentProfessor.getIsActive());
         professorRepository.save(currentProfessor);
     }
 
     @Transactional
     public void coordinatorStateChanger(Long id) {
         Professor currentProfessor = findById(id);
-        currentProfessor.setCoordinator(!currentProfessor.isCoordinator());
+        currentProfessor.setCoordinator(!currentProfessor.getCoordinator());
         professorRepository.save(currentProfessor);
     }
 }
