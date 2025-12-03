@@ -29,7 +29,10 @@ public class DashboardController {
     private final MeetingService meetingService;
 
     @GetMapping
-    public String dashboard(Model model, Authentication authentication) {
+    public String dashboard(Model model, Authentication authentication,
+                            @RequestParam(required = false) String status,
+                            @RequestParam(required = false) Long studentId,
+                            @RequestParam(required = false) Long professorId) {
 
         model.addAttribute("pageTitle", "Dashboard");
         model.addAttribute("activePage", "dashboard");
@@ -61,12 +64,23 @@ public class DashboardController {
              * Renderização de Serviços à acessos de culho Coordenativo 
              */  
         } else if (roles.contains("ROLE_COORDINATOR")) {
+
             Professor professor = professorService.findByLogin(authentication.getName())
-                    .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado."));
+                .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado."));
+
             model.addAttribute("professor", professor);
-            model.addAttribute("allProcesses", processService.findAllProcesses());
-            model.addAttribute("waitingProcesses", processService.findWaitingProcesses());
+            // listas auxiliares para os filtros
             model.addAttribute("professors", professorService.findAll());
+            model.addAttribute("students", studentService.findAll());
+
+            // aplica filtros opcionais (status, studentId, professorId)
+            var filtered = processService.findAllFiltered(status, studentId, professorId);
+            model.addAttribute("allProcesses", filtered);
+            // expose current filter values to the template to keep selections
+            model.addAttribute("filterStatus", status);
+            model.addAttribute("filterStudentId", studentId);
+            model.addAttribute("filterProfessorId", professorId);
+            model.addAttribute("waitingProcesses", processService.findWaitingProcesses());
             model.addAttribute("mainContent", "pages/dashboard-coordinator :: content");
         
             /**

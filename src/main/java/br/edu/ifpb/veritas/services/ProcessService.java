@@ -71,6 +71,37 @@ public class ProcessService {
                 .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado."));
     }
 
+    /**
+     * Retorna processos filtrados por status, estudante e/ou professor (relator).
+     * Todos os parâmetros são opcionais; quando nulos, não participam do filtro.
+     */
+    public List<Process> findAllFiltered(String status, Long studentId, Long professorId) {
+        Specification<Process> spec = Specification.where(null);
+
+        if (status != null && !status.isBlank()) {
+            try {
+                StatusProcess statusEnum = StatusProcess.valueOf(status.toUpperCase());
+                spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), statusEnum));
+            } catch (IllegalArgumentException e) {
+                // ignore invalid status values and return no additional filter
+            }
+        }
+
+        if (studentId != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("student").get("id"), studentId));
+        }
+
+        if (professorId != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("professor").get("id"), professorId));
+        }
+
+        if (spec == null) {
+            return processRepository.findAll();
+        }
+
+        return processRepository.findAll(spec);
+    }
+
     public List<Process> findWaitingProcesses() {
         return processRepository.findByStatus(StatusProcess.WAITING);
     }
