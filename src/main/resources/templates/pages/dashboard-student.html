@@ -16,8 +16,33 @@
 
     <div class="bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-2xl font-semibold text-gray-700 mb-4">Meus Processos</h2>
-        <!-- Aqui você pode adicionar a lógica para listar os processos do estudante -->
-        <p class="text-gray-600">Listagem de processos do estudante aparecerá aqui.</p>
+
+        <div th:if="${processes != null and #lists.isEmpty(processes) == false}" class="mb-4">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead>
+                <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Número</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Criado em</th>
+                    <th class="px-4 py-2"></th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                <tr th:each="proc : ${processes}">
+                    <td class="px-4 py-2 text-sm text-gray-700" th:text="${proc.number}">—</td>
+                    <td class="px-4 py-2 text-sm text-gray-700" th:text="${proc.title}">—</td>
+                    <td class="px-4 py-2 text-sm text-gray-700" th:text="${proc.status}">—</td>
+                    <td class="px-4 py-2 text-sm text-gray-700" th:text="${#temporals.format(proc.createdAt, 'dd/MM/yyyy HH:mm')}">—</td>
+                    <td class="px-4 py-2 text-sm"><a th:href="@{'/processes/' + ${proc.id}}" class="text-indigo-600 hover:underline">Detalhes</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${processes == null or #lists.isEmpty(processes)}" class="mb-4">
+            <p class="text-gray-600">Você ainda não possui processos registrados.</p>
+        </div>
 
         <hr class="my-6">
 
