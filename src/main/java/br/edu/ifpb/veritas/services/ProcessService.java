@@ -66,6 +66,11 @@ public class ProcessService {
         return processRepository.findAll();
     }
 
+    public Process findById(Long id) {
+        return processRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado."));
+    }
+
     public List<Process> findWaitingProcesses() {
         return processRepository.findByStatus(StatusProcess.WAITING);
     }

@@ -64,6 +64,25 @@ public class AdminController {
         return "redirect:/dashboard";
     }
 
+    // --- LISTAGENS DE USUÁRIOS (Professores e Estudantes) ---
+    @GetMapping("/students")
+    public String listStudents(Model model) {
+        model.addAttribute("students", studentService.findAll());
+        model.addAttribute("professors", professorService.findAll());
+        model.addAttribute("pageTitle", "Gerenciar Usuários");
+        model.addAttribute("mainContent", "pages/admin/manage-users :: content");
+        return "home";
+    }
+
+    @GetMapping("/professors")
+    public String listProfessors(Model model) {
+        model.addAttribute("students", studentService.findAll());
+        model.addAttribute("professors", professorService.findAll());
+        model.addAttribute("pageTitle", "Gerenciar Usuários");
+        model.addAttribute("mainContent", "pages/admin/manage-users :: content");
+        return "home";
+    }
+
     // --- GERENCIAMENTO DE USUÁRIOS ---
     @GetMapping("/users")
     public String showUserManagementPage(Model model) {

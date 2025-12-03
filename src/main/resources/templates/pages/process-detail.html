@@ -1,0 +1,64 @@
+<div th:fragment="content" class="container mx-auto p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Detalhes do Processo</h1>
+        <a th:href="@{/dashboard}" class="text-sm text-indigo-600 hover:underline">Voltar ao Dashboard</a>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h2 class="text-xl font-semibold mb-2" th:text="${process.title}">Título do Processo</h2>
+                <p class="text-sm text-gray-500 mb-4">Número: <span th:text="${process.number}">0000</span></p>
+
+                <p class="mb-4" th:text="${process.description}">Descrição do processo</p>
+
+                <p class="text-sm text-gray-600">Criado em: <span th:text="${#temporals.format(process.createdAt, 'dd/MM/yyyy HH:mm')}">-</span></p>
+                <p class="text-sm text-gray-600">Status: <strong th:text="${process.status}">-</strong></p>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-semibold">Metadados</h3>
+                <ul class="mt-3 space-y-2 text-sm text-gray-700">
+                    <li>Estudante: <span th:text="${process.student != null ? process.student.name : '-'}">-</span></li>
+                    <li>Assunto: <span th:text="${process.subject != null ? process.subject.title : '-'}">-</span></li>
+                    <li>Relator (Professor): <span th:text="${process.professor != null ? process.professor.name : 'Não atribuído'}">-</span></li>
+                    <li>Opinião: <pre th:text="${process.opinion}"></pre></li>
+                </ul>
+            </div>
+        </div>
+
+        <hr class="my-6">
+
+        <div>
+            <h3 class="text-lg font-semibold mb-3">Votos</h3>
+            <div th:if="${process.votes != null and #lists.isEmpty(process.votes) == false}">
+                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                    <thead>
+                    <tr>
+                        <th class="px-4 py-2 text-left text-gray-500 uppercase">Membro</th>
+                        <th class="px-4 py-2 text-left text-gray-500 uppercase">Decisão</th>
+                        <th class="px-4 py-2 text-left text-gray-500 uppercase">Observação</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="vote : ${process.votes}">
+                        <td class="px-4 py-2" th:text="${vote.professor != null ? vote.professor.name : '-'}">—</td>
+                        <td class="px-4 py-2" th:text="${vote.voteType}">—</td>
+                        <td class="px-4 py-2" th:text="${vote.away ? 'Ausente' : ''}">—</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div th:if="${process.votes == null or #lists.isEmpty(process.votes)}">
+                <p class="text-gray-600">Ainda não há votos registrados neste processo.</p>
+            </div>
+        </div>
+
+        <!-- Reuniões relacionadas não são exibidas aqui (não há mapeamento bidirecional em Process) -->
+
+        <div class="mt-6">
+            <h3 class="text-lg font-semibold mb-3">Anexos</h3>
+            <p class="text-gray-600">Funcionalidade de anexos ainda não implementada.</p>
+        </div>
+    </div>
+</div>

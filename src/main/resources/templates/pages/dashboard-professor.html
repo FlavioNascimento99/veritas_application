@@ -24,7 +24,7 @@
                 <tr th:each="process : ${processes}">
                     <td class="px-6 py-4 whitespace-nowrap" th:text="${process.number}"></td>
                     <td class="px-6 py-4 whitespace-nowrap" th:text="${process.title}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap" th:text="${#dates.format(process.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td class="px-6 py-4 whitespace-nowrap" th:text="${#temporals.format(process.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <a th:href="@{'/processes/' + ${process.id}}" class="text-indigo-600 hover:text-indigo-900">Detalhes</a>
                     </td>

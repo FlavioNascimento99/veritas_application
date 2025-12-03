@@ -30,21 +30,26 @@ public class DashboardController {
 
     @GetMapping
     public String dashboard(Model model, Authentication authentication) {
+
         model.addAttribute("pageTitle", "Dashboard");
         model.addAttribute("activePage", "dashboard");
 
-        // Obtém todas as roles do usuário autenticado
         List<String> roles = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
+        /**
+         * Em caso de Acesso Administrativo, vamos entregar todos os dados existentes em Banco.
+         */
         if (roles.contains("ROLE_ADMIN")) {
-            // Admin overview metrics
             model.addAttribute("studentsCount", studentService.findAll().size());
             model.addAttribute("professorsCount", professorService.findAll().size());
             model.addAttribute("subjectsCount", subjectService.findAll().size());
             model.addAttribute("processesCount", processService.findAllProcesses().size());
-            // Recent processes (last 5)
+
+            /**
+             * Ordenação de Serviços à acessos de culho Administrativo 
+             */
             var recent = processService.findAllProcesses().stream()
                     .sorted((a,b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
                     .limit(5)
@@ -52,6 +57,9 @@ public class DashboardController {
             model.addAttribute("recentProcesses", recent);
             model.addAttribute("mainContent", "pages/dashboard-admin :: content");
         
+            /**
+             * Renderização de Serviços à acessos de culho Coordenativo 
+             */  
         } else if (roles.contains("ROLE_COORDINATOR")) {
             Professor professor = professorService.findByLogin(authentication.getName())
                     .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado."));
@@ -61,6 +69,9 @@ public class DashboardController {
             model.addAttribute("professors", professorService.findAll());
             model.addAttribute("mainContent", "pages/dashboard-coordinator :: content");
         
+            /**
+             * Renderização de Serviços à acessos de culho Mestre 
+             */  
         } else if (roles.contains("ROLE_PROFESSOR")) {
             Professor professor = professorService.findByLogin(authentication.getName())
                     .orElseThrow(() -> new IllegalArgumentException("Professor não encontrado."));
@@ -69,6 +80,9 @@ public class DashboardController {
             model.addAttribute("meetings", meetingService.findAll());
             model.addAttribute("mainContent", "pages/dashboard-professor :: content");
         
+            /**
+             * Renderização de Serviços à acessos de culho Estudantil 
+             */  
         } else if (roles.contains("ROLE_STUDENT")) {
             Student student = studentService.findByLogin(authentication.getName())
                     .orElseThrow(() -> new IllegalArgumentException("Estudante não encontrado."));
@@ -78,14 +92,18 @@ public class DashboardController {
             model.addAttribute("mainContent", "pages/dashboard-student :: content");
         
         } else {
-            // Se o usuário não tiver nenhuma role conhecida, redireciona para o login
+            /**
+             * Usuário não apresenta nenhum perfil de Acesso == Erro.
+             */
             return "redirect:/login?error";
         }
 
         return "home";
     }
 
-    // Coordinator action to assign a professor to a process (form POST)
+    /**
+     *  Rota para assinatura de Processo à Professores
+     */
     @PostMapping("/assign")
     public String assignProfessorToProcess(@RequestParam("processId") Long processId,
                                            @RequestParam("professorId") Long professorId,
