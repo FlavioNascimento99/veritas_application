@@ -73,3 +73,26 @@ Estes requisitos definem as especificações técnicas obrigatórias para a impl
 *   **Entrega:** O código deve mostrar funcionalidades plenas (com telas e registro no banco).
 *   **Colaboração:** O repositório Git deve conter *commits* de **TODOS os membros da equipe** como registro da participação na implementação.
 *   **Arquitetura:** Os diagramas de Casos de Usos, de Classe e de Estados são sugeridos como ponto de partida e devem ser melhorados e refinados. Telas prototipadas (planejamento de sessão e condução de julgamento) foram fornecidas como referência.
+
+### 6. Estrutura do Projeto
+veritas/
+├── src/
+│   ├── main/
+│   │   ├── java/br/edu/.../veritas/
+│   │   │   ├── configs/
+│   │   │   ├── controllers/
+│   │   │   ├── enums/
+│   │   │   ├── exceptions/
+│   │   │   ├── models/
+│   │   │   ├── repositories/
+│   │   │   ├── services/
+│   │   │   └── VeritasApplication.java
+│   │   └── resources/
+│   │       ├── templates/
+│   │       │   ├── fragments/
+│   │       │   ├── layout/
+│   │       │   ├── pages/
+│   │       │   ├── home.html
+│   │       │   ├── register.html
+│   │       └── application.properties
+└── pom.xml
