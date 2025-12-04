@@ -97,4 +97,3 @@ veritas/
 │   │       │   └── register.html
 │   │       └── application.properties
 └── pom.xml
-´´´
