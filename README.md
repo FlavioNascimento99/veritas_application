@@ -75,6 +75,7 @@ Estes requisitos definem as especificações técnicas obrigatórias para a impl
 *   **Arquitetura:** Os diagramas de Casos de Usos, de Classe e de Estados são sugeridos como ponto de partida e devem ser melhorados e refinados. Telas prototipadas (planejamento de sessão e condução de julgamento) foram fornecidas como referência.
 
 ### 6. Estrutura do Projeto
+```
 veritas/
 ├── src/
 │   ├── main/
@@ -93,6 +94,7 @@ veritas/
 │   │       │   ├── layout/
 │   │       │   ├── pages/
 │   │       │   ├── home.html
-│   │       │   ├── register.html
+│   │       │   └── register.html
 │   │       └── application.properties
 └── pom.xml
+´´´
