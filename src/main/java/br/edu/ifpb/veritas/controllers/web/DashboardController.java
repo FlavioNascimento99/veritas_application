@@ -53,9 +53,9 @@ public class DashboardController {
             /**
              * Ordenação de Serviços à acessos de culho Administrativo 
              */
-            var recent = processService.findAllProcesses().stream()
+                var recent = processService.findAllProcesses().stream()
                     .sorted((a,b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
-                    .limit(5)
+                    .limit(10)
                     .toList();
             model.addAttribute("recentProcesses", recent);
             model.addAttribute("mainContent", "pages/dashboard-admin :: content");

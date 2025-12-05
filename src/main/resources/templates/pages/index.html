@@ -1,17 +1,81 @@
-<div th:fragment="mainContent" class="bg-white dark:bg-gray-900">
+<div th:fragment="mainContent" class="relative flex flex-col items-center m-2 dark:bg-gray-900">
+
+    <!-- Animated geometric background (behind content) -->
+    <div aria-hidden="true" class="absolute inset-0 -z-10 overflow-hidden">
+        <style>
+            .animated-shape { 
+                position: absolute;
+                border-radius: 24px;
+                filter: blur(36px);
+                opacity: .6;
+                transform: translateZ(0);
+            
+            }
+
+            @keyframes floatA { 
+                0% { 
+                    transform: translateY(0) rotate(0deg);
+                } 
+                
+                50% { 
+                    transform: translateY(-36px) rotate(18deg);
+                } 
+                
+                100% { 
+                    transform: translateY(0) rotate(0deg);
+                } 
+            }
+
+            @keyframes floatB { 
+                0% { 
+                    transform: translateY(0) translateX(0) rotate(0deg);
+                } 
+
+                50% { 
+                    transform: translateY(-18px) translateX(24px) rotate(45deg);
+                } 
+                
+                100% { 
+                    transform: translateY(0) translateX(0) rotate(0deg);
+                } 
+            }
+            
+            @keyframes floatC { 
+                0% { 
+                    transform: translateY(0) rotate(0deg);
+                } 
+                
+                50% { 
+                    transform: translateY(-24px) rotate(-12deg);
+                } 
+                
+                100% { 
+                    transform: translateY(0) rotate(0deg);
+                } 
+            }
+        </style>
+
+        <div class="animated-bg w-full h-full relative">
+            <div class="animated-shape bg-cyan-300"     style="width:360px; height:360px; left:-6%;  top:8%;     animation:floatA 1s ease-in-out infinite;"></div>
+            <div class="animated-shape bg-green-400"    style="width:220px; height:220px; right:-6%; top:18%;    border-radius:40%;animation:floatB 1s ease-in-out infinite;"></div>
+            <div class="animated-shape bg-purple-700"   style="width:280px; height:280px; left:20%;  bottom:-8%; animation:floatC 1s ease-in-out infinite;"></div>
+            <div class="animated-shape bg-blue-600"     style="width:140px; height:140px; right:18%; bottom:6%;  border-radius:12%; animation:floatA 1s ease-in-out infinite;opacity:0.45;"></div>
+        </div>
+    </div>
 
     <!-- Hero Section -->
-    <section class="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100">
-        <div class="container mx-auto flex flex-col items-center px-4 py-16 text-center md:py-32 md:px-10 lg:px-32 xl:max-w-3xl">
-            <h1 class="text-4xl font-bold leading-none sm:text-5xl">
-                Bem-vindo ao <span class="text-indigo-600 dark:text-indigo-400">Veritas</span>
+    <section class="relative bg-cover bg-center text-white border-1 border-gray-300 rounded-3xl shadow-xl w-fit m-10">
+        <div class="container mx-auto flex flex-col items-center px-4 py-10 text-center md:py-10 md:px-10 lg:px-12 xl:max-w-3xl">
+            <h1 class="text-4xl text-gray-300 font-bold leading-none sm:text-5xl">
+                <span class="text-black font-thin">Bem-vindo ao</span>
+                <span class="text-indigo-600 dark:text-indigo-400"> Veritas</span>
             </h1>
-            <p class="px-8 mt-8 mb-12 text-lg">
-                Uma aplicação moderna e intuitiva para gerenciar seus processos acadêmicos com eficiência e estilo.
+            <p class="px-8 mt-8 mb-12 text-lg font-extralight text-black text-justify">
+                Uma aplicação moderna e intuitiva, criada com objetivo de ser um projeto de disciplina da graduação, para gerenciar seus processos acadêmicos com eficiência e estilo.
             </p>
             <div class="flex flex-wrap justify-center">
-                <a th:href="@{/login}" class="px-8 py-3 m-2 text-lg font-semibold rounded bg-indigo-600 text-gray-50 hover:bg-indigo-700">Comece Agora</a>
-                <a th:href="@{/about}" class="px-8 py-3 m-2 text-lg border rounded dark:text-gray-100 dark:border-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">Saiba Mais</a>
+                <a th:href="@{/login}" class="px-8 py-3 m-2 text-lg font-semibold rounded bg-indigo-600 text-gray-50 hover:bg-indigo-700">Comece Agora</a> <!-- O estilo deste botão já contrasta bem -->
+                <a th:href="@{/about}" class="px-8 py-3 m-2 text-lg text-black border rounded border-gray-300 hover:bg-gray-100 hover:text-gray-800">Saiba Mais</a> <!-- Ajuste no hover para melhor visibilidade -->
             </div>
         </div>
     </section>

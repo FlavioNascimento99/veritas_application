@@ -1,14 +1,70 @@
 <div th:fragment="content" class="relative flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
-    <!-- Fundo com Gradiente e Formas -->
-    <div class="absolute inset-0 z-0">
-        <div class="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-600 opacity-20 dark:opacity-30"></div>
-        <div class="absolute top-0 left-0 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-        <div class="absolute top-0 right-0 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div class="absolute bottom-0 left-1/4 w-72 h-72 bg-green-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+    <!-- Animated geometric background (behind content) -->
+    <div aria-hidden="true" class="absolute inset-0 z-8 overflow-hidden w-full h-screen">
+        <style>
+            .animated-shape { 
+                position: absolute;
+                border-radius: 24px;
+                filter: blur(36px);
+                opacity: .6;
+                transform: translateZ(0);
+            
+            }
+
+            @keyframes floatA { 
+                0% { 
+                    transform: translateY(0) rotate(0deg);
+                } 
+                
+                50% { 
+                    transform: translateY(-36px) rotate(18deg);
+                } 
+                
+                100% { 
+                    transform: translateY(0) rotate(0deg);
+                } 
+            }
+
+            @keyframes floatB { 
+                0% { 
+                    transform: translateY(0) translateX(0) rotate(0deg);
+                } 
+
+                50% { 
+                    transform: translateY(-18px) translateX(24px) rotate(45deg);
+                } 
+                
+                100% { 
+                    transform: translateY(0) translateX(0) rotate(0deg);
+                } 
+            }
+            
+            @keyframes floatC { 
+                0% { 
+                    transform: translateY(0) rotate(0deg);
+                } 
+                
+                50% { 
+                    transform: translateY(-24px) rotate(-12deg);
+                } 
+                
+                100% { 
+                    transform: translateY(0) rotate(0deg);
+                } 
+            }
+        </style>
+
+        <div class="animated-bg w-full h-full relative">
+            <div class="animated-shape bg-cyan-300"     style="width:360px; height:360px; left:5%;   top:10%;    animation:floatA 8s ease-in-out infinite;"></div>
+            <div class="animated-shape bg-green-400"    style="width:220px; height:220px; right:10%; top:30%;    border-radius:40%;animation:floatB 6s ease-in-out infinite;"></div>
+            <div class="animated-shape bg-purple-700"   style="width:280px; height:280px; left:15%;  bottom:10%; animation:floatC 9s ease-in-out infinite;"></div>
+            <div class="animated-shape bg-blue-600"     style="width:140px; height:140px; right:15%; bottom:15%; border-radius:12%; animation:floatA 5s ease-in-out infinite;opacity:0.45;"></div>
+        </div>
     </div>
 
+
     <!-- Card de Login -->
-    <div class="relative z-10 w-full max-w-md p-8 space-y-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl shadow-2xl">
+    <section class="relative z-10 w-full max-w-md p-8 space-y-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl shadow-2xl">
         <div class="text-center">
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Bem-vindo de volta!</h1>
             <p class="text-gray-600 dark:text-gray-400">Faça login para acessar o Veritas.</p>
@@ -27,7 +83,7 @@
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     </div>
                     <input id="username" name="username" type="text" autocomplete="email" required
-                           class="appearance-none block w-full px-10 py-3 border border-gray-300 dark:border-gray-600 rounded-md placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
+                        class="appearance-none block w-full px-10 py-3 border border-gray-300 dark:border-gray-600 rounded-md placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
                 </div>
             </div>
 
@@ -40,7 +96,7 @@
                         </svg>
                     </div>
                     <input id="password" name="password" type="password" autocomplete="current-password" required
-                           class="appearance-none block w-full px-10 py-3 border border-gray-300 dark:border-gray-600 rounded-md placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
+                        class="appearance-none block w-full px-10 py-3 border border-gray-300 dark:border-gray-600 rounded-md placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
                 </div>
             </div>
             <div>
@@ -50,48 +106,5 @@
                 </button>
             </div>
         </form>
-
-        <div class="relative my-6">
-            <div class="absolute inset-0 flex items-center" aria-hidden="true">
-                <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
-            </div>
-            <div class="relative flex justify-center text-sm">
-                <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">Ou continue com</span>
-            </div>
-        </div>
-
-        <div>
-
-        </div>
-
-        <p class="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-            Não tem uma conta?
-            <a th:href="@{/register}" class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
-                Cadastre-se
-            </a>
-        </p>
-    </div>
+    </section>
 </div>
-
-<style>
-    @keyframes blob {
-        0% {
-            transform: translate(0px, 0px) scale(1);
-        }
-        33% {
-            transform: translate(30px, -50px) scale(1.1);
-        }
-        66% {
-            transform: translate(-20px, 20px) scale(0.9);
-        }
-        100% {
-            transform: translate(0px, 0px) scale(1);
-        }
-    }
-    .animation-delay-2000 {
-        animation-delay: 2s;
-    }
-    .animation-delay-4000 {
-        animation-delay: 4s;
-    }
-</style>
