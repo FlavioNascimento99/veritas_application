@@ -15,9 +15,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProcessRepository extends JpaRepository<Process, Long>, JpaSpecificationExecutor<Process> {
-  List<Process> findByStudentId(Long studentId);
+  List<Process> findByProcessCreator_Id(Long studentId);
 
-  List<Process> findByProfessorId(Long professorId);
+  List<Process> findByProcessRapporteur_Id(Long professorId);
 
   List<Process> findBySubjectId(Long subjectId);
 
@@ -33,25 +33,25 @@ public interface ProcessRepository extends JpaRepository<Process, Long>, JpaSpec
    * 4. Busca por Processos finalizados por um determinado Professor.
    * 5. Busca por Processos de determinado estudante.
    */
-  @Query("SELECT p FROM Process p WHERE p.professor.id= :professorId AND p.status='UNDER_ANALISYS'")
+  @Query("SELECT p FROM Process p WHERE p.processRapporteur.id = :professorId AND p.status = 'UNDER_ANALISYS'")
   List<Process> findProfessorIdleProcesses(@Param("professorId") Long professorId);
 
   @Query("SELECT p FROM Process p WHERE p.createdAt BETWEEN :start AND :end")
   List<Process> findByPeriod(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
-  @Query("SELECT p FROM Process p WHERE p.status IN ('WAITING', 'UNDER_ANALISYS')")
+  @Query("SELECT p FROM Process p WHERE p.status IN (br.edu.ifpb.veritas.enums.StatusProcess.WAITING, br.edu.ifpb.veritas.enums.StatusProcess.UNDER_ANALISYS)")
   List<Process> findPendingProcesses();
 
-  @Query("SELECT COUNT(p) FROM Process p WHERE p.professor.id = :professorId AND p.status IN ('APPROVED', 'REJECTED')")
+  @Query("SELECT COUNT(p) FROM Process p WHERE p.processRapporteur.id = :professorId AND p.status IN (br.edu.ifpb.veritas.enums.StatusProcess.APPROVED, br.edu.ifpb.veritas.enums.StatusProcess.REJECTED)")
   Long countProcessesFinishedByProfessor(@Param("professorId") Long professorId);
 
-  @Query("SELECT p FROM Process p WHERE p.student.id = :professorId " +
+  @Query("SELECT p FROM Process p WHERE p.processCreator.id = :studentId " +
       "ORDER BY p.createdAt DESC")
-  List<Process> findLastProcessesFromStudent(@Param("studentId") Long professorId);
+  List<Process> findLastProcessesFromStudent(@Param("studentId") Long studentId);
 
   // Contadores (Interessante posteriomente para Relatórios)
   Long countByStatus(StatusProcess status);
 
-  Long countByStudentIdAndStatus(Long studentId, StatusProcess status);
+  Long countByProcessCreator_IdAndStatus(Long studentId, StatusProcess status);
 
 }

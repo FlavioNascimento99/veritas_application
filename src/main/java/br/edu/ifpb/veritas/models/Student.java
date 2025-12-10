@@ -15,9 +15,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "TB_STUDENT")
+@Table(name = "TB_STUDENTS")
 @DiscriminatorValue("STUDENT")
-
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Student {
 
@@ -25,26 +24,58 @@ public class Student {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(name = "NAME")
   private String name;
+
+  @Column(name = "PHONE_NUMBER")
   private String phoneNumber;
-  // Matrícula
-  private String register;
-  private String login;
-  private String password;
-  private Boolean isActive = true;
   /**
-   *    Necessário trocar de arraylist por list, vista o problema com valor       fixo entregue por arraylist
-   *  Listagem de processos do mesmo poderá ser salvo dentro deste atributo.
-   *  (Incerto da necessidade)
+   * Log 1: Já não vejo mais necessidade na implementação de Matrícula
+   * dentro da estidade estudante, visto que não vai ser necessário nenhum
+   * tipo de busca ou filtro de forma obrigatória dentro da aplicação.
    */
+  @Column(name = "REGISTER")
+  private String register;
 
-//  @OneToMany
-//  @JoinColumn(name="CREATED_PROCESSES")
-//  private List<Process> createdProcesses;
+  /**
+   * Log 1: Seria interessante a implementação de uma regra para criação de 
+   * login dentro do sistema, seja baseado em @ ou primeiro e último nome do 
+   * usuário.
+   */
+  @Column(name = "LOGIN")
+  private String login;
 
-  @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
-  private List<Process> interestedStudent; // interessado em processos
+  @Column(name = "PASSWORD")
+  private String password;
 
+  @Column(name = "IS_ACTIVE")
+  private Boolean isActive = true;
+
+
+  /**
+   * Log 1: Essa propriedade se trata do lado B de uma relação bi-direcional entre 
+   * Aluno e seu Curso.
+   */
+  @ManyToOne
+  @JoinColumn(name = "CURRENT_COURSE")
+  private Course currentCourse;
+
+  /**
+   * Log 1: Listagem de Processos emitidos pelo Estudante em questão.
+   */
+  @OneToMany(mappedBy = "processCreator", cascade = CascadeType.ALL)
+  private List<Process> processList; 
+  
+  /**
+   * Log 1: Ainda não definido exatamente como deverá ser feito a implementação
+   * do representante do Colegiado. Inicialmente, penso na NÃO NECESSIDADE de um, 
+   * mas sim em algo como um Listener do Processo.
+   * 
+   * Papel do Listener do Processo irá se resumir a um usuário do tipo Estudante, que
+   * a partir de um Observer. 
+   * 
+   * Consultar: https://refactoring.guru/design-patterns/observer
+   */
   @OneToOne(mappedBy = "representativeStudent")
   private Collegiate representativeCollegiate;
 }

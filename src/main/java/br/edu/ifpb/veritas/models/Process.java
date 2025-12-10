@@ -19,7 +19,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "tb_processes")
+@Table(name = "TB_PROCESSES")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 
 public class Process {
@@ -28,21 +28,50 @@ public class Process {
    private Long id;
 
    /**
-    * Informações básicas estruturais da classe
+    * Basic Data
     */
+   @Column(name = "TITLE")
    private String title;
+
+   @Column(name = "DESCRIPTION")
    private String description;
+
+   @Column(name = "NUMBER")
    private String number;
+ 
+
+   /**
+    * Temporal Data
+    */
+   @Column(name = "CREATED_AT")
    private LocalDateTime createdAt;
+
+   @Column(name = "DISTRIBUTED_AT")
    private LocalDateTime distributedAt;
+
+   @Column(name = "SOLVED_AT")
    private LocalDateTime solvedAt;
+
+
+   /**
+    * ?? Não tenho mais certeza de nada quanto a isso daqui.
+    */
    private String opinion;
 
+
+   @Column(name = "PROCESS_STATUS")
    @Enumerated(EnumType.STRING)
    private StatusProcess status;
 
-   @Column(name = "rapporteurVote")
+   @Column(name = "RAPPORTEUR_VOTE")
    private DecisionType rapporteurVote;
+
+
+   /**
+   * Log 1: Referente à Portaria do Processo.
+   */
+   @Column(name = "PROCESS_ORDER")
+   private String processOrder;
 
    /**
     * Log 1: Estudante que criara o processo em questão.
@@ -51,8 +80,8 @@ public class Process {
     * Estudante.
     */
    @ManyToOne
-   @JoinColumn(name = "interestedStudent_id", nullable = false)
-   private Student student;
+   @JoinColumn(name = "INTERESTED_STUDENT_ID", nullable = false)
+   private Student processCreator;
 
    /**
     * Log 1: Assim como o estudante emissor do processo,
@@ -73,19 +102,16 @@ public class Process {
     * já que no momento inicial, "não existirá".
     */
    @ManyToOne
-   @JoinColumn(name = "professor_relator_id", nullable= true)
-   private Professor professor; // professor relator
+   @JoinColumn(name = "PROFESSOR_RAPPORTEUR_ID", nullable= true)
+   private Professor processRapporteur;
 
-   @OneToMany(mappedBy = "process", cascade = CascadeType.ALL)
-   private List<Vote> votes = new ArrayList<>(); // Votos dos membros do colegiado neste process
 
    /**
-    * Relacionamento Many-To-One vem pelo fato de
-    * que teremos um Collegiate com N Processes.
+    * Log 1: Lista de Votos efetuados dentro deste processo.
+    * 
+    * Votos possui os ID de cada membro e seu respectivo
+    * voto.
     */
-// Não é o collegiate que irá gerir o processo
-// @ManyToOne
-// @JoinColumn(name="COLLEGIATE_ID", nullable=true)
-// private Collegiate collegiate;
-
+   @OneToMany(mappedBy = "process", cascade = CascadeType.ALL)
+   private List<Vote> processVoteList;
 }

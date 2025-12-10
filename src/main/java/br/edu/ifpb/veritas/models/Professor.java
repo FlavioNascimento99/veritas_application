@@ -28,17 +28,30 @@ public class Professor {
   /**
    * Required fields for Postman test
    */
+
+  @Column(name = "NAME")
   private String name;
+
+  @Column(name = "PHONE_NUMBER")
   private String phoneNumber;
+ 
+  @Column(name = "REGISTER")
   private String register;
+
+  @Column(name = "LOGIN")
   private String login;
+
+  @Column(name = "PASSWORD")
   private String password;
 
-  @Column(name = "coordinator", nullable = false)
+  @Column(name = "IS_COORDINATOR", nullable = false)
   private Boolean coordinator = false;
   
-  @Column(name = "is_active", nullable = false)  
+  @Column(name = "IS_ACTIVE", nullable = false)  
   private Boolean isActive      = true;
+
+  @OneToOne(mappedBy = "courseCoordinator")
+  private Course coordinatorAt;
 
   /**
    * Listagem de Processos anexados ao professor.
@@ -48,17 +61,12 @@ public class Professor {
    * lidar com listas dinâmicas tão bem quanto listas de
    * tamanho pre-definido.
    */
-//  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-//  private List<Process> forwardedProcesses;
 
-  @ManyToMany(mappedBy = "members")
-  private List<Collegiate> collegiates = new ArrayList<>(); // participa de 1..* colegiados
 
-  // Não deveria existir algo assim associando os processos ao professor relator?
-  @OneToMany(mappedBy = "professor")
-  private List<Process> forwardedProcesses; // relator de processos
-
-  @OneToMany(mappedBy = "professor")
-  private List<Vote> votes = new ArrayList<>(); // 0.. * votos
-
+  /**
+   * Log 1: Listagem de Colegiados? Não soa como algo com sentido pra 
+   * mim, Professor sim, faz parte de Colegiado, não o contrário.
+   * ManyToMany(mappedBy = "members")
+   * private List<Collegiate> collegiates;
+   */
 }

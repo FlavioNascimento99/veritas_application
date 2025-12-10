@@ -173,7 +173,7 @@ public class AdminService {
     // Creio que, no caso de colegiados, não há problema em exclui-los
     @Transactional
     public void deleteCollegiate(Long id) {
-        collegiateService.delete(id);
+        collegiateService.unactivate(id);
     }
 
     public List<Professor> listCollegiateMembers(Long collegiateId) {

@@ -1,10 +1,10 @@
 package br.edu.ifpb.veritas.enums;
 
 public enum StatusProcess {
-   WAITING("WAITING"),
-   UNDER_ANALISYS("UNDER_ANALISYS"),
-   APPROVED("APPROVED"),
-   REJECTED("REJECTED");
+   WAITING("EM ESPERA"),
+   UNDER_ANALISYS("SOB ANÁLISE"),
+   APPROVED("APROVADO"),
+   REJECTED("REJEITADO");
 
    private String status;
 

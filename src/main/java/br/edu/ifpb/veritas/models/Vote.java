@@ -14,20 +14,39 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "tb_votes")
+@Table(name = "TB_VOTES")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Vote {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   private VoteType voteType;
+  
+  /**
+   * Log 1: Define se o mesmo (Professor membro do Colegiado) 
+   * encontrou-se ausente da reunião para definir destino do 
+   * Processo.
+   */
   private Boolean away;
 
+
+  /**
+   * Log 1: Haverá N votos para um Processo, logo referencia 
+   * a este segundo.
+   */
   @ManyToOne
-  @JoinColumn(name = "process_id", nullable = false)
+  @JoinColumn(name = "PROCESS_ID", nullable = true)
   private Process process;
 
-  @ManyToOne
-  @JoinColumn(name = "professor_id", nullable = false)
+
+  /**
+   * Log 1: Professor referente ao voto em questão,
+   * neste caso, pra mim, faz mais sentido o OneToOne.
+   * 
+   * Log 2: de ManyToOne para OneToOne.
+   */
+  @OneToOne
+  @JoinColumn(name = "PROFESSOR_ID", nullable = false)
   private Professor professor;
+
 }

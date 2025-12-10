@@ -8,11 +8,8 @@ import java.util.Optional;
 
 @Repository
 public interface CollegiateRepository extends JpaRepository<Collegiate, Long> {
-    Optional<Collegiate> findByCourse(String course);
+    Optional<Collegiate> findByRepresentativeStudentId(Long studentId);
 
-    // Busca o colegiado pelo ID do representante estudantil
-    Optional<Collegiate> findByRepresentativeStudentId(Long representativeStudentId);
-
-    // Busca o colegiado pelo ID de uma reunião associada
-    Optional<Collegiate> findByMeetingsId(Long meetingId);
+    // Corrected method name to traverse the relationship
+    Optional<Collegiate> findByCollegiateMeetingsList_Id(Long meetingId);
 }

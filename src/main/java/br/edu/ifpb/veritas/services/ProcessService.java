@@ -34,32 +34,27 @@ public class ProcessService {
         if (studentId == null) {
             throw new IllegalArgumentException("O ID do estudante não pode ser nulo.");
         }
-        // ✅ Busca o estudante por ID
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudante não encontrado com o ID: " + studentId));
         
-        // ✅ Valida o subjectId
         if (subjectId == null) {
             throw new IllegalArgumentException("O ID do assunto não pode ser nulo.");
         }
         
-        // ✅ Busca o assunto
         Subject subject = subjectRepository.findById(subjectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Assunto não encontrado com o ID: " + subjectId));
 
-        // ✅ Configura o processo
-        process.setStudent(student);
+        process.setProcessCreator(student);
         process.setSubject(subject);
         process.setCreatedAt(LocalDateTime.now());
         process.setStatus(StatusProcess.WAITING);
         process.setNumber(generateProcessNumber());
 
-        // ✅ Salva
         return processRepository.save(process);
     }
 
     public List<Process> listByStudent(Long studentId) {
-        return processRepository.findByStudentId(studentId);
+        return processRepository.findByProcessCreator_Id(studentId);
     }
 
     public List<Process> findAllProcesses() {
@@ -88,11 +83,11 @@ public class ProcessService {
         }
 
         if (studentId != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("student").get("id"), studentId));
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("processCreator").get("id"), studentId));
         }
 
         if (professorId != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("professor").get("id"), professorId));
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("processRapporteur").get("id"), professorId));
         }
 
         if (spec == null) {
@@ -107,7 +102,7 @@ public class ProcessService {
     }
 
     public List<Process> listByProfessor(Long professorId) {
-        return processRepository.findByProfessorId(professorId);
+        return processRepository.findByProcessRapporteur_Id(professorId);
     }
 
     public List<Process> listByStudentFiltered(Long studentId, String status, Long subjectId) {
@@ -119,7 +114,7 @@ public class ProcessService {
                 .orElseThrow(() -> new ResourceNotFoundException("Estudante não encontrado com o ID: " + studentId));
 
         Specification<Process> spec = Specification.where((root, query, criteriaBuilder) ->
-                criteriaBuilder.equal(root.get("student").get("id"), studentId));
+                criteriaBuilder.equal(root.get("processCreator").get("id"), studentId));
 
         if (status != null && !status.isBlank()) {
             try {
@@ -155,7 +150,7 @@ public class ProcessService {
         }
 
         // 4. Atribui o professor, atualiza o status e a data de distribuição
-        process.setProfessor(professor);
+        process.setProcessRapporteur(professor);
         process.setStatus(StatusProcess.UNDER_ANALISYS);
         process.setDistributedAt(LocalDateTime.now());
 

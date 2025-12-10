@@ -40,15 +40,11 @@ public class CollegiateService {
     @Transactional
     public Collegiate update(Long id, Collegiate payload) {
         Collegiate current = findById(id);
-        // Colocar validações
-
         current.setCreatedAt(payload.getCreatedAt());
-        current.setEndedAt(payload.getEndedAt());
+        current.setClosedAt(payload.getClosedAt());
         current.setDescription(payload.getDescription());
-        current.setResolution(payload.getResolution());
-        current.setCourse(payload.getCourse());
-        current.setMembers(payload.getMembers());
-        current.setMeetings(payload.getMeetings());
+        current.setCollegiateMemberList(payload.getCollegiateMemberList());
+        current.setCollegiateMeetingsList(payload.getCollegiateMeetingsList());
         current.setRepresentativeStudent(payload.getRepresentativeStudent());
         return collegiateRepository.save(current);
     }
@@ -61,19 +57,23 @@ public class CollegiateService {
 
     // Retorna o colegiado associado a uma reunião específica
     public Collegiate findByMeeting(Long meetingId) {
-        return collegiateRepository.findByMeetingsId(meetingId)
+        return collegiateRepository.findByCollegiateMeetingsList_Id(meetingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Colegiado associado à reunião informado não encontrado."));
     }
 
     // Retorna a lista de professores membros de um determinado colegiado
     public List<Professor> findProfessorsByCollegiate(Long id) {
         Collegiate collegiate = findById(id);
-        return List.copyOf(collegiate.getMembers());
+        return List.copyOf(collegiate.getCollegiateMemberList());
     }
 
+
+    /**
+     * Log 1: Não teremos exclusão de dados dentro da aplicação.
+     */
     @Transactional
-    public void delete(Long id) {
+    public void unactivate(Long id) {
         Collegiate current = findById(id);
-        collegiateRepository.delete(current);
+        current.setClosedAt(LocalDateTime.now());
     }
 }

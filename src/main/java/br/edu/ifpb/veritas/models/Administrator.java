@@ -9,7 +9,7 @@ import lombok.*;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "tb_administrators")
+@Table(name = "TB_ADMINISTRATOR")
 @DiscriminatorValue("ADMINISTRATOR")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Administrator {
@@ -18,12 +18,23 @@ public class Administrator {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "TB_ADMIN_NAME")
     private String name;
+
+    @Column(name = "TB_ADMIN_PHONE_NUMBER")
     private String phoneNumber;
+
+    @Column(name = "TB_ADMIN_REGISTER")
     private String register;
+
+    @Column(name = "TB_ADMIN_LOGIN")
     private String login;
+
+    @Column(name = "TB_ADMIN_PASSWORD")
     private String password;
 
-    // Para não ter que excluir o admin
+    /**
+     * Admin isActive full true.
+     */
     private Boolean isActive = true;
 }
