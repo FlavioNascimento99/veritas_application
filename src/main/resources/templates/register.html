@@ -1,11 +1,12 @@
 <div th:fragment="content" class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4 py-12">
   <div class="w-full max-w-md">
+    
     <!-- Card Principal -->
     <div class="bg-white rounded-lg shadow-lg p-8">
+      
       <!-- Header do Formulário -->
       <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">Criar Conta</h1>
-        <p class="text-gray-600">Junte-se à Veritas</p>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Cadastro Administrativo</h1>
       </div>
 
       <!-- Formulário de Registro -->
@@ -25,10 +26,25 @@
           />
         </div>
 
+        <!-- Senha -->
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+            Registro
+          </label>
+          <input
+            type="text"
+            id="register"
+            name="register"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+            placeholder="Mínimo 6 caracteres"
+          />
+        </div>
+
         <!-- Email -->
         <div>
           <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-            Email
+            Login
           </label>
           <input
             type="email"
@@ -81,9 +97,6 @@
             required
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
           >
-            <option value="">Selecione um tipo</option>
-            <option value="student">Estudante</option>
-            <option value="professor">Professor</option>
             <option value="admin">Administrador</option>
           </select>
         </div>
@@ -97,27 +110,5 @@
         </button>
       </form>
 
-      <!-- Link para Login -->
-      <div class="text-center mt-6">
-        <p class="text-gray-600">
-          Já tem uma conta?
-          <a
-            th:href="@{/login}"
-            class="text-indigo-600 hover:text-indigo-700 font-medium transition"
-          >
-            Faça login
-          </a>
-        </p>
-      </div>
-      
-    <!-- Link para Página Principal -->
-    <div class="text-center mt-4">
-      <a
-        th:href="@{/}"
-        class="text-gray-600 hover:text-gray-800 text-sm transition"
-      >
-        Voltar à página inicial
-      </a>
-    </div>
   </div>
 </div>
