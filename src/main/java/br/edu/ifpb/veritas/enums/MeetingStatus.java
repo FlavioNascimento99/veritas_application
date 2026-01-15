@@ -2,8 +2,8 @@ package br.edu.ifpb.veritas.enums;
 
 
 public enum MeetingStatus {
-   CLOSED("CLOSED"),
-   SCHEDULED("SCHEDULED");
+   FINALIZADA("FINALIZADA"),
+   AGENDADA ("AGENDADA");
 
    private String status;
 
