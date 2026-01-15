@@ -59,4 +59,9 @@ public class MeetingService {
     public List<Meeting> findByCollegiateId(Long collegiateId) {
         return meetingRepository.findByCollegiateId(collegiateId);
     }
+
+    // Filtra por colegiado e status
+    public List<Meeting> findByCollegiateIdAndStatus(Long collegiateId, MeetingStatus status) {
+        return meetingRepository.findByCollegiateIdAndStatus(collegiateId, status);
+    }
 }

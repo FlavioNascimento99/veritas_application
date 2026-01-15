@@ -10,6 +10,9 @@ import java.util.Optional;
 public interface CollegiateRepository extends JpaRepository<Collegiate, Long> {
     Optional<Collegiate> findByRepresentativeStudentId(Long studentId);
 
-    // Corrected method name to traverse the relationship
-    Optional<Collegiate> findByCollegiateMeetingsList_Id(Long meetingId);
+    // Busca colegiado a partir da reunião
+    Optional<Collegiate> findByCollegiateMeetingsListId(Long meetingId);
+
+    // Busca colegiado a partir do professor
+    Optional<Collegiate> findByCollegiateMemberListId(Long professorId);
 }

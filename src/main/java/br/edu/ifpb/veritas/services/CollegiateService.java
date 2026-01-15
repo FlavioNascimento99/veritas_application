@@ -57,7 +57,7 @@ public class CollegiateService {
 
     // Retorna o colegiado associado a uma reunião específica
     public Collegiate findByMeeting(Long meetingId) {
-        return collegiateRepository.findByCollegiateMeetingsList_Id(meetingId)
+        return collegiateRepository.findByCollegiateMeetingsListId(meetingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Colegiado associado à reunião informado não encontrado."));
     }
 
@@ -75,5 +75,11 @@ public class CollegiateService {
     public void unactivate(Long id) {
         Collegiate current = findById(id);
         current.setClosedAt(LocalDateTime.now());
+    }
+
+    // Retorna o colegiado associado a um professor específico
+    public Collegiate findByProfessorId(Long professorId) {
+        return collegiateRepository.findByCollegiateMemberListId(professorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Colegiado não encontrado para o professor."));
     }
 }
