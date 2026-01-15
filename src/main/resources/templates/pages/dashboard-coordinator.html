@@ -66,8 +66,8 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <tr th:each="process : ${allProcesses}">
-                        <td class="px-6 py-4 whitespace-nowrap" th:text="${process.student != null ? process.student.name : '-'}"></td>
-                        <td class="px-6 py-4 whitespace-nowrap" th:text="${process.professor != null ? process.professor.name : '-'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap" th:text="${process.processCreator != null ? process.processCreator.name : '-'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap" th:text="${process.processRapporteur != null ? process.processRapporteur.name : '-'}"></td>
                         
                         <td class="px-6 py-4 whitespace-nowrap" th:text="${process.number}"></td>
                         <td class="px-6 py-4 whitespace-nowrap" th:text="${process.title}"></td>
