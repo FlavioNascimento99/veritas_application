@@ -415,143 +415,200 @@ public class DataSeeder implements CommandLineRunner {
         }
     }
 
-    /**
-     * Cria reuniões de colegiado com processos na pauta.
+        /**
+     * Cria reuniões de colegiado com processos na pauta e professores participantes. 
      * Cria reuniões em diferentes estados (programadas, finalizadas).
      * Mínimo de 5 reuniões para testes.
      */
-    private void seedMeetings() {
-        log.info(">>> Criando Reuniões...");
-
-        List<Meeting> existingMeetings = meetingService.findAll();
-        if (!existingMeetings.isEmpty()) {
-            log.info("Reuniões já existem no banco. Pulando criação.");
-            return;
-        }
-
-        List<Collegiate> allCollegiates = collegiateService.findAll();
-        List<Process> allProcesses = processService.findAllProcesses();
-
-        if (allCollegiates.isEmpty()) {
-            log.warn("Não há colegiados cadastrados. Pulando criação de reuniões.");
-            return;
-        }
-
-        // Reunião 1: Programada para o futuro
-        try {
-            Meeting meeting1 = new Meeting();
-            meeting1.setCollegiate(allCollegiates.get(0));
-            meeting1.setCreatedAt(LocalDateTime.now().plusDays(15));
-            meeting1.setStatus(MeetingStatus.AGENDADA);
-            
-            // Adiciona alguns processos na pauta
-            if (!allProcesses.isEmpty()) {
-                List<Process> pauta1 = new ArrayList<>();
-                for (int i = 0; i < Math.min(3, allProcesses.size()); i++) {
-                    pauta1.add(allProcesses. get(i));
-                }
-                meeting1.setProcesses(pauta1);
+        private void seedMeetings() {
+            log.info(">>> Criando Reuniões.. .");
+    
+            List<Meeting> existingMeetings = meetingService.findAll();
+            if (! existingMeetings.isEmpty()) {
+                log.info("Reuniões já existem no banco.  Pulando criação.");
+                return;
             }
-            
-            meetingService. create(meeting1);
-            log.info("✓ Reunião criada (AGENDADA): Colegiado - {}", 
-                     meeting1.getCollegiate().getDescription());
-        } catch (Exception e) {
-            log.warn("Erro ao criar reunião 1: {}", e.getMessage());
-        }
-
-        // Reunião 2: Já finalizada (passado)
-        if (allCollegiates.size() > 1) {
+    
+            List<Collegiate> allCollegiates = collegiateService.findAll();
+            List<Process> allProcesses = processService.findAllProcesses();
+            List<Professor> allProfessors = professorService.findAll();
+    
+            if (allCollegiates.isEmpty()) {
+                log. warn("Não há colegiados cadastrados. Pulando criação de reuniões.");
+                return;
+            }
+    
+            if (allProfessors.isEmpty()) {
+                log.warn("Não há professores cadastrados. As reuniões serão criadas sem participantes.");
+            }
+    
+            // Reunião 1: Programada para o futuro
             try {
-                Meeting meeting2 = new Meeting();
-                meeting2.setCollegiate(allCollegiates.get(1));
-                meeting2.setCreatedAt(LocalDateTime.now().minusDays(30));
-                meeting2.setStatus(MeetingStatus.FINALIZADA);
+                Meeting meeting1 = new Meeting();
+                meeting1.setCollegiate(allCollegiates.get(0));
+                meeting1.setCreatedAt(LocalDateTime. now().plusDays(15));
+                meeting1.setStatus(MeetingStatus. AGENDADA);
                 
-                if (allProcesses.size() > 3) {
-                    List<Process> pauta2 = new ArrayList<>();
-                    for (int i = 3; i < Math.min(6, allProcesses.size()); i++) {
-                        pauta2.add(allProcesses. get(i));
+                // Adiciona alguns processos na pauta
+                if (!allProcesses. isEmpty()) {
+                    List<Process> pauta1 = new ArrayList<>();
+                    for (int i = 0; i < Math.min(3, allProcesses. size()); i++) {
+                        pauta1.add(allProcesses.get(i));
                     }
-                    meeting2.setProcesses(pauta2);
+                    meeting1.setProcesses(pauta1);
                 }
                 
-                meetingService.create(meeting2);
-                log.info("✓ Reunião criada (FINALIZADA): Colegiado - {}", 
-                         meeting2.getCollegiate().getDescription());
-            } catch (Exception e) {
-                log.warn("Erro ao criar reunião 2: {}", e.getMessage());
-            }
-        }
-
-        // Reunião 3: Programada próxima
-        try {
-            Meeting meeting3 = new Meeting();
-            meeting3.setCollegiate(allCollegiates.get(0));
-            meeting3.setCreatedAt(LocalDateTime.now().plusDays(7));
-            meeting3.setStatus(MeetingStatus.AGENDADA);
-            
-            if (allProcesses. size() > 6) {
-                List<Process> pauta3 = new ArrayList<>();
-                for (int i = 6; i < Math.min(9, allProcesses.size()); i++) {
-                    pauta3.add(allProcesses.get(i));
+                // Escala professores para participar da reunião (primeiros 4 professores)
+                if (!allProfessors.isEmpty()) {
+                    List<Professor> participants1 = new ArrayList<>();
+                    for (int i = 0; i < Math.min(4, allProfessors.size()); i++) {
+                        participants1.add(allProfessors.get(i));
+                    }
+                    meeting1.setParticipants(participants1);
                 }
-                meeting3.setProcesses(pauta3);
+                
+                meetingService.create(meeting1);
+                log.info("✓ Reunião criada (AGENDADA): Colegiado - {} | Participantes: {}", 
+                         meeting1.getCollegiate().getDescription(),
+                         meeting1.getParticipants().size());
+            } catch (Exception e) {
+                log.warn("Erro ao criar reunião 1: {}", e.getMessage());
             }
-            
-            meetingService. create(meeting3);
-            log.info("✓ Reunião criada (AGENDADA): Colegiado - {}", 
-                     meeting3.getCollegiate().getDescription());
-        } catch (Exception e) {
-            log.warn("Erro ao criar reunião 3: {}", e.getMessage());
-        }
-
-        // Reunião 4: Finalizada antiga
-        if (allCollegiates.size() > 2) {
+    
+            // Reunião 2: Já finalizada (passado)
+            if (allCollegiates.size() > 1) {
+                try {
+                    Meeting meeting2 = new Meeting();
+                    meeting2.setCollegiate(allCollegiates.get(1));
+                    meeting2.setCreatedAt(LocalDateTime.now().minusDays(30));
+                    meeting2.setStatus(MeetingStatus. FINALIZADA);
+                    
+                    if (allProcesses.size() > 3) {
+                        List<Process> pauta2 = new ArrayList<>();
+                        for (int i = 3; i < Math. min(6, allProcesses.size()); i++) {
+                            pauta2.add(allProcesses.get(i));
+                        }
+                        meeting2.setProcesses(pauta2);
+                    }
+                    
+                    // Escala professores diferentes (índices 2 a 6)
+                    if (allProfessors.size() > 2) {
+                        List<Professor> participants2 = new ArrayList<>();
+                        int startIdx = 2;
+                        for (int i = startIdx; i < Math.min(startIdx + 5, allProfessors.size()); i++) {
+                            participants2.add(allProfessors.get(i));
+                        }
+                        meeting2.setParticipants(participants2);
+                    }
+                    
+                    meetingService.create(meeting2);
+                    log. info("✓ Reunião criada (FINALIZADA): Colegiado - {} | Participantes: {}", 
+                             meeting2.getCollegiate().getDescription(),
+                             meeting2.getParticipants().size());
+                } catch (Exception e) {
+                    log.warn("Erro ao criar reunião 2: {}", e.getMessage());
+                }
+            }
+    
+            // Reunião 3: Programada próxima
             try {
-                Meeting meeting4 = new Meeting();
-                meeting4.setCollegiate(allCollegiates. get(2));
-                meeting4.setCreatedAt(LocalDateTime.now().minusDays(60));
-                meeting4.setStatus(MeetingStatus.FINALIZADA);
+                Meeting meeting3 = new Meeting();
+                meeting3.setCollegiate(allCollegiates.get(0));
+                meeting3.setCreatedAt(LocalDateTime.now().plusDays(7));
+                meeting3.setStatus(MeetingStatus. AGENDADA);
                 
-                if (allProcesses.size() > 9) {
-                    List<Process> pauta4 = new ArrayList<>();
-                    for (int i = 9; i < Math. min(11, allProcesses.size()); i++) {
-                        pauta4.add(allProcesses. get(i));
+                if (allProcesses.size() > 6) {
+                    List<Process> pauta3 = new ArrayList<>();
+                    for (int i = 6; i < Math. min(9, allProcesses.size()); i++) {
+                        pauta3.add(allProcesses.get(i));
                     }
-                    meeting4.setProcesses(pauta4);
+                    meeting3.setProcesses(pauta3);
                 }
                 
-                meetingService.create(meeting4);
-                log.info("✓ Reunião criada (FINALIZADA): Colegiado - {}", 
-                         meeting4.getCollegiate().getDescription());
-            } catch (Exception e) {
-                log.warn("Erro ao criar reunião 4: {}", e.getMessage());
-            }
-        }
-
-        // Reunião 5: Programada futuro distante
-        if (allCollegiates.size() > 1) {
-            try {
-                Meeting meeting5 = new Meeting();
-                meeting5.setCollegiate(allCollegiates. get(1));
-                meeting5.setCreatedAt(LocalDateTime.now().plusDays(30));
-                meeting5.setStatus(MeetingStatus.AGENDADA);
-                
-                if (allProcesses.size() > 11) {
-                    List<Process> pauta5 = new ArrayList<>();
-                    for (int i = 11; i < Math. min(14, allProcesses.size()); i++) {
-                        pauta5.add(allProcesses. get(i));
+                // Escala mix de professores (índices pares)
+                if (! allProfessors.isEmpty()) {
+                    List<Professor> participants3 = new ArrayList<>();
+                    for (int i = 0; i < allProfessors. size() && participants3.size() < 4; i += 2) {
+                        participants3.add(allProfessors.get(i));
                     }
-                    meeting5.setProcesses(pauta5);
+                    meeting3.setParticipants(participants3);
                 }
                 
-                meetingService.create(meeting5);
-                log.info("✓ Reunião criada (AGENDADA): Colegiado - {}", 
-                         meeting5.getCollegiate().getDescription());
+                meetingService.create(meeting3);
+                log.info("✓ Reunião criada (AGENDADA): Colegiado - {} | Participantes:  {}", 
+                         meeting3.getCollegiate().getDescription(),
+                         meeting3.getParticipants().size());
             } catch (Exception e) {
-                log.warn("Erro ao criar reunião 5: {}", e.getMessage());
+                log.warn("Erro ao criar reunião 3: {}", e.getMessage());
+            }
+    
+            // Reunião 4: Finalizada antiga
+            if (allCollegiates.size() > 2) {
+                try {
+                    Meeting meeting4 = new Meeting();
+                    meeting4.setCollegiate(allCollegiates.get(2));
+                    meeting4.setCreatedAt(LocalDateTime.now().minusDays(60));
+                    meeting4.setStatus(MeetingStatus. FINALIZADA);
+                    
+                    if (allProcesses.size() > 9) {
+                        List<Process> pauta4 = new ArrayList<>();
+                        for (int i = 9; i < Math. min(11, allProcesses. size()); i++) {
+                            pauta4.add(allProcesses.get(i));
+                        }
+                        meeting4.setProcesses(pauta4);
+                    }
+                    
+                    // Escala últimos professores da lista
+                    if (allProfessors.size() > 6) {
+                        List<Professor> participants4 = new ArrayList<>();
+                        int startIdx = allProfessors. size() - 5;
+                        for (int i = startIdx; i < allProfessors. size(); i++) {
+                            participants4.add(allProfessors.get(i));
+                        }
+                        meeting4.setParticipants(participants4);
+                    }
+                    
+                    meetingService.create(meeting4);
+                    log.info("✓ Reunião criada (FINALIZADA): Colegiado - {} | Participantes: {}", 
+                             meeting4.getCollegiate().getDescription(),
+                             meeting4.getParticipants().size());
+                } catch (Exception e) {
+                    log.warn("Erro ao criar reunião 4: {}", e.getMessage());
+                }
+            }
+    
+            // Reunião 5: Programada futuro distante
+            if (allCollegiates.size() > 1) {
+                try {
+                    Meeting meeting5 = new Meeting();
+                    meeting5.setCollegiate(allCollegiates.get(1));
+                    meeting5.setCreatedAt(LocalDateTime.now().plusDays(30));
+                    meeting5.setStatus(MeetingStatus. AGENDADA);
+                    
+                    if (allProcesses.size() > 11) {
+                        List<Process> pauta5 = new ArrayList<>();
+                        for (int i = 11; i < Math.min(14, allProcesses. size()); i++) {
+                            pauta5.add(allProcesses.get(i));
+                        }
+                        meeting5.setProcesses(pauta5);
+                    }
+                    
+                    // Escala professores ímpares
+                    if (! allProfessors.isEmpty()) {
+                        List<Professor> participants5 = new ArrayList<>();
+                        for (int i = 1; i < allProfessors. size() && participants5.size() < 5; i += 2) {
+                            participants5.add(allProfessors.get(i));
+                        }
+                        meeting5.setParticipants(participants5);
+                    }
+                    
+                    meetingService. create(meeting5);
+                    log.info("✓ Reunião criada (AGENDADA): Colegiado - {} | Participantes: {}", 
+                             meeting5.getCollegiate().getDescription(),
+                             meeting5.getParticipants().size());
+                } catch (Exception e) {
+                    log.warn("Erro ao criar reunião 5: {}", e.getMessage());
+                }
             }
         }
-    }
 }
