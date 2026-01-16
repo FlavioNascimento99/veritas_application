@@ -64,4 +64,19 @@ public class MeetingService {
     public List<Meeting> findByCollegiateIdAndStatus(Long collegiateId, MeetingStatus status) {
         return meetingRepository.findByCollegiateIdAndStatus(collegiateId, status);
     }
+
+    // Busca todas as reuniões onde o professor está escalado como participante
+    public List<Meeting> findByParticipantId(Long professorId) {
+        return meetingRepository. findByParticipantsId(professorId);
+    }
+
+    // Busca reuniões AGENDADAS onde o professor está escalado
+    public List<Meeting> findScheduledMeetingsByParticipant(Long professorId) {
+        return meetingRepository.findByParticipantsIdAndStatus(professorId, MeetingStatus. AGENDADA);
+    }
+
+    // Busca reuniões de um colegiado específico onde o professor está escalado
+    public List<Meeting> findByCollegiateAndParticipant(Long collegiateId, Long professorId) {
+        return meetingRepository.findByCollegiateIdAndParticipantsId(collegiateId, professorId);
+    }
 }

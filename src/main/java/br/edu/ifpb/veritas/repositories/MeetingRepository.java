@@ -17,4 +17,13 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
 
     // Filtra reuniões do colegiado por status
     List<Meeting> findByCollegiateIdAndStatus(Long collegiateId, MeetingStatus status);
+
+    // Busca reuniões onde um determinado professor está escalado como participante
+    List<Meeting> findByParticipantsId(Long professorId);
+
+    // Busca reuniões AGENDADAS onde o professor está escalado
+    List<Meeting> findByParticipantsIdAndStatus(Long professorId, MeetingStatus status);
+
+    // Busca reuniões de um colegiado onde o professor está escalado
+    List<Meeting> findByCollegiateIdAndParticipantsId(Long collegiateId, Long professorId);
 }

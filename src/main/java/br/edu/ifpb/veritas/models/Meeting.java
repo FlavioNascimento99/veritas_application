@@ -11,6 +11,7 @@
 package br.edu.ifpb.veritas.models;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import br.edu.ifpb.veritas.enums.MeetingStatus;
@@ -61,5 +62,15 @@ public class Meeting {
 
   // Acredito que a ata foi adiada foi adiada
   // para a próxima etapa do projeto
+
+  // REQFUNC 06
+  // Lista de professores escalados para a reunião
+  @ManyToMany
+    @JoinTable(
+            name = "meeting_participants",
+            joinColumns = @JoinColumn(name = "meeting_id"),
+            inverseJoinColumns = @JoinColumn(name = "professor_id")
+    )
+    private List<Professor> participants = new ArrayList<>();
 
 }
