@@ -83,5 +83,5 @@ public class Meeting {
 
   // REQFUNC 10: Indica se a reunião está atualmente em andamento
   @Column(name = "is_active")
-  private boolean isActive = false;
+  private boolean active = false;
 }
