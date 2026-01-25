@@ -57,7 +57,15 @@ public class Meeting {
   )
   private List<Process> processes; // 0..* processos em pauta
 
+  @Column(name = "created_at")
   private LocalDateTime createdAt;
+
+  // REQFUNC 9: Data e hora em que a reunião está agendada para acontecer
+  @Column(name = "scheduled_date")
+  private LocalDateTime scheduledDate;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "status")
   private MeetingStatus status;
 
   // Acredito que a ata foi adiada foi adiada
@@ -73,4 +81,7 @@ public class Meeting {
     )
     private List<Professor> participants = new ArrayList<>();
 
+  // REQFUNC 10: Indica se a reunião está atualmente em andamento
+  @Column(name = "is_active")
+  private boolean isActive = false;
 }

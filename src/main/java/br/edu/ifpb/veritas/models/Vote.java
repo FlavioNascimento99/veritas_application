@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -20,6 +22,9 @@ public class Vote {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "vote_type")
   private VoteType voteType;
   
   /**
@@ -27,8 +32,16 @@ public class Vote {
    * encontrou-se ausente da reunião para definir destino do 
    * Processo.
    */
-  private Boolean away;
+  private Boolean away = false;
 
+
+  // O columnDefinition é para permitir textos longos (que imagino que seria o caso, visto que é uma justificativa de um voto)
+  @Column(name = "justification", columnDefinition = "TEXT")
+  private String justification;
+
+  // Registra a data e hora em que o voto foi realizado
+  @Column(name = "voted_at")
+  private LocalDateTime votedAt;
 
   /**
    * Log 1: Haverá N votos para um Processo, logo referencia 
