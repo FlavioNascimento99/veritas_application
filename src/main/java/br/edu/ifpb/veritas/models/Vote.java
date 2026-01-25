@@ -53,12 +53,11 @@ public class Vote {
 
 
   /**
-   * Log 1: Professor referente ao voto em questão,
-   * neste caso, pra mim, faz mais sentido o OneToOne.
-   * 
-   * Log 2: de ManyToOne para OneToOne.
+   * Um professor pode votar em MÚLTIPLOS processos (um voto por processo).
+   * - Muitos votos podem pertencer a um professor (em processos diferentes)
+   * - Cada voto pertence a um único professor
    */
-  @OneToOne
+  @ManyToOne
   @JoinColumn(name = "PROFESSOR_ID", nullable = false)
   private Professor professor;
 

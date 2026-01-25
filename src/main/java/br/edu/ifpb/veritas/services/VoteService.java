@@ -25,14 +25,19 @@ public class VoteService {
     private final ProcessRepository processRepository;
     private final ProfessorRepository professorRepository;
 
-    // REQFUNC 5: Professor registra seu voto em um processo
+    /**
+     * REQFUNC 5: Professor registra seu voto em um processo.
+     *
+     * Se o professor for o relator do processo, além de registrar o voto
+     * na tabela TB_VOTES, também atualiza o campo rapporteurVote no Process.
+     */
     @Transactional
     public Vote registerVote(Long processId, Long professorId, VoteType voteType, String justification) {
         // Verifica se o processo existe
         Process process = processRepository.findById(processId)
                 .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado com ID: " + processId));
 
-        // Veririca se o professor existe
+        // Verifica se o professor existe
         Professor professor = professorRepository.findById(professorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com ID: " + professorId));
 
@@ -42,7 +47,7 @@ public class VoteService {
             throw new IllegalStateException("Professor já votou neste processo. ID do voto existente: " + existingVote.get().getId());
         }
 
-        // Computa o voto de fato
+        // Cria e salva o voto
         Vote vote = new Vote();
         vote.setProcess(process);
         vote.setProfessor(professor);
@@ -51,7 +56,19 @@ public class VoteService {
         vote.setAway(false);
         vote.setVotedAt(LocalDateTime.now());
 
-        return voteRepository.save(vote);
+        Vote savedVote = voteRepository.save(vote);
+
+        // CORREÇÃO: Se o professor é o relator, atualiza o campo rapporteurVote do Process
+        if (process.getProcessRapporteur() != null &&
+                process.getProcessRapporteur().getId().equals(professorId)) {
+
+            // Converte VoteType para DecisionType
+            DecisionType decision = convertVoteToDecision(voteType);
+            process.setRapporteurVote(decision);
+            processRepository.save(process);
+        }
+
+        return savedVote;
     }
 
     // Registra ausência de um professor em uma votação
@@ -115,7 +132,6 @@ public class VoteService {
         // Calcula maioria
         long majority = (totalVotes / 2) + 1;
 
-        // --- Acho que a lógica é essa, é bom validar com mais calma depois ---
         // Se maioria votou com o relator, mantém o voto do relator
         if (votesForRapporteur >= majority) {
             return rapporteurVote;
@@ -125,11 +141,24 @@ public class VoteService {
         }
     }
 
-    // Converte DecisionType (do relator) para VoteType (dos membros)
+    /**
+     * Converte DecisionType (do relator) para VoteType (dos membros).
+     */
     private VoteType convertDecisionToVote(DecisionType decision) {
         if (decision == null) return null;
         return decision == DecisionType.DEFERIMENTO
                 ? VoteType.DEFERIDO
                 : VoteType.INDEFERIDO;
+    }
+
+    /**
+     * Converte VoteType para DecisionType.
+     * Usado quando o relator vota, para atualizar o campo rapporteurVote do Process.
+     */
+    private DecisionType convertVoteToDecision(VoteType voteType) {
+        if (voteType == null) return null;
+        return voteType == VoteType.DEFERIDO
+                ? DecisionType.DEFERIMENTO
+                : DecisionType.INDEFERIMENTO;
     }
 }
