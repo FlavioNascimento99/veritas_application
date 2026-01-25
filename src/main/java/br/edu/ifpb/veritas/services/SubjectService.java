@@ -17,7 +17,6 @@ public class SubjectService {
 
     private final SubjectRepository subjectRepository;
 
-
     /**
      * Consutáveis
      * 

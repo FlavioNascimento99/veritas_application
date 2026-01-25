@@ -10,16 +10,20 @@ import br.edu.ifpb.veritas.repositories.ProcessRepository;
 import br.edu.ifpb.veritas.repositories.ProfessorRepository;
 import br.edu.ifpb.veritas.repositories.VoteRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Service
+@RequiredArgsConstructor
 public class VoteService {
 
-    private VoteRepository voteRepository;
-    private ProcessRepository processRepository;
-    private ProfessorRepository professorRepository;
+    private final VoteRepository voteRepository;
+    private final ProcessRepository processRepository;
+    private final ProfessorRepository professorRepository;
 
     // REQFUNC 5: Professor registra seu voto em um processo
     @Transactional
