@@ -62,9 +62,9 @@ public class DashboardController {
             model.addAttribute("recentProcesses", recent);
             model.addAttribute("mainContent", "pages/dashboard-admin ::  content");
 
-        /**
-         * Renderização de Serviços à acessos de cunho Coordenativo
-         */
+            /**
+             * Renderização de Serviços à acessos de cunho Coordenativo
+             */
         } else if (roles. contains("ROLE_COORDINATOR")) {
 
             Professor professor = professorService.findByLogin(authentication.getName())
@@ -82,43 +82,34 @@ public class DashboardController {
             model.addAttribute("waitingProcesses", processService. findWaitingProcesses());
             model.addAttribute("mainContent", "pages/dashboard-coordinator :: content");
 
-        /**
-         * Renderização de Serviços à acessos de cunho Mestre (Professor)
-         * Implementa REQFUNC 4 e REQFUNC 6
-         */
+            /**
+             * Renderização de Serviços à acessos de cunho Mestre (Professor)
+             * Implementa REQFUNC 4 e REQFUNC 6
+             */
         } else if (roles.contains("ROLE_PROFESSOR")) {
-
             Professor professor = professorService.findByLogin(authentication.getName())
                     .orElseThrow(() -> new IllegalArgumentException("Professor não encontrado."));
 
-            // Colegiado do professor (ajuste conforme sua modelagem de relação)
-            Collegiate collegiate = collegiateService.findByProfessorId(professor.getId());
-            if (collegiate == null) {
-                throw new IllegalArgumentException("Colegiado não encontrado para o professor.");
-            }
-
-
-            // Filtro de reuniões por status
-            List<Meeting> collegiateMeetings;
-            if (meetingStatus != null && !meetingStatus.isBlank()) {
-                MeetingStatus statusEnum = MeetingStatus.valueOf(meetingStatus);
-                collegiateMeetings = meetingService.findByCollegiateIdAndStatus(collegiate.getId(), statusEnum);
-            } else {
-                collegiateMeetings = meetingService.findByCollegiateId(collegiate.getId());
-            }
-
-            // Reuniões nas quais o professor está escalado e agendadas
-            List<Meeting> scheduledMeetings = meetingService.findScheduledMeetingsByParticipant(professor.getId());
-
             model.addAttribute("professor", professor);
-            model.addAttribute("collegiateMeetings", collegiateMeetings);
-            model.addAttribute("scheduledMeetings", scheduledMeetings);
+            model.addAttribute("processes", processService.listByProfessor(professor.getId()));
 
-            // Popula o dropdown de status e devolve o valor selecionado
+            // ========== ADICIONAR ESTA LINHA ==========
             model.addAttribute("meetingStatuses", MeetingStatus.values());
+
+            // ========== REQFUNC 4: Reuniões do Colegiado (com filtro de status) ==========
+            List<Meeting> collegiateMeetings = findCollegiateMeetingsForProfessor(professor.getId(), meetingStatus);
+            model.addAttribute("collegiateMeetings", collegiateMeetings);
             model.addAttribute("filterMeetingStatus", meetingStatus);
 
+            // ========== REQFUNC 6: Reuniões Agendadas onde o professor está escalado ==========
+            List<Meeting> scheduledParticipations = meetingService.findScheduledMeetingsByParticipant(professor.getId());
+            model.addAttribute("scheduledMeetings", scheduledParticipations);
             model.addAttribute("mainContent", "pages/dashboard-professor :: content");
+
+
+            /**
+             * Renderização de Serviços à acessos de cunho Estudantil
+             */
         } else if (roles.contains("ROLE_STUDENT")) {
             Student student = studentService.findByLogin(authentication. getName())
                     .orElseThrow(() -> new IllegalArgumentException("Estudante não encontrado. "));
