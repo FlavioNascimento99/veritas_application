@@ -29,7 +29,6 @@ public class MeetingService {
 
     @Transactional
     public Meeting create(Meeting meeting) {
-        // Seta a data de criação se não estiver definida
         if (meeting.getCreatedAt() == null) {
             meeting.setCreatedAt(LocalDateTime.now());
         }
@@ -45,18 +44,35 @@ public class MeetingService {
                 .orElseThrow(() -> new ResourceNotFoundException("Reunião não encontrada."));
     }
 
+    /**
+     * REQFUNC 12: Impede alteração de reunião finalizada
+     */
     @Transactional
     public Meeting update(Long id, Meeting payload) {
         Meeting currentMeeting = findById(id);
+
+        // Impede alteração de reunião finalizada
+        if (currentMeeting.getStatus() == MeetingStatus.FINALIZADA) {
+            throw new IllegalStateException("Não é possível alterar uma reunião finalizada.");
+        }
+
         currentMeeting.setCollegiate(payload.getCollegiate());
         currentMeeting.setProcesses(payload.getProcesses());
+        currentMeeting.setScheduledDate(payload.getScheduledDate());
         currentMeeting.setStatus(payload.getStatus());
+
         return meetingRepository.save(currentMeeting);
     }
 
     @Transactional
     public Meeting updateStatus(Long id, MeetingStatus status) {
         Meeting meeting = findById(id);
+
+        // Impede alteração de status de reunião já finalizada
+        if (meeting.getStatus() == MeetingStatus.FINALIZADA) {
+            throw new IllegalStateException("Não é possível alterar o status de uma reunião já finalizada.");
+        }
+
         meeting.setStatus(status);
         return meetingRepository.save(meeting);
     }
@@ -65,43 +81,35 @@ public class MeetingService {
         return meetingRepository.findByStatus(status);
     }
 
-    // Retorna todas as reuniões associadas a um colegiado específico
     public List<Meeting> findByCollegiateId(Long collegiateId) {
         return meetingRepository.findByCollegiateId(collegiateId);
     }
 
-    // Filtra por colegiado e status
     public List<Meeting> findByCollegiateIdAndStatus(Long collegiateId, MeetingStatus status) {
         return meetingRepository.findByCollegiateIdAndStatus(collegiateId, status);
     }
 
-    // Busca todas as reuniões onde o professor está escalado como participante
     public List<Meeting> findByParticipantId(Long professorId) {
         return meetingRepository.findByParticipantsId(professorId);
     }
 
-    // Busca reuniões AGENDADAS onde o professor está escalado
     public List<Meeting> findScheduledMeetingsByParticipant(Long professorId) {
-        return meetingRepository.findByParticipantsIdAndStatus(professorId, MeetingStatus. AGENDADA);
+        return meetingRepository.findByParticipantsIdAndStatus(professorId, MeetingStatus.AGENDADA);
     }
 
-    // Busca reuniões de um colegiado específico onde o professor está escalado
     public List<Meeting> findByCollegiateAndParticipant(Long collegiateId, Long professorId) {
         return meetingRepository.findByCollegiateIdAndParticipantsId(collegiateId, professorId);
     }
 
-    // REQFUNC 9: Coordenador cria uma reunião definindo data, pauta e participantes
     @Transactional
     public Meeting createMeetingWithAgenda(Long collegiateId,
                                            LocalDateTime scheduledDate,
                                            List<Long> processIds,
                                            List<Long> participantIds) {
 
-        // 1. Valida se o colegiado existe
         Collegiate collegiate = collegiateRepository.findById(collegiateId)
                 .orElseThrow(() -> new ResourceNotFoundException("Colegiado não encontrado com ID: " + collegiateId));
 
-        // 2. Valida e carrega os processos da pauta
         List<Process> processes = new ArrayList<>();
         if (processIds != null && !processIds.isEmpty()) {
             for (Long processId : processIds) {
@@ -111,14 +119,12 @@ public class MeetingService {
             }
         }
 
-        // 3. Valida e carrega os professores participantes
         List<Professor> participants = new ArrayList<>();
         if (participantIds != null && !participantIds.isEmpty()) {
             for (Long professorId : participantIds) {
                 Professor professor = professorRepository.findById(professorId)
                         .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com ID: " + professorId));
 
-                // Verifica se o professor pertence ao colegiado
                 if (!collegiate.getCollegiateMemberList().contains(professor)) {
                     throw new IllegalArgumentException("Professor ID " + professorId + " não pertence ao colegiado.");
                 }
@@ -127,7 +133,6 @@ public class MeetingService {
             }
         }
 
-        // 4. Cria a reunião
         Meeting meeting = new Meeting();
         meeting.setCollegiate(collegiate);
         meeting.setScheduledDate(scheduledDate);
@@ -140,7 +145,6 @@ public class MeetingService {
         return meetingRepository.save(meeting);
     }
 
-    // REQFUNC 9: Adiciona processos à pauta de uma reunião existente
     @Transactional
     public Meeting addProcessesToAgenda(Long meetingId, List<Long> processIds) {
         Meeting meeting = findById(meetingId);
@@ -160,7 +164,6 @@ public class MeetingService {
         return meetingRepository.save(meeting);
     }
 
-    // REQFUNC 9: Adiciona participantes a uma reunião existente
     @Transactional
     public Meeting addParticipants(Long meetingId, List<Long> participantIds) {
         Meeting meeting = findById(meetingId);
@@ -181,12 +184,8 @@ public class MeetingService {
         return meetingRepository.save(meeting);
     }
 
-    /**
-     * REQFUNC 10: Inicia uma reunião (apenas uma pode estar ativa por vez).
-     */
     @Transactional
     public Meeting startMeeting(Long meetingId) {
-        // Verifica se já existe reunião ativa
         meetingRepository.findByActiveTrue().ifPresent(activeMeeting -> {
             throw new IllegalStateException("Já existe uma reunião ativa (ID: " + activeMeeting.getId() + "). Finalize-a antes de iniciar outra.");
         });
@@ -198,13 +197,13 @@ public class MeetingService {
         }
 
         meeting.setActive(true);
-        meeting.setStatus(MeetingStatus.AGENDADA); // Mantém como agendada enquanto está acontecendo
+        meeting.setStatus(MeetingStatus.AGENDADA);
 
         return meetingRepository.save(meeting);
     }
 
     /**
-     * REQFUNC 12: Finaliza uma reunião.
+     * REQFUNC 12: Finaliza uma reunião, travando todas as alterações.
      */
     @Transactional
     public Meeting finalizeMeeting(Long meetingId) {
@@ -220,9 +219,6 @@ public class MeetingService {
         return meetingRepository.save(meeting);
     }
 
-    /**
-     * Busca a reunião atualmente ativa.
-     */
     public Meeting findActiveMeeting() {
         return meetingRepository.findByActiveTrue()
                 .orElseThrow(() -> new ResourceNotFoundException("Nenhuma reunião está ativa no momento."));

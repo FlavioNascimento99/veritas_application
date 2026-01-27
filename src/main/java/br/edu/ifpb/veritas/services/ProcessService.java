@@ -134,22 +134,27 @@ public class ProcessService {
         return processRepository.findAll(spec);
     }
 
+    /**
+     * Impede redistribuição de processos já julgados
+     */
     @Transactional
     public Process distribute(Long processId, Long professorId) {
-        // 1. Busca o processo
         Process process = processRepository.findById(processId)
-                .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado com o ID: " + processId));
+                .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado com ID: " + processId));
 
-        // 2. Busca o professor (relator)
         Professor professor = professorRepository.findById(professorId)
-                .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com o ID: " + professorId));
+                .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com ID: " + professorId));
 
-        // 3. Valida se o processo está aguardando distribuição
+        // Impede redistribuição de processo já finalizado
+        if (process.getStatus() == StatusProcess.APPROVED || process.getStatus() == StatusProcess.REJECTED) {
+            throw new IllegalStateException("Não é possível redistribuir um processo já finalizado.");
+        }
+
+        // Valida se o processo está aguardando distribuição
         if (process.getStatus() != StatusProcess.WAITING) {
             throw new IllegalStateException("O processo não pode ser distribuído pois seu status é: " + process.getStatus());
         }
 
-        // 4. Atribui o professor, atualiza o status e a data de distribuição
         process.setProcessRapporteur(professor);
         process.setStatus(StatusProcess.UNDER_ANALISYS);
         process.setDistributedAt(LocalDateTime.now());
