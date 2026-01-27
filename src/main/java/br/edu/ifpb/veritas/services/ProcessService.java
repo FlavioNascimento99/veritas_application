@@ -36,11 +36,11 @@ public class ProcessService {
         }
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudante não encontrado com o ID: " + studentId));
-        
+
         if (subjectId == null) {
             throw new IllegalArgumentException("O ID do assunto não pode ser nulo.");
         }
-        
+
         Subject subject = subjectRepository.findById(subjectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Assunto não encontrado com o ID: " + subjectId));
 
@@ -166,6 +166,18 @@ public class ProcessService {
         // Use the current year and a 5-digit sequence derived from the current time
         int seq = (int) (System.currentTimeMillis() % 100000);
         return String.format("%d-%05d", Year.now().getValue(), seq);
+    }
+
+    // Busca processos finalizados (aprovados ou rejeitados)
+    public List<Process> findFinalizedProcesses() {
+        return processRepository.findByStatusIn(List.of(StatusProcess.APPROVED, StatusProcess.REJECTED));
+    }
+
+    // Verifica se um processo pode ser votado
+    public boolean canBeVoted(Long processId) {
+        Process process = findById(processId);
+        return process.getStatus() == StatusProcess.UNDER_ANALISYS
+                && process.getProcessRapporteur() != null;
     }
 
 }

@@ -31,7 +31,11 @@ public class VoteService {
 
     /**
      * REQFUNC 5: Professor registra seu voto em um processo.
-     * REQFUNC 12: Impede votação em processos de reuniões finalizadas.
+     *
+     * Validações:
+     * - Processo não pode estar finalizado
+     * - Professor não pode votar duas vezes no mesmo processo
+     * - Reunião contendo o processo não pode estar finalizada
      */
     @Transactional
     public Vote registerVote(Long processId, Long professorId, VoteType voteType, String justification) {
@@ -41,10 +45,15 @@ public class VoteService {
         Professor professor = professorRepository.findById(professorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com ID: " + professorId));
 
-        // Impede voto em processo de reunião finalizada
+        // Impede voto em processo já finalizado
+        if (process.getStatus() == StatusProcess.APPROVED || process.getStatus() == StatusProcess.REJECTED) {
+            throw new IllegalStateException("Não é possível votar em um processo já finalizado. Status: " + process.getStatus());
+        }
+
+        // Impede voto em reunião finalizada
         validateMeetingNotFinalized(processId);
 
-        // Valida se o processo está em análise
+        // Valida se o processo está sob análise
         if (process.getStatus() != StatusProcess.UNDER_ANALISYS) {
             throw new IllegalStateException("Processo não está disponível para votação. Status atual: " + process.getStatus());
         }
@@ -78,7 +87,7 @@ public class VoteService {
     }
 
     /**
-     * Valida se o processo está em reunião finalizada
+     * Verifica se reunião contendo o processo não está finalizada
      */
     private void validateMeetingNotFinalized(Long processId) {
         List<Meeting> meetings = meetingRepository.findByProcessInAgenda(processId);
@@ -93,6 +102,59 @@ public class VoteService {
         }
     }
 
+    /**
+     * REQFUNC 11: Apregoa um processo e calcula seu resultado final automaticamente.
+     *
+     * Este método deve ser chamado pelo coordenador durante a reunião ativa.
+     *
+     * Finaliza o julgamento do processo, calculando o resultado baseado nos votos
+     * e atualizando seu status para APPROVED ou REJECTED
+     */
+    @Transactional
+    public Process announceProcess(Long processId) {
+        Process process = processRepository.findById(processId)
+                .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado com ID: " + processId));
+
+        // Valida se o processo está sob análise
+        if (process.getStatus() != StatusProcess.UNDER_ANALISYS) {
+            throw new IllegalStateException("Processo não pode ser apregoado. Status atual: " + process.getStatus());
+        }
+
+        // Valida se o relator já votou
+        if (process.getRapporteurVote() == null) {
+            throw new IllegalStateException("Relator ainda não votou neste processo. Apregoamento não pode ser realizado.");
+        }
+
+        // Valida se há uma reunião ativa
+        Meeting activeMeeting = meetingRepository.findByActiveTrue()
+                .orElseThrow(() -> new IllegalStateException("Não há reunião ativa no momento."));
+
+        // Valida se o processo está na pauta da reunião ativa
+        boolean isInAgenda = activeMeeting.getProcesses().stream()
+                .anyMatch(p -> p.getId().equals(processId));
+
+        if (!isInAgenda) {
+            throw new IllegalStateException("Processo não está na pauta da reunião ativa (ID: " + activeMeeting.getId() + ").");
+        }
+
+        // Calcula o resultado da votação
+        VoteType result = calculateResult(processId);
+
+        // Atualiza o status do processo baseado no resultado
+        if (result == VoteType.DEFERIDO) {
+            process.setStatus(StatusProcess.APPROVED);
+        } else {
+            process.setStatus(StatusProcess.REJECTED);
+        }
+
+        process.setSolvedAt(LocalDateTime.now());
+
+        return processRepository.save(process);
+    }
+
+    /**
+     * Registra ausência de um professor em uma votação
+     */
     @Transactional
     public Vote registerAbsence(Long processId, Long professorId) {
         Process process = processRepository.findById(processId)
@@ -103,6 +165,11 @@ public class VoteService {
 
         // Valida se reunião não está finalizada
         validateMeetingNotFinalized(processId);
+
+        // Valida se processo não está finalizado
+        if (process.getStatus() == StatusProcess.APPROVED || process.getStatus() == StatusProcess.REJECTED) {
+            throw new IllegalStateException("Não é possível registrar ausência em processo já finalizado.");
+        }
 
         Vote vote = new Vote();
         vote.setProcess(process);
@@ -125,6 +192,13 @@ public class VoteService {
         return voteRepository.findByProcessIdAndProfessorId(processId, professorId).isPresent();
     }
 
+    /**
+     * REQFUNC 11: Calcula o resultado da votação de um processo.
+     *
+     * Regra de negócio:
+     * - Se maioria votou igual ao relator → resultado = voto do relator
+     * - Se maioria votou diferente do relator → resultado = contrário ao relator
+     */
     public VoteType calculateResult(Long processId) {
         Process process = processRepository.findById(processId)
                 .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado."));
@@ -135,19 +209,64 @@ public class VoteService {
             throw new IllegalStateException("Relator ainda não votou neste processo.");
         }
 
+        // Contagem de votos
         Long votesForRapporteur = voteRepository.countByProcessIdAndVoteType(processId, rapporteurVote);
         Long totalVotes = voteRepository.countVotesByProcessId(processId);
 
+        // Se não houve votação pelos membros, prevalece o voto do relator
         if (totalVotes == 0) {
             return rapporteurVote;
         }
 
+        // Calcula maioria
         long majority = (totalVotes / 2) + 1;
 
+        // Se maioria votou com o relator, mantém o voto do relator
         if (votesForRapporteur >= majority) {
             return rapporteurVote;
         } else {
+            // Caso contrário, retorna o contrário do voto do relator
             return rapporteurVote == VoteType.DEFERIDO ? VoteType.INDEFERIDO : VoteType.DEFERIDO;
+        }
+    }
+
+    /**
+     * Retorna informações sobre a votação de um processo
+     */
+    public VotingStats getVotingStats(Long processId) {
+        Process process = processRepository.findById(processId)
+                .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado."));
+
+        Long totalVotes = voteRepository.countVotesByProcessId(processId);
+        Long votesForDeferido = voteRepository.countByProcessIdAndVoteType(processId, VoteType.DEFERIDO);
+        Long votesForIndeferido = voteRepository.countByProcessIdAndVoteType(processId, VoteType.INDEFERIDO);
+
+        return new VotingStats(
+                totalVotes,
+                votesForDeferido,
+                votesForIndeferido,
+                process.getRapporteurVote(),
+                process.getStatus()
+        );
+    }
+
+    /**
+     * Estatísticas de votação
+     */
+    public static class VotingStats {
+        public final Long totalVotes;
+        public final Long votesForDeferido;
+        public final Long votesForIndeferido;
+        public final VoteType rapporteurVote;
+        public final StatusProcess processStatus;
+
+        public VotingStats(Long totalVotes, Long votesForDeferido, Long votesForIndeferido,
+                           VoteType rapporteurVote, StatusProcess processStatus) {
+            this.totalVotes = totalVotes;
+            this.votesForDeferido = votesForDeferido;
+            this.votesForIndeferido = votesForIndeferido;
+            this.rapporteurVote = rapporteurVote;
+            this.processStatus = processStatus;
         }
     }
 }
