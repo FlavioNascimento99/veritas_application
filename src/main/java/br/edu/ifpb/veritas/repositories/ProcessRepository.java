@@ -54,4 +54,6 @@ public interface ProcessRepository extends JpaRepository<Process, Long>, JpaSpec
 
   Long countByProcessCreator_IdAndStatus(Long studentId, StatusProcess status);
 
+  List<Process> findByStatusIn(List<StatusProcess> statusProcess);
+
 }
