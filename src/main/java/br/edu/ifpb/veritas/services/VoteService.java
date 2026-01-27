@@ -1,6 +1,5 @@
 package br.edu.ifpb.veritas.services;
 
-import br.edu.ifpb.veritas.enums.DecisionType;
 import br.edu.ifpb.veritas.enums.VoteType;
 import br.edu.ifpb.veritas.exceptions.ResourceNotFoundException;
 import br.edu.ifpb.veritas.models.Process;
@@ -58,13 +57,11 @@ public class VoteService {
 
         Vote savedVote = voteRepository.save(vote);
 
-        // CORREÇÃO: Se o professor é o relator, atualiza o campo rapporteurVote do Process
+        // Se o professor é o relator, atualiza o campo rapporteurVote do Process
         if (process.getProcessRapporteur() != null &&
                 process.getProcessRapporteur().getId().equals(professorId)) {
 
-            // Converte VoteType para DecisionType
-            DecisionType decision = convertVoteToDecision(voteType);
-            process.setRapporteurVote(decision);
+            process.setRapporteurVote(voteType);
             processRepository.save(process);
         }
 
@@ -114,7 +111,7 @@ public class VoteService {
                 .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado."));
 
         // Voto do relator (já registrado no processo)
-        VoteType rapporteurVote = convertDecisionToVote(process.getRapporteurVote());
+        VoteType rapporteurVote = process.getRapporteurVote();
 
         if (rapporteurVote == null) {
             throw new IllegalStateException("Relator ainda não votou neste processo.");
@@ -139,26 +136,5 @@ public class VoteService {
             // Caso contrário, retorna o contrário do voto do relator
             return rapporteurVote == VoteType.DEFERIDO ? VoteType.INDEFERIDO : VoteType.DEFERIDO;
         }
-    }
-
-    /**
-     * Converte DecisionType (do relator) para VoteType (dos membros).
-     */
-    private VoteType convertDecisionToVote(DecisionType decision) {
-        if (decision == null) return null;
-        return decision == DecisionType.DEFERIMENTO
-                ? VoteType.DEFERIDO
-                : VoteType.INDEFERIDO;
-    }
-
-    /**
-     * Converte VoteType para DecisionType.
-     * Usado quando o relator vota, para atualizar o campo rapporteurVote do Process.
-     */
-    private DecisionType convertVoteToDecision(VoteType voteType) {
-        if (voteType == null) return null;
-        return voteType == VoteType.DEFERIDO
-                ? DecisionType.DEFERIMENTO
-                : DecisionType.INDEFERIMENTO;
     }
 }
