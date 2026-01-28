@@ -71,17 +71,23 @@ public class Meeting {
   // Acredito que a ata foi adiada foi adiada
   // para a próxima etapa do projeto
 
-  // REQFUNC 06
-  // Lista de professores escalados para a reunião
+  // REQFUNC 09: Lista de professores escalados para a reunião
   @ManyToMany
-    @JoinTable(
-            name = "meeting_participants",
-            joinColumns = @JoinColumn(name = "meeting_id"),
-            inverseJoinColumns = @JoinColumn(name = "professor_id")
+  @JoinTable(
+          name = "meeting_participants",
+          joinColumns = @JoinColumn(name = "meeting_id"),
+          inverseJoinColumns = @JoinColumn(name = "professor_id")
     )
-    private List<Professor> participants = new ArrayList<>();
+  private List<Professor> participants = new ArrayList<>();
 
   // REQFUNC 10: Indica se a reunião está atualmente em andamento
   @Column(name = "is_active")
   private boolean active = false;
+
+  /**
+   * Ata da reunião (PDF)
+   */
+  @Lob
+  @Column(name = "meeting_document", columnDefinition = "BYTEA")
+  private byte[] meetingDocument;
 }

@@ -1,6 +1,7 @@
 package br.edu.ifpb.veritas.services;
 
 import br.edu.ifpb.veritas.enums.MeetingStatus;
+import br.edu.ifpb.veritas.enums.StatusProcess;
 import br.edu.ifpb.veritas.exceptions.ResourceNotFoundException;
 import br.edu.ifpb.veritas.models.Collegiate;
 import br.edu.ifpb.veritas.models.Meeting;
@@ -115,6 +116,17 @@ public class MeetingService {
             for (Long processId : processIds) {
                 Process process = processRepository.findById(processId)
                         .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado com ID: " + processId));
+
+                // VALIDAÇÃO ADICIONAL: Processo deve estar EM_ANALISE
+                if (process.getStatus() != StatusProcess.UNDER_ANALISYS) {
+                    throw new IllegalStateException("Apenas processos em análise podem ser adicionados à pauta. Processo ID " + processId + " está com status: " + process.getStatus().getStatus());
+                }
+
+                // VALIDAÇÃO ADICIONAL: Relator deve ter votado
+                if (process.getRapporteurVote() == null) {
+                    throw new IllegalStateException("Processo ID " + processId + " não pode ser adicionado à pauta pois o relator ainda não registrou sua decisão.");
+                }
+
                 processes.add(process);
             }
         }
@@ -156,6 +168,16 @@ public class MeetingService {
         for (Long processId : processIds) {
             Process process = processRepository.findById(processId)
                     .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado com ID: " + processId));
+
+            // VALIDAÇÃO: Processo deve estar EM_ANALISE
+            if (process.getStatus() != StatusProcess.UNDER_ANALISYS) {
+                throw new IllegalStateException("Apenas processos em análise podem ser adicionados à pauta. Status atual: " + process.getStatus().getStatus());
+            }
+
+            // VALIDAÇÃO: Relator deve ter votado
+            if (process.getRapporteurVote() == null) {
+                throw new IllegalStateException("O relator do processo (ID: " + processId + ") ainda não registrou sua decisão.");
+            }
 
             if (!meeting.getProcesses().contains(process)) {
                 meeting.getProcesses().add(process);

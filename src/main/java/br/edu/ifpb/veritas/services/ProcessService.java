@@ -14,7 +14,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.List;
@@ -150,6 +152,11 @@ public class ProcessService {
             throw new IllegalStateException("Não é possível redistribuir um processo já finalizado.");
         }
 
+        // Impede redistribuição de processo em análise
+        if (process.getStatus() == StatusProcess.UNDER_ANALISYS) {
+            throw new IllegalStateException("Este processo já foi distribuído para um relator e está em análise. Não é possível redistribuí-lo.");
+        }
+
         // Valida se o processo está aguardando distribuição
         if (process.getStatus() != StatusProcess.WAITING) {
             throw new IllegalStateException("O processo não pode ser distribuído pois seu status é: " + process.getStatus());
@@ -179,5 +186,4 @@ public class ProcessService {
         return process.getStatus() == StatusProcess.UNDER_ANALISYS
                 && process.getProcessRapporteur() != null;
     }
-
 }

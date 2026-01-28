@@ -3,6 +3,7 @@ package br.edu.ifpb.veritas.models;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import br.edu.ifpb.veritas.enums.DecisionType;
 import br.edu.ifpb.veritas.enums.VoteType;
 import br.edu.ifpb.veritas.enums.StatusProcess;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -43,15 +44,13 @@ public class Process {
    @Column(name = "SOLVED_AT")
    private LocalDateTime solvedAt;
 
-   private String opinion;
-
    @Column(name = "PROCESS_STATUS")
    @Enumerated(EnumType.STRING)
    private StatusProcess status;
 
    @Column(name = "RAPPORTEUR_VOTE")
    @Enumerated(EnumType.STRING)
-   private VoteType rapporteurVote;
+   private DecisionType rapporteurVote;
 
    @Column(name = "PROCESS_ORDER")
    private String processOrder;
@@ -70,4 +69,27 @@ public class Process {
 
    @OneToMany(mappedBy = "process", cascade = CascadeType.ALL)
    private List<Vote> processVoteList;
+
+   /**
+    * Justificativa escrita pelo relator ao votar (REQFUNC 5)
+    */
+   @Column(name = "RAPPORTEUR_JUSTIFICATION", columnDefinition = "TEXT")
+   private String rapporteurJustification;
+
+   /**
+    * REQFUNC 16: Armazena o PDF do requerimento enviado pelo aluno
+    */
+   @Lob
+   @Column(name = "DOCUMENT", columnDefinition = "BYTEA")
+   private byte[] document;
+
+   @Column(name = "DOCUMENT_FILENAME")
+   private String documentFilename;
+
+   @Column(name = "DOCUMENT_UPLOAD_DATE")
+   private LocalDateTime documentUploadDate;
+
+   /**
+    * Status atual do processo no fluxo
+    */
 }
