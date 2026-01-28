@@ -87,7 +87,6 @@ public class Meeting {
   /**
    * Ata da reunião (PDF)
    */
-  @Lob
-  @Column(name = "meeting_document", columnDefinition = "BYTEA")
+  @Column(name = "meeting_document", columnDefinition = "bytea")
   private byte[] meetingDocument;
 }

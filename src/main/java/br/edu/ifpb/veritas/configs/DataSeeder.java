@@ -1,7 +1,8 @@
 package br.edu.ifpb.veritas.configs;
 
+import br.edu.ifpb.veritas.enums.DecisionType;
 import br.edu.ifpb.veritas.enums.MeetingStatus;
-import br.edu.ifpb.veritas.enums.VoteType;
+import br.edu.ifpb.veritas.enums.StatusProcess;
 import br.edu.ifpb.veritas.models.*;
 import br.edu.ifpb.veritas.models.Process;
 import br.edu.ifpb.veritas.services.*;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * DataSeeder: Classe responsável por popular o banco de dados com dados iniciais
@@ -20,15 +22,16 @@ import java.util.List;
  *
  * Executa automaticamente ao iniciar a aplicação (implementa CommandLineRunner).
  *
- * Ordem de execução:
+ * ORDEM DE EXECUÇÃO (CRÍTICA - NÃO ALTERAR):
  * 1. Administradores
  * 2. Assuntos (Subjects)
  * 3. Professores
  * 4. Estudantes
  * 5. Colegiados
  * 6. Processos
- * 7. Reuniões (Meetings)
- * 8. Votos (Votes) - NOVO
+ * 7. Distribuição de Processos (para que fiquem UNDER_ANALISYS)
+ * 8. Votos dos Relatores (OBRIGATÓRIO antes de criar reuniões)
+ * 9. Reuniões (só podem ter processos com relator que já votou)
  */
 @Slf4j
 @Component
@@ -42,7 +45,7 @@ public class DataSeeder implements CommandLineRunner {
     private final CollegiateService collegiateService;
     private final ProcessService processService;
     private final MeetingService meetingService;
-    private final VoteService voteService;  // ← NOVO: injeção do VoteService
+    private final VoteService voteService;
 
     @Override
     public void run(String... args) throws Exception {
@@ -54,8 +57,8 @@ public class DataSeeder implements CommandLineRunner {
         seedStudents();
         seedCollegiates();
         seedProcesses();
+        seedRapporteurVotes();  // ← IMPORTANTE: Votos dos relatores ANTES das reuniões
         seedMeetings();
-        seedVotes();  // ← NOVO: popula votos
 
         log.info("====== BANCO DE DADOS POPULADO COM SUCESSO ======");
     }
@@ -71,7 +74,7 @@ public class DataSeeder implements CommandLineRunner {
             Administrator admin1 = new Administrator();
             admin1.setName("Admin Master");
             admin1.setLogin("admin");
-            admin1.setPassword("admin123");  // Será criptografada pelo service
+            admin1.setPassword("admin123");
             admin1.setRegister("ADM001");
             admin1.setPhoneNumber("(83) 99999-0001");
             admin1.setIsActive(true);
@@ -136,10 +139,10 @@ public class DataSeeder implements CommandLineRunner {
             Professor prof1 = new Professor();
             prof1.setName("Dr. João Silva");
             prof1.setLogin("joao.silva");
-            prof1.setPassword("prof123");  // Será criptografada
+            prof1.setPassword("prof123");
             prof1.setRegister("PROF001");
             prof1.setPhoneNumber("(83) 98888-0001");
-            prof1.setCoordinator(true);  // É coordenador
+            prof1.setCoordinator(true);
             prof1.setIsActive(true);
             professorService.create(prof1);
 
@@ -204,7 +207,7 @@ public class DataSeeder implements CommandLineRunner {
             Student student1 = new Student();
             student1.setName("Lucas Ferreira");
             student1.setLogin("lucas.ferreira");
-            student1.setPassword("aluno123");  // Será criptografada
+            student1.setPassword("aluno123");
             student1.setRegister("20231001");
             student1.setPhoneNumber("(83) 97777-0001");
             student1.setIsActive(true);
@@ -242,14 +245,13 @@ public class DataSeeder implements CommandLineRunner {
         log.info("Populando colegiados...");
 
         if (collegiateService.findAll().isEmpty()) {
-            // Busca professores já criados
             List<Professor> allProfessors = professorService.findAll();
 
             if (allProfessors.size() >= 4) {
                 Collegiate collegiate1 = new Collegiate();
                 collegiate1.setDescription("Colegiado de Ciência da Computação");
                 collegiate1.setCreatedAt(LocalDateTime.now().minusMonths(6));
-                collegiate1.setCollegiateMemberList(allProfessors.subList(0, 4));  // Primeiros 4 professores
+                collegiate1.setCollegiateMemberList(allProfessors.subList(0, 4));
                 collegiateService.create(collegiate1);
 
                 log.info("✓ 1 colegiado criado com {} membros", 4);
@@ -263,7 +265,10 @@ public class DataSeeder implements CommandLineRunner {
 
     /**
      * SEED 6: Processos
-     * Cria processos de alunos.
+     * Cria processos de alunos e já distribui alguns para professores.
+     *
+     * IMPORTANTE: Os processos precisam ser distribuídos aqui para que possam
+     * receber votos dos relatores antes de serem adicionados à pauta de reuniões.
      */
     private void seedProcesses() {
         log.info("Populando processos...");
@@ -273,42 +278,56 @@ public class DataSeeder implements CommandLineRunner {
             List<Subject> subjects = subjectService.findAll();
             List<Professor> professors = professorService.findAll();
 
-            if (!students.isEmpty() && !subjects.isEmpty()) {
-                // Processo 1: Aguardando distribuição
+            if (!students.isEmpty() && !subjects.isEmpty() && !professors.isEmpty()) {
+                // Processo 1: Aguardando distribuição (sem relator)
                 Process process1 = new Process();
                 process1.setTitle("Solicitação de Reabertura de Matrícula");
                 process1.setDescription("Solicito a reabertura de matrícula devido a problemas de saúde.");
                 processService.createProcess(process1, students.get(0).getId(), subjects.get(0).getId());
+                log.info("✓ Processo 1 criado - Status: WAITING (aguardando distribuição)");
 
-                // Processo 2: Sob análise (já distribuído)
+                // Processo 2: Distribuído para Dra. Maria (relator votará depois)
                 Process process2 = new Process();
                 process2.setTitle("Solicitação de Dilatação de Prazo");
                 process2.setDescription("Solicito dilatação de prazo para conclusão do TCC.");
-                Process createdProcess2 = processService.createProcess(process2, students.get(1).getId(), subjects.get(1).getId());
+                Process createdProcess2 = processService.createProcess(
+                        process2,
+                        students.get(1).getId(),
+                        subjects.get(1).getId()
+                );
+                processService.distribute(createdProcess2.getId(), professors.get(1).getId()); // Dra. Maria
+                log.info("✓ Processo 2 criado e distribuído - Relator: Dra. Maria - Status: UNDER_ANALISYS");
 
-                if (!professors.isEmpty()) {
-                    processService.distribute(createdProcess2.getId(), professors.get(1).getId());  // Distribui para Prof. Maria
-                }
-
-                // Processo 3: Aguardando distribuição
+                // Processo 3: Distribuído para Dr. Carlos (relator votará depois)
                 Process process3 = new Process();
                 process3.setTitle("Solicitação de Trancamento de Disciplina");
                 process3.setDescription("Solicito trancamento da disciplina de Cálculo II.");
-                processService.createProcess(process3, students.get(2).getId(), subjects.get(2).getId());
+                Process createdProcess3 = processService.createProcess(
+                        process3,
+                        students.get(2).getId(),
+                        subjects.get(2).getId()
+                );
+                processService.distribute(createdProcess3.getId(), professors.get(2).getId()); // Dr. Carlos
+                log.info("✓ Processo 3 criado e distribuído - Relator: Dr. Carlos - Status: UNDER_ANALISYS");
 
-                // Processo 4: Sob análise
+                // Processo 4: Distribuído para Dr. Pedro (relator votará depois)
                 Process process4 = new Process();
                 process4.setTitle("Solicitação de Aproveitamento de Estudos");
                 process4.setDescription("Solicito aproveitamento da disciplina cursada em outra instituição.");
-                Process createdProcess4 = processService.createProcess(process4, students.get(0).getId(), subjects.get(3).getId());
+                Process createdProcess4 = processService.createProcess(
+                        process4,
+                        students.get(0).getId(),
+                        subjects.get(3).getId()
+                );
 
-                if (professors.size() >= 3) {
-                    processService.distribute(createdProcess4.getId(), professors.get(2).getId());  // Distribui para Prof. Carlos
+                if (professors.size() >= 5) {
+                    processService.distribute(createdProcess4.getId(), professors.get(4).getId()); // Dr. Pedro
+                    log.info("✓ Processo 4 criado e distribuído - Relator: Dr. Pedro - Status: UNDER_ANALISYS");
                 }
 
-                log.info("✓ {} processos criados", 4);
+                log.info("✓ 4 processos criados (3 distribuídos, 1 aguardando)");
             } else {
-                log.warn("⚠ Não há estudantes ou assuntos suficientes para criar processos.");
+                log.warn("⚠ Não há estudantes, assuntos ou professores suficientes para criar processos.");
             }
         } else {
             log.info("⚠ Processos já existem no banco. Pulando...");
@@ -316,8 +335,105 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     /**
-     * SEED 7: Reuniões
-     * Cria reuniões com pauta e participantes (REQFUNC 9).
+     * SEED 7: Votos dos Relatores (REQFUNC 5)
+     *
+     * CRÍTICO: Este método DEVE ser executado ANTES de seedMeetings()
+     *
+     * Motivo: createMeetingWithAgenda() valida se o relator já votou antes de
+     * adicionar o processo à pauta da reunião.
+     */
+    private void seedRapporteurVotes() {
+        log.info("Populando votos dos relatores (REQFUNC 5)...");
+
+        try {
+            List<Process> processes = processService.findAllProcesses();
+            List<Professor> professors = professorService.findAll();
+
+            // Filtra apenas processos que estão UNDER_ANALISYS e têm relator
+            List<Process> processesUnderAnalysis = processes.stream()
+                    .filter(p -> p.getStatus() == StatusProcess.UNDER_ANALISYS)
+                    .filter(p -> p.getProcessRapporteur() != null)
+                    .collect(Collectors.toList());
+
+            if (processesUnderAnalysis.isEmpty()) {
+                log.warn("⚠ Não há processos sob análise com relator para votar.");
+                return;
+            }
+
+            int votosRegistrados = 0;
+
+            // Voto 1: Dra. Maria (relatora do processo 2) vota DEFERIMENTO
+            Process processo2 = processesUnderAnalysis.stream()
+                    .filter(p -> p.getProcessRapporteur().getId().equals(professors.get(1).getId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (processo2 != null) {
+                voteService.registerRapporteurDecision(
+                        processo2.getId(),
+                        professors.get(1).getId(), // Dra. Maria
+                        DecisionType.DEFERIMENTO,
+                        "Concordo com a solicitação do aluno. Caso bem fundamentado com documentação médica."
+                );
+                log.info("✓ Voto do relator registrado: Dra. Maria votou DEFERIMENTO no processo {}",
+                        processo2.getNumber());
+                votosRegistrados++;
+            }
+
+            // Voto 2: Dr. Carlos (relator do processo 3) vota INDEFERIMENTO
+            Process processo3 = processesUnderAnalysis.stream()
+                    .filter(p -> p.getProcessRapporteur().getId().equals(professors.get(2).getId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (processo3 != null) {
+                voteService.registerRapporteurDecision(
+                        processo3.getId(),
+                        professors.get(2).getId(), // Dr. Carlos
+                        DecisionType.INDEFERIMENTO,
+                        "Não há justificativa suficiente para o trancamento neste momento do semestre."
+                );
+                log.info("✓ Voto do relator registrado: Dr. Carlos votou INDEFERIMENTO no processo {}",
+                        processo3.getNumber());
+                votosRegistrados++;
+            }
+
+            // Voto 3: Dr. Pedro (relator do processo 4) vota DEFERIMENTO
+            if (professors.size() >= 5) {
+                Process processo4 = processesUnderAnalysis.stream()
+                        .filter(p -> p.getProcessRapporteur().getId().equals(professors.get(4).getId()))
+                        .findFirst()
+                        .orElse(null);
+
+                if (processo4 != null) {
+                    voteService.registerRapporteurDecision(
+                            processo4.getId(),
+                            professors.get(4).getId(), // Dr. Pedro
+                            DecisionType.DEFERIMENTO,
+                            "O aluno apresentou toda documentação necessária para aproveitamento de estudos."
+                    );
+                    log.info("✓ Voto do relator registrado: Dr. Pedro votou DEFERIMENTO no processo {}",
+                            processo4.getNumber());
+                    votosRegistrados++;
+                }
+            }
+
+            log.info("✓ {} votos de relatores registrados com sucesso", votosRegistrados);
+
+        } catch (Exception e) {
+            log.error("⚠ Erro ao popular votos dos relatores: {}", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * SEED 8: Reuniões (REQFUNC 9)
+     *
+     * IMPORTANTE: Só adiciona à pauta processos que:
+     * 1. Estão UNDER_ANALISYS
+     * 2. Têm relator que já votou (rapporteurVote != null)
+     *
+     * Estas validações são feitas automaticamente pelo MeetingService.
      */
     private void seedMeetings() {
         log.info("Populando reuniões...");
@@ -327,24 +443,40 @@ public class DataSeeder implements CommandLineRunner {
             List<Process> processes = processService.findAllProcesses();
             List<Professor> professors = professorService.findAll();
 
-            if (!collegiates.isEmpty() && processes.size() >= 2 && professors.size() >= 3) {
-                Collegiate collegiate = collegiates.get(0);
+            if (collegiates.isEmpty() || processes.isEmpty() || professors.size() < 4) {
+                log.warn("⚠ Não há colegiados, processos ou professores suficientes para criar reuniões.");
+                return;
+            }
 
-                // REUNIÃO 1: Agendada para o futuro (REQFUNC 4 e 6)
-                List<Long> processIds1 = Arrays.asList(
-                        processes.get(0).getId(),
-                        processes.get(1).getId()
-                );
+            Collegiate collegiate = collegiates.get(0);
+
+            // Filtra processos elegíveis para pauta (UNDER_ANALISYS + relator já votou)
+            List<Process> eligibleProcesses = processes.stream()
+                    .filter(p -> p.getStatus() == StatusProcess.UNDER_ANALISYS)
+                    .filter(p -> p.getRapporteurVote() != null)
+                    .collect(Collectors.toList());
+
+            if (eligibleProcesses.size() < 2) {
+                log.warn("⚠ Não há processos elegíveis suficientes (UNDER_ANALISYS + relator votou) para criar reuniões.");
+                return;
+            }
+
+            try {
+                // REUNIÃO 1: Agendada para o futuro
+                List<Long> processIds1 = eligibleProcesses.subList(0, 2).stream()
+                        .map(Process::getId)
+                        .collect(Collectors.toList());
 
                 List<Long> participantIds1 = Arrays.asList(
                         professors.get(0).getId(),  // Dr. João (Coordenador)
                         professors.get(1).getId(),  // Dra. Maria
-                        professors.get(2).getId()   // Dr. Carlos
+                        professors.get(2).getId(),  // Dr. Carlos
+                        professors.get(3).getId()   // Dra. Ana
                 );
 
                 Meeting meeting1 = meetingService.createMeetingWithAgenda(
                         collegiate.getId(),
-                        LocalDateTime.now().plusDays(7),  // Agendada para daqui 7 dias
+                        LocalDateTime.now().plusDays(7),
                         processIds1,
                         participantIds1
                 );
@@ -352,12 +484,11 @@ public class DataSeeder implements CommandLineRunner {
                 log.info("✓ Reunião AGENDADA criada (ID: {}) com {} processos e {} participantes",
                         meeting1.getId(), processIds1.size(), participantIds1.size());
 
-                // REUNIÃO 2: Já finalizada (histórico)
-                if (processes.size() >= 4 && professors.size() >= 4) {
-                    List<Long> processIds2 = Arrays.asList(
-                            processes.get(2).getId(),
-                            processes.get(3).getId()
-                    );
+                // REUNIÃO 2: Já finalizada (histórico) - apenas se houver mais processos elegíveis
+                if (eligibleProcesses.size() >= 3) {
+                    List<Long> processIds2 = eligibleProcesses.subList(2, Math.min(3, eligibleProcesses.size())).stream()
+                            .map(Process::getId)
+                            .collect(Collectors.toList());
 
                     List<Long> participantIds2 = Arrays.asList(
                             professors.get(0).getId(),
@@ -368,7 +499,7 @@ public class DataSeeder implements CommandLineRunner {
 
                     Meeting meeting2 = meetingService.createMeetingWithAgenda(
                             collegiate.getId(),
-                            LocalDateTime.now().minusMonths(1),  // Ocorreu há 1 mês
+                            LocalDateTime.now().minusMonths(1),
                             processIds2,
                             participantIds2
                     );
@@ -380,77 +511,14 @@ public class DataSeeder implements CommandLineRunner {
                             meeting2.getId(), processIds2.size(), participantIds2.size());
                 }
 
-                log.info("✓ {} reuniões criadas", 2);
-            } else {
-                log.warn("⚠ Não há colegiados, processos ou professores suficientes para criar reuniões.");
+                log.info("✓ Reuniões criadas com sucesso");
+
+            } catch (Exception e) {
+                log.error("⚠ Erro ao criar reuniões: {}", e.getMessage());
+                e.printStackTrace();
             }
         } else {
             log.info("⚠ Reuniões já existem no banco. Pulando...");
-        }
-    }
-
-    /**
-     * SEED 8: Votos (NOVO - REQFUNC 5)
-     * Cria votos de professores em processos.
-     */
-    private void seedVotes() {
-        log.info("Populando votos...");
-
-        try {
-            List<Process> processes = processService.findAllProcesses();
-            List<Professor> professors = professorService.findAll();
-
-            if (processes.size() >= 2 && professors.size() >= 3) {
-                // Voto 1: Dra. Maria vota DEFERIDO no processo 2 (processo que ela relatou)
-                Process process2 = processes.stream()
-                        .filter(p -> p.getProcessRapporteur() != null && p.getProcessRapporteur().getId().equals(professors.get(1).getId()))
-                        .findFirst()
-                        .orElse(null);
-
-                if (process2 != null) {
-                    voteService.registerVote(
-                            process2.getId(),
-                            professors.get(1).getId(),  // Dra. Maria
-                            VoteType.DEFERIDO,
-                            "Concordo com a solicitação do aluno. Caso bem fundamentado."
-                    );
-                    log.info("✓ Voto registrado: Dra. Maria votou DEFERIDO no processo {}", process2.getNumber());
-                }
-
-                // Voto 2: Dr. João (coordenador) vota DEFERIDO no mesmo processo
-                if (process2 != null) {
-                    voteService.registerVote(
-                            process2.getId(),
-                            professors.get(0).getId(),  // Dr. João
-                            VoteType.DEFERIDO,
-                            "Acompanho o voto da relatora. Situação justifica o deferimento."
-                    );
-                    log.info("�� Voto registrado: Dr. João votou DEFERIDO no processo {}", process2.getNumber());
-                }
-
-                // Voto 3: Dr. Carlos vota INDEFERIDO (divergente)
-                if (process2 != null) {
-                    voteService.registerVote(
-                            process2.getId(),
-                            professors.get(2).getId(),  // Dr. Carlos
-                            VoteType.INDEFERIDO,
-                            "Entendo que não há justificativa suficiente para o pedido."
-                    );
-                    log.info("✓ Voto registrado: Dr. Carlos votou INDEFERIDO no processo {}", process2.getNumber());
-                }
-
-                // Voto 4: Dra. Ana está ausente
-                if (process2 != null && professors.size() >= 4) {
-                    voteService.registerAbsence(process2.getId(), professors.get(3).getId());  // Dra. Ana
-                    log.info("✓ Ausência registrada: Dra. Ana ausente no processo {}", process2.getNumber());
-                }
-
-                log.info("✓ {} votos criados", 4);
-            } else {
-                log.warn("⚠ Não há processos ou professores suficientes para criar votos.");
-            }
-        } catch (Exception e) {
-            log.error("⚠ Erro ao popular votos: {}", e.getMessage());
         }
     }
 }
