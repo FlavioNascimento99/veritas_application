@@ -3,6 +3,7 @@ package br.edu.ifpb.veritas.models;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import br.edu.ifpb.veritas.config.DecisionTypeConverter;
 import br.edu.ifpb.veritas.enums.DecisionType;
 import br.edu.ifpb.veritas.enums.VoteType;
 import br.edu.ifpb.veritas.enums.StatusProcess;
@@ -48,9 +49,9 @@ public class Process {
     @Enumerated(EnumType.STRING)
     private StatusProcess status;
 
-   @Column(name = "RAPPORTEUR_VOTE")
-   @Enumerated(EnumType.STRING)
-   private DecisionType rapporteurVote;
+    @Column(name = "RAPPORTEUR_VOTE")
+    @Convert(converter = DecisionTypeConverter.class)
+    private DecisionType rapporteurVote;
 
     @Column(name = "PROCESS_ORDER")
     private String processOrder;
