@@ -7,6 +7,8 @@ import br.edu.ifpb.veritas.models.Subject;
 import br.edu.ifpb.veritas.services.ProfessorService;
 import br.edu.ifpb.veritas.services.StudentService;
 import br.edu.ifpb.veritas.services.SubjectService;
+import br.edu.ifpb.veritas.services.ProcessService;
+import br.edu.ifpb.veritas.services.CollegiateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,6 +23,8 @@ public class AdminController {
     private final StudentService studentService;
     private final ProfessorService professorService;
     private final SubjectService subjectService;
+    private final ProcessService processService;
+    private final CollegiateService collegiateService;
 
     // --- CADASTRO DE ESTUDANTE ---
     @GetMapping("/students/new")
@@ -140,5 +144,23 @@ public class AdminController {
         subjectService.reactivate(id);
         redirectAttributes.addFlashAttribute("successMessage", "Assunto reativado com sucesso!");
         return "redirect:/admin/subjects";
+    }
+
+    // --- GERENCIAMENTO DE PROCESSOS ---
+    @GetMapping("/processes")
+    public String listProcesses(Model model) {
+        model.addAttribute("processes", processService.findAllProcesses());
+        model.addAttribute("pageTitle", "Gerenciar Processos");
+        model.addAttribute("mainContent", "pages/admin/processes :: content");
+        return "home";
+
+    // --- GERENCIAMENTO DE COLEGIADOS ---
+    @GetMapping("/collegiates")
+    public String listCollegiates(Model model) {
+        model.addAttribute("collegiates", collegiateService.findAll());
+        model.addAttribute("pageTitle", "Gerenciar Colegiados");
+        model.addAttribute("mainContent", "pages/admin/collegiates :: content");
+        return "home";
+    }
     }
 }

@@ -1,7 +1,6 @@
 package br.edu.ifpb.veritas.configs;
 
 import br.edu.ifpb.veritas.enums.MeetingStatus;
-import br.edu.ifpb.veritas.enums.StatusProcess;
 import br.edu.ifpb.veritas.enums.VoteType;
 import br.edu.ifpb.veritas.models.*;
 import br.edu.ifpb.veritas.models.Process;

@@ -2,10 +2,7 @@ package br.edu.ifpb.veritas.controllers.web;
 
 import java.time.Year;
 
-import br.edu.ifpb.veritas.services.SubjectService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -20,9 +17,6 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequiredArgsConstructor
 public class HomeController {
-
-   private final SubjectService subjectService;
-
    @ModelAttribute
    public void addCommonAttribute(Model model, HttpSession http) {
       model.addAttribute("SystemName", "VERITAS");
