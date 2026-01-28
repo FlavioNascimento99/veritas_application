@@ -86,12 +86,12 @@ public class VoteService {
        Vote savedVote = voteRepository.save(vote);
 
        // Se o professor é o relator, atualiza o voto do relator no processo
-       if (process.getProcessRapporteur() != null &&
-               process.getProcessRapporteur().getId().equals(professorId)) {
+    //    if (process.getProcessRapporteur() != null &&
+    //            process.getProcessRapporteur().getId().equals(professorId)) {
 
-           process.setRapporteurVote(voteType);
-           processRepository.save(process);
-       }
+    //        process.setRapporteurVote(vote.getVoteType());
+    //        processRepository.save(process);
+    //    }
        
        return savedVote;
    }
@@ -112,7 +112,7 @@ public class VoteService {
      */
     @Transactional
     public Process registerRapporteurDecision(Long processId, Long professorId,
-                                              VoteType decision, String justification) {
+                                              DecisionType decision, String justification) {
         Process process = processRepository.findById(processId)
                 .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado com ID: " + processId));
 
