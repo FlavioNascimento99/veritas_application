@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm" th:fragment="header">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <!-- Logo -->
+            <div class="flex items-center">
+                <i class="fas fa-book-open text-2xl text-indigo-600 mr-3"></i>
+                <h1 class="text-2xl font-bold text-gray-900">Veritas</h1>
+            </div>
+
+            <!-- Menu Desktop -->
+            <nav class="hidden md:flex items-center space-x-1">
+                <a th:href="@{/dashboard}" class="px-4 py-2 text-gray-700 hover:text-indigo-600 font-medium transition-colors duration-200">
+                    <i class="fas fa-tachometer-alt mr-1"></i>Dashboard
+                </a>
+            </nav>
+
+            <!-- Menu Usuario -->
+            <div class="flex items-center space-x-4">
+                <div class="hidden sm:flex items-center space-x-3">
+                    <div class="text-right">
+                        <p class="text-sm font-semibold text-gray-900" sec:authentication="name"></p>
+                        <p class="text-xs text-indigo-600 font-medium" sec:authorize="hasRole('ADMIN')">
+                            <i class="fas fa-crown text-xs mr-1"></i>Administrador
+                        </p>
+                        <p class="text-xs text-indigo-600 font-medium" sec:authorize="hasRole('COORDINATOR')">
+                            <i class="fas fa-briefcase text-xs mr-1"></i>Coordenador
+                        </p>
+                        <p class="text-xs text-indigo-600 font-medium" sec:authorize="hasRole('PROFESSOR')">
+                            <i class="fas fa-chalkboard text-xs mr-1"></i>Professor
+                        </p>
+                        <p class="text-xs text-indigo-600 font-medium" sec:authorize="hasRole('STUDENT')">
+                            <i class="fas fa-graduation-cap text-xs mr-1"></i>Estudante
+                        </p>
+                    </div>
+                    <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-full flex items-center justify-center text-white font-bold">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+                
+                <!-- Dropdown Logout -->
+                <div class="relative group">
+                    <button class="inline-flex items-center px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="absolute right-0 mt-0 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                        <form th:action="@{/logout}" method="post">
+                            <button type="submit" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200 font-medium">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+</body>
+</html>

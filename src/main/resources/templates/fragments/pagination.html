@@ -1,0 +1,32 @@
+<section th:fragment="paginator(resourcePath, navPage)">
+  <nav aria-label="Paginador" th:if="${navPage.totalPages > 0}">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" th:classappend="${navPage.currentPage == 1} ? 'disabled'">
+        <a th:replace="fragments/pagination :: page(1, ${navPage.pageSize}, '<<', 'Primeira', ${resourcePath})"></a>
+      </li>
+      <li class="page-item font-weight-bold" th:classappend="${navPage.currentPage == 1} ? 'disabled'">
+        <a th:replace="fragments/pagination :: page(${navPage.currentPage - 1}, ${navPage.pageSize}, 'Anterior', 'Página Anterior', ${resourcePath})"></a>
+      </li>
+      <li class="page-item disabled" th:if="${navPage.currentPage - 2 > 1}">
+        <a class="page-link" href="#">...</a>
+      </li>
+      <li class="page-item" th:classappend="${page == currentPage} ? 'active'"
+          th:each="page : ${#numbers.sequence(navPage.currentPage > 2 ? navPage.currentPage - 2 : 1, navPage.currentPage + 2 < navPage.totalPages ? navPage.currentPage + 2 : navPage.totalPages)}">
+        <a th:replace="fragments/pagination :: page(${page}, ${navPage.pageSize}, ${page}, 'Página ' + ${page}, ${resourcePath})"></a>
+      </li>
+      <li class="page-item disabled" th:if="${navPage.currentPage + 2 < navPage.totalPages}">
+        <a class="page-link" href="#">...</a>
+      </li>
+      <li class="page-item font-weight-bold" th:classappend="${navPage.currentPage == navPage.totalPages} ? 'disabled'">
+        <a th:replace="fragments/pagination :: page(${navPage.currentPage + 1}, ${navPage.pageSize}, 'Próxima', 'Próxima Página', ${resourcePath})"></a>
+      </li>
+      <li class="page-item" th:classappend="${navPage.currentPage == navPage.totalPages} ? 'disabled'">
+        <a th:replace="fragments/pagination :: page(${navPage.totalPages},  ${navPage.pageSize}, '>>', 'Última', ${resourcePath})"></a>
+      </li>
+    </ul>
+  </nav>
+</section>
+
+<a th:fragment="page(pageNum, pageSize, label, tooltip, resourcePath)" class="page-link" th:href="@{'/'+${resourcePath} + '?' + 'page=' + ${pageNum} + '&size=' + ${pageSize}}" th:title="${tooltip}" rel="tooltip">
+  [[${label}]]
+</a>

@@ -1,0 +1,98 @@
+<div th:fragment="content" class="p-6 bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto">
+        <!-- Cabeçalho -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Gerenciar Colegiados</h1>
+                <p class="text-gray-600 mt-2">Lista de todos os colegiados do sistema</p>
+            </div>
+            <a th:href="@{/dashboard}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200 font-semibold">
+                <i class="fas fa-arrow-left mr-2"></i>Retornar ao Dashboard
+            </a>
+        </div>
+
+        <!-- Mensagens de Feedback -->
+        <div th:if="${successMessage}" class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+            <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <!-- Tabela de Colegiados -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div th:if="${collegiates.isEmpty()}" class="p-8 text-center">
+                <p class="text-gray-500 text-lg">Nenhum colegiado encontrado</p>
+            </div>
+
+            <div th:unless="${collegiates.isEmpty()}" class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gradient-to-r from-purple-600 to-purple-700 text-white">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-sm font-semibold">ID</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold">Descrição</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold">Membros</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold">Criado em</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold">Status</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr th:each="collegiate : ${collegiates}" class="bg-white hover:bg-gray-100 transition-colors duration-200">
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900">
+                                <span th:text="${collegiate.id}"></span>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-700">
+                                <span th:text="${collegiate.description ?: 'Sem descrição'}"></span>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-700">
+                                <span th:if="${collegiate.collegiateMemberList == null or collegiate.collegiateMemberList.isEmpty()}" class="text-gray-500 italic">Nenhum membro</span>
+                                <div th:if="${collegiate.collegiateMemberList != null and !collegiate.collegiateMemberList.isEmpty()}" class="flex flex-wrap gap-2">
+                                    <span th:each="member : ${collegiate.collegiateMemberList}" class="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs font-semibold">
+                                        <i class="fas fa-user mr-1"></i><span th:text="${member.name}"></span>
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-700">
+                                <span th:text="${#temporals.format(collegiate.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                            </td>
+                            <td class="px-6 py-4 text-sm">
+                                <span th:if="${collegiate.closedAt == null}" class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
+                                    ATIVO
+                                </span>
+                                <span th:if="${collegiate.closedAt != null}" class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">
+                                    ENCERRADO
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm">
+                                <a href="#" class="text-purple-600 hover:text-purple-900 font-semibold transition-colors duration-200">
+                                    <i class="fas fa-eye mr-1"></i>Visualizar
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Estatísticas -->
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-600">
+                <h3 class="text-gray-600 text-sm font-semibold uppercase tracking-wide">Total de Colegiados</h3>
+                <p class="text-3xl font-bold text-gray-900 mt-2" th:text="${collegiates.size()}"></p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-600">
+                <h3 class="text-gray-600 text-sm font-semibold uppercase tracking-wide">Colegiados Ativos</h3>
+                <p class="text-3xl font-bold text-gray-900 mt-2" 
+                   th:text="${collegiates.stream().filter(c -> c.closedAt == null).count()}"></p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-600">
+                <h3 class="text-gray-600 text-sm font-semibold uppercase tracking-wide">Colegiados Encerrados</h3>
+                <p class="text-3xl font-bold text-gray-900 mt-2" 
+                   th:text="${collegiates.stream().filter(c -> c.closedAt != null).count()}"></p>
+            </div>
+        </div>
+    </div>
+</div>

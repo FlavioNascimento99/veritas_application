@@ -1,0 +1,211 @@
+<div th:fragment="content" class="container mx-auto p-6">
+    <!-- Cabeçalho -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Dashboard do Professor</h1>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                Sair (Logout)
+            </button>
+        </form>
+    </div>
+
+    <!-- ========== SEÇÃO 1: Processos para Análise (REQFUNC 3 + 5) ========== -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-2xl font-semibold text-gray-700 mb-4">
+            <i class="fas fa-clipboard-list mr-2 text-blue-600"></i>Processos para Análise
+        </h2>
+
+        <div th:if="${processes != null and !#lists.isEmpty(processes)}">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Número</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Situação do Voto</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Criado Em</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                <tr th:each="process : ${processes}" class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${process.number}"></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700" th:text="${process.title ?: 'Sem título'}"></td>
+
+                    <!-- Status do Processo -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                            <span th:if="${process.status}"
+                                  th:classappend="${process.status.name() == 'WAITING'} ? 'bg-yellow-100 text-yellow-800' :
+                                                 (${process.status.name() == 'UNDER_ANALISYS'} ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800')"
+                                  class="px-2 py-1 text-xs font-semibold rounded-full"
+                                  th:text="${process.status.getStatus()}">
+                            </span>
+                    </td>
+
+                    <!-- REQFUNC 5: Situação do Voto -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <!-- Precisa votar (processo sob análise e ainda não votou) -->
+                        <span th:if="${process.status.name() == 'UNDER_ANALISYS'}"
+                              class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">
+                                <i class="fas fa-exclamation-circle mr-1"></i>Aguarda Voto
+                            </span>
+
+                        <!-- Outros status -->
+                        <span th:if="${process.status.name() != 'UNDER_ANALISYS'}"
+                              class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-600">
+                                <i class="fas fa-clock mr-1"></i>Não Aplicável
+                            </span>
+                    </td>
+
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700"
+                        th:text="${#temporals.format(process.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+
+                    <!-- Ações -->
+                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <a th:href="@{'/processes/' + ${process.id}}"
+                           th:classappend="${process.status.name() == 'UNDER_ANALISYS'} ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-600 hover:bg-gray-700'"
+                           class="inline-flex items-center px-3 py-1 text-xs font-medium text-white rounded-md shadow-sm transition-colors">
+                            <i th:class="${process.status.name() == 'UNDER_ANALISYS'} ? 'fas fa-vote-yea mr-1' : 'fas fa-eye mr-1'"></i>
+                            <span th:text="${process.status.name() == 'UNDER_ANALISYS'} ? 'Votar' : 'Detalhes'"></span>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${processes == null or #lists.isEmpty(processes)}">
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+                <i class="fas fa-inbox text-gray-400 text-3xl mb-3"></i>
+                <p class="text-gray-600 font-medium">Nenhum processo atribuído</p>
+                <p class="text-gray-500 text-sm">Quando processos forem distribuídos para você, aparecerão aqui.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== LINHA SEPARADORA ========== -->
+    <hr class="my-6">
+
+    <!-- ========== SEÇÃO 2: Reuniões do Colegiado (REQFUNC 4) ========== -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-2xl font-semibold text-gray-700 mb-4">
+            <i class="fas fa-users mr-2 text-green-600"></i>Reuniões do Colegiado
+        </h2>
+
+        <!-- Filtro de Reuniões por Status -->
+        <div class="mb-4">
+            <form th:action="@{/dashboard}" method="get" class="flex flex-wrap gap-3 items-end mb-4">
+                <div>
+                    <label for="meetingStatusFilter" class="text-sm text-gray-600 block">Filtrar por Status</label>
+                    <select id="meetingStatusFilter" name="meetingStatus"
+                            class="rounded border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 px-2 py-1">
+                        <option value="">Todas</option>
+                        <option th:each="s : ${meetingStatuses}"
+                                th:value="${s.name()}"
+                                th:text="${s.status}"
+                                th:selected="${filterMeetingStatus != null and filterMeetingStatus.equals(s.name())}">
+                        </option>
+                    </select>
+                </div>
+                <button type="submit" class="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700">
+                    Filtrar
+                </button>
+                <a th:href="@{/dashboard}" class="ml-2 text-sm text-gray-600 hover:underline">Limpar Filtro</a>
+            </form>
+        </div>
+
+        <!-- Tabela de Reuniões do Colegiado -->
+        <div th:if="${collegiateMeetings != null and !#lists.isEmpty(collegiateMeetings)}">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Colegiado</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Criação</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Processos</th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                <tr th:each="meeting : ${collegiateMeetings}" class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700" th:text="${meeting.id}"></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700"
+                        th:text="${meeting.collegiate != null ? meeting.collegiate.description : 'N/A'}"></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700"
+                        th:text="${meeting.createdAt != null ? #temporals.format(meeting.createdAt, 'dd/MM/yyyy HH:mm') : 'N/A'}"></td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <!-- Badge de status com cores diferenciadas -->
+                        <span th:if="${meeting.status != null}"
+                              th:classappend="${meeting.status.name() == 'AGENDADA'} ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'"
+                              class="px-2 py-1 text-xs font-semibold rounded-full"
+                              th:text="${meeting.status.status}">
+                            </span>
+                        <span th:if="${meeting.status == null}" class="text-gray-500">N/A</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700"
+                        th:text="${meeting.processes != null ? #lists.size(meeting.processes) : 0}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${collegiateMeetings == null or #lists.isEmpty(collegiateMeetings)}">
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+                <i class="fas fa-calendar-times text-gray-400 text-3xl mb-3"></i>
+                <p class="text-gray-600 font-medium">Nenhuma reunião encontrada</p>
+                <p class="text-gray-500 text-sm">Não há reuniões para o seu colegiado com os filtros aplicados.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== LINHA SEPARADORA ========== -->
+    <hr class="my-6">
+
+    <!-- ========== SEÇÃO 3: Reuniões Agendadas (Escalado para Participar) (REQFUNC 6) ========== -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-2xl font-semibold text-gray-700 mb-4">
+            <i class="fas fa-calendar-check mr-2 text-purple-600"></i>Minhas Reuniões Agendadas
+        </h2>
+        <p class="text-sm text-gray-500 mb-4">Reuniões nas quais você foi escalado para participar.</p>
+
+        <!-- Tabela de Reuniões Escaladas -->
+        <div th:if="${scheduledMeetings != null and !#lists.isEmpty(scheduledMeetings)}">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Colegiado</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Agendada</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Processos em Pauta</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Participantes</th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                <tr th:each="meeting : ${scheduledMeetings}" class="hover:bg-purple-50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${meeting.id}"></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700"
+                        th:text="${meeting.collegiate != null ? meeting.collegiate.description : 'N/A'}"></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700"
+                        th:text="${meeting.createdAt != null ? #temporals.format(meeting.createdAt, 'dd/MM/yyyy HH:mm') : 'A definir'}"></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                        <span th:text="${meeting.processes != null ? #lists.size(meeting.processes) : 0}"></span>
+                        <span class="text-gray-400">processo(s)</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                        <span th:text="${meeting.participants != null ? #lists.size(meeting.participants) : 0}"></span>
+                        <span class="text-gray-400">membro(s)</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mensagem quando não há reuniões agendadas -->
+        <div th:if="${scheduledMeetings == null or #lists.isEmpty(scheduledMeetings)}"
+             class="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+            <i class="fas fa-calendar-times text-gray-400 text-3xl mb-3"></i>
+            <p class="text-gray-600 font-medium">Nenhuma reunião agendada</p>
+            <p class="text-gray-500 text-sm">Você não está escalado para nenhuma reunião agendada no momento.</p>
+        </div>
+    </div>
+</div>
