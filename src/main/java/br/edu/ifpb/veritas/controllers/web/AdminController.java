@@ -153,6 +153,7 @@ public class AdminController {
         model.addAttribute("pageTitle", "Gerenciar Processos");
         model.addAttribute("mainContent", "pages/admin/processes :: content");
         return "home";
+    }
 
     // --- GERENCIAMENTO DE COLEGIADOS ---
     @GetMapping("/collegiates")
@@ -162,5 +163,5 @@ public class AdminController {
         model.addAttribute("mainContent", "pages/admin/collegiates :: content");
         return "home";
     }
-    }
+    
 }

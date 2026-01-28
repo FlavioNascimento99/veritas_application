@@ -50,7 +50,7 @@ public class Process {
 
    @Column(name = "RAPPORTEUR_VOTE")
    @Enumerated(EnumType.STRING)
-   private DecisionType rapporteurVote;
+   private VoteType rapporteurVote;
 
    @Column(name = "PROCESS_ORDER")
    private String processOrder;

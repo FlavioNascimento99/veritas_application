@@ -47,54 +47,54 @@ public class VoteService {
 //     * - Professor não pode votar duas vezes no mesmo processo
 //     * - Reunião contendo o processo não pode estar finalizada
 //     */
-//    @Transactional
-//    public Vote registerVote(Long processId, Long professorId, VoteType voteType, String justification) {
-//        Process process = processRepository.findById(processId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado com ID: " + processId));
-//
-//        Professor professor = professorRepository.findById(professorId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com ID: " + professorId));
-//
-//        // Impede voto em processo já finalizado
-//        if (process.getStatus() == StatusProcess.APPROVED || process.getStatus() == StatusProcess.REJECTED) {
-//            throw new IllegalStateException("Não é possível votar em um processo já finalizado. Status: " + process.getStatus());
-//        }
-//
-//        // Impede voto em reunião finalizada
-//        validateMeetingNotFinalized(processId);
-//
-//        // Valida se o processo está sob análise
-//        if (process.getStatus() != StatusProcess.UNDER_ANALISYS) {
-//            throw new IllegalStateException("Processo não está disponível para votação. Status atual: " + process.getStatus());
-//        }
-//
-//        // Verifica se o professor já votou
-//        Optional<Vote> existingVote = voteRepository.findByProcessIdAndProfessorId(processId, professorId);
-//        if (existingVote.isPresent()) {
-//            throw new IllegalStateException("Professor já votou neste processo. ID do voto existente: " + existingVote.get().getId());
-//        }
-//
-//        // Cria e salva o voto
-//        Vote vote = new Vote();
-//        vote.setProcess(process);
-//        vote.setProfessor(professor);
-//        vote.setVoteType(voteType);
-//        vote.setJustification(justification);
-//        vote.setAway(false);
-//        vote.setVotedAt(LocalDateTime.now());
-//
-//        Vote savedVote = voteRepository.save(vote);
-//
-//        // Se o professor é o relator, atualiza o voto do relator no processo
-//        if (process.getProcessRapporteur() != null &&
-//                process.getProcessRapporteur().getId().equals(professorId)) {
-//
-//            process.setRapporteurVote(voteType);
-//            processRepository.save(process);
-//        }
-//
-//        return savedVote;
-//    }
+   @Transactional
+   public Vote registerVote(Long processId, Long professorId, VoteType voteType, String justification) {
+       Process process = processRepository.findById(processId)
+               .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado com ID: " + processId));
+
+       Professor professor = professorRepository.findById(professorId)
+               .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com ID: " + professorId));
+
+       // Impede voto em processo já finalizado
+       if (process.getStatus() == StatusProcess.APPROVED || process.getStatus() == StatusProcess.REJECTED) {
+           throw new IllegalStateException("Não é possível votar em um processo já finalizado. Status: " + process.getStatus());
+       }
+
+       // Impede voto em reunião finalizada
+       validateMeetingNotFinalized(processId);
+
+       // Valida se o processo está sob análise
+       if (process.getStatus() != StatusProcess.UNDER_ANALISYS) {
+           throw new IllegalStateException("Processo não está disponível para votação. Status atual: " + process.getStatus());
+       }
+
+       // Verifica se o professor já votou
+       Optional<Vote> existingVote = voteRepository.findByProcessIdAndProfessorId(processId, professorId);
+       if (existingVote.isPresent()) {
+           throw new IllegalStateException("Professor já votou neste processo. ID do voto existente: " + existingVote.get().getId());
+       }
+
+       // Cria e salva o voto
+       Vote vote = new Vote();
+       vote.setProcess(process);
+       vote.setProfessor(professor);
+       vote.setVoteType(voteType);
+       vote.setJustification(justification);
+       vote.setAway(false);
+       vote.setVotedAt(LocalDateTime.now());
+
+       Vote savedVote = voteRepository.save(vote);
+
+       // Se o professor é o relator, atualiza o voto do relator no processo
+       if (process.getProcessRapporteur() != null &&
+               process.getProcessRapporteur().getId().equals(professorId)) {
+
+           process.setRapporteurVote(voteType);
+           processRepository.save(process);
+       }
+       
+       return savedVote;
+   }
 
     /**
      * Achei melhor separar os métodos (um pro voto do relator e outro pro voto dos membros do colegiado)
@@ -112,7 +112,7 @@ public class VoteService {
      */
     @Transactional
     public Process registerRapporteurDecision(Long processId, Long professorId,
-                                              DecisionType decision, String justification) {
+                                              VoteType decision, String justification) {
         Process process = processRepository.findById(processId)
                 .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado com ID: " + processId));
 
