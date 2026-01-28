@@ -65,9 +65,9 @@
                     <tr th:each="proc : ${recentProcesses}">
                         <td class="px-4 py-2" th:text="${proc.number}">--</td>
                         <td class="px-4 py-2" th:text="${proc.title}">--</td>
-                        <td class="px-4 py-2" th:text="${proc.student != null ? proc.student.name : '—'}">—</td>
+                        <td class="px-4 py-2" th:text="${proc.processCreator != null ? proc.processCreator.name : '—'}">—</td>
                         <td class="px-4 py-2" th:text="${proc.status}">—</td>
-                        <td class="px-4 py-2" th:text="${#dates.format(proc.createdAt, 'dd/MM/yyyy HH:mm')}">--</td>
+                        <td class="px-4 py-2" th:text="${#temporals.format(proc.createdAt, 'dd/MM/yyyy HH:mm')}">--</td>
                         <td class="px-4 py-2"><a th:href="@{/processes/{id}(id=${proc.id})}" class="text-indigo-600 hover:underline">Detalhes</a></td>
                     </tr>
                     </tbody>
