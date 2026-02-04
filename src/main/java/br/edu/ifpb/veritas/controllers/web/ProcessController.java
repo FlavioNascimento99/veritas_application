@@ -1,7 +1,7 @@
 package br.edu.ifpb.veritas.controllers.web;
 
+import br.edu.ifpb.veritas.enums.DecisionType;
 import br.edu.ifpb.veritas.enums.StatusProcess;
-import br.edu.ifpb.veritas.enums.VoteType;
 import br.edu.ifpb.veritas.models.Process;
 import br.edu.ifpb.veritas.models.Professor;
 import br.edu.ifpb.veritas.services.ProcessService;
@@ -64,12 +64,12 @@ public class ProcessController {
             boolean canVote = process.getStatus() == StatusProcess.UNDER_ANALISYS;
             model.addAttribute("canVote", canVote);
 
-            // Verifica se o professor já votou neste processo
-            boolean hasVoted = voteService.hasVoted(id, professor.getId());
+            // Verifica se o RELATOR já votou
+            boolean hasVoted = process.getRapporteurVote() != null;
             model.addAttribute("hasVoted", hasVoted);
 
-            // Adiciona os tipos de voto para o formulário
-            model.addAttribute("voteTypes", VoteType.values());
+            // Adiciona os tipos de decisão para o formulário do relator
+            model.addAttribute("decisionTypes", DecisionType.values());
         }
 
         model.addAttribute("mainContent", "pages/process-detail :: content");
@@ -77,59 +77,74 @@ public class ProcessController {
     }
 
     /**
-     * REQFUNC 5: Endpoint para registrar voto do professor no processo
+     * REQFUNC 5: Endpoint para registrar voto do RELATOR no processo
+     *
+     * O relator vota pelo DEFERIMENTO ou INDEFERIMENTO do processo,
+     * utilizando o enum DecisionType
      */
     @PostMapping("/{id}/vote")
     public String voteOnProcess(
             @PathVariable("id") Long processId,
-            @RequestParam("voteType") VoteType voteType,
+            @RequestParam("voteType") String voteTypeStr,  // Recebe como String para converter manualmente
             @RequestParam("justification") String justification,
             Authentication authentication,
             RedirectAttributes redirectAttributes
     ) {
         try {
-            // Busca o professor logado
+            // 1. Busca o professor logado
             Professor professor = professorService.findByLogin(authentication.getName())
                     .orElseThrow(() -> new IllegalArgumentException("Professor não encontrado."));
 
-            // Busca o processo
+            // 2. Busca o processo
             Process process = processService.findById(processId);
 
-            // Verifica se é o relator
+            // 3. Verifica se é o relator
             if (process.getProcessRapporteur() == null ||
                     !process.getProcessRapporteur().getId().equals(professor.getId())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "Apenas o relator pode votar neste processo.");
                 return "redirect:/processes/" + processId;
             }
 
-            // Verifica se o processo está sob análise
+            // 4. Verifica se o processo está sob análise
             if (process.getStatus() != StatusProcess.UNDER_ANALISYS) {
                 redirectAttributes.addFlashAttribute("errorMessage", "Este processo não está disponível para votação.");
                 return "redirect:/processes/" + processId;
             }
 
-            // Verifica se já votou
-            if (voteService.hasVoted(processId, professor.getId())) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Você já votou neste processo.");
+            // 5. Verifica se o relator já votou (usando rapporteurVote do Process, não Vote genérico)
+            if (process.getRapporteurVote() != null) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Você já registrou sua decisão neste processo.");
                 return "redirect:/processes/" + processId;
             }
 
-            // Valida justificativa
+            // 6. Valida justificativa
             if (justification == null || justification.trim().isEmpty()) {
                 redirectAttributes.addFlashAttribute("errorMessage", "A justificativa é obrigatória.");
                 return "redirect:/processes/" + processId;
             }
 
-            // 4. Registra o voto
-            voteService.registerVote(processId, professor.getId(), voteType, justification.trim());
+            // 7. Converte o valor recebido para DecisionType
+            DecisionType decision = DecisionType.fromValue(voteTypeStr);
+            if (decision == null) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Tipo de voto inválido: " + voteTypeStr);
+                return "redirect:/processes/" + processId;
+            }
 
-            // 5. Mensagem de sucesso e redirect
+            // 8. Registra a decisão do relator
+            voteService.registerRapporteurDecision(processId, professor.getId(), decision, justification.trim());
+
+            // 9. Mensagem de sucesso e redirect
+            String decisionText = decision == DecisionType.DEFERIMENTO ? "Deferimento" : "Indeferimento";
             redirectAttributes.addFlashAttribute("successMessage",
-                    "Voto registrado com sucesso! Tipo: " + voteType.getStatus());
+                    "Decisão registrada com sucesso! Tipo: " + decisionText);
 
+        } catch (IllegalStateException e) {
+            // Erros de regra de negócio (ex: já votou, reunião finalizada, etc.)
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {
+            // Outros erros inesperados
             redirectAttributes.addFlashAttribute("errorMessage",
-                    "Erro ao registrar voto: " + e.getMessage());
+                    "Erro ao registrar decisão: " + e.getMessage());
         }
 
         return "redirect:/processes/" + processId;

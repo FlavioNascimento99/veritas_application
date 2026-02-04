@@ -124,28 +124,36 @@
                 <div class="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-lg">
                     <p class="text-blue-700 flex items-center">
                         <i class="fas fa-exclamation-circle mr-2"></i>
-                        <strong>Atenção:</strong> Como relator, você deve registrar seu voto. Esta ação não pode ser desfeita.
+                        <strong>Atenção:</strong> Como relator, você deve registrar sua decisão. Esta ação não pode ser desfeita.
                     </p>
                 </div>
 
                 <form th:action="@{'/processes/' + ${process.id} + '/vote'}" method="post" class="space-y-6">
-                    <!-- Tipo de Voto -->
+                    <!-- Tipo de Decisão (DEFERIMENTO ou INDEFERIMENTO) -->
                     <div>
-                        <label class="block text-sm font-bold text-gray-900 mb-4">Seu Voto *</label>
+                        <label class="block text-sm font-bold text-gray-900 mb-4">Sua Decisão *</label>
                         <div class="grid grid-cols-2 gap-4">
-                            <label class="relative flex items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-green-50 hover:border-green-500 transition-all">
+                            <label class="relative flex items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-green-50 hover:border-green-500 transition-all has-[:checked]:bg-green-50 has-[:checked]:border-green-500">
                                 <input type="radio" name="voteType" value="DEFERIMENTO" required class="sr-only peer">
                                 <div class="flex items-center space-x-3 w-full">
-                                    <div class="w-5 h-5 border-2 border-gray-300 rounded-full peer-checked:border-green-600 peer-checked:bg-green-600"></div>
-                                    <span class="font-semibold text-green-700">DEFERIMENTO</span>
+                                    <div class="w-5 h-5 border-2 border-gray-300 rounded-full peer-checked:border-green-600 peer-checked:bg-green-600 flex items-center justify-center">
+                                        <div class="w-2 h-2 bg-white rounded-full hidden peer-checked:block"></div>
+                                    </div>
+                                    <span class="font-semibold text-green-700">
+                            <i class="fas fa-check-circle mr-1"></i>DEFERIMENTO
+                        </span>
                                 </div>
                             </label>
 
-                            <label class="relative flex items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-red-50 hover:border-red-500 transition-all">
+                            <label class="relative flex items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-red-50 hover:border-red-500 transition-all has-[:checked]:bg-red-50 has-[:checked]:border-red-500">
                                 <input type="radio" name="voteType" value="INDEFERIMENTO" required class="sr-only peer">
                                 <div class="flex items-center space-x-3 w-full">
-                                    <div class="w-5 h-5 border-2 border-gray-300 rounded-full peer-checked:border-red-600 peer-checked:bg-red-600"></div>
-                                    <span class="font-semibold text-red-700">INDEFERIMENTO</span>
+                                    <div class="w-5 h-5 border-2 border-gray-300 rounded-full peer-checked:border-red-600 peer-checked:bg-red-600 flex items-center justify-center">
+                                        <div class="w-2 h-2 bg-white rounded-full hidden peer-checked:block"></div>
+                                    </div>
+                                    <span class="font-semibold text-red-700">
+                            <i class="fas fa-times-circle mr-1"></i>INDEFERIMENTO
+                        </span>
                                 </div>
                             </label>
                         </div>
@@ -154,7 +162,7 @@
                     <!-- Justificativa -->
                     <div>
                         <label for="justification" class="block text-sm font-bold text-gray-900 mb-2">
-                            Justificativa do Voto *
+                            Justificativa da Decisão *
                         </label>
                         <textarea id="justification" name="justification" required rows="6" maxlength="1000"
                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent resize-none"
@@ -165,7 +173,7 @@
                     <!-- Botões -->
                     <div class="flex gap-4 pt-4">
                         <button type="submit" class="flex-1 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-3 px-6 rounded-lg transition-all shadow-md hover:shadow-lg">
-                            <i class="fas fa-check mr-2"></i>Registrar Voto
+                            <i class="fas fa-check mr-2"></i>Registrar Decisão
                         </button>
                         <a th:href="@{/dashboard}" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-3 px-6 rounded-lg transition-all text-center">
                             <i class="fas fa-times mr-2"></i>Cancelar
