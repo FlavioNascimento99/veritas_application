@@ -90,6 +90,15 @@ public class Process {
     private LocalDateTime documentUploadDate;
 
     /**
+     * REQFUNC 14: Associação com uma reunião (ManyToOne).
+     * Um processo pode estar em uma única reunião apenas.
+     * Garante que um processo adicionado a uma reunião não será adicionado a outra.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "meeting_id", nullable = true)
+    private Meeting meeting;
+
+    /**
      * Status atual do processo no fluxo
      */
 }

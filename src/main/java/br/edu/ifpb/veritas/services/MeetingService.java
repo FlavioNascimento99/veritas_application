@@ -13,12 +13,15 @@ import br.edu.ifpb.veritas.repositories.ProcessRepository;
 import br.edu.ifpb.veritas.repositories.ProfessorRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MeetingService {
@@ -95,7 +98,7 @@ public class MeetingService {
     }
 
     public List<Meeting> findScheduledMeetingsByParticipant(Long professorId) {
-        return meetingRepository.findByParticipantsIdAndStatus(professorId, MeetingStatus.AGENDADA);
+        return meetingRepository.findByParticipantsIdAndStatus(professorId, MeetingStatus.DISPONIVEL);
     }
 
     public List<Meeting> findByCollegiateAndParticipant(Long collegiateId, Long professorId) {
@@ -107,6 +110,15 @@ public class MeetingService {
                                            LocalDateTime scheduledDate,
                                            List<Long> processIds,
                                            List<Long> participantIds) {
+        return createMeetingWithAgenda(collegiateId, scheduledDate, processIds, participantIds, null);
+    }
+
+    @Transactional
+    public Meeting createMeetingWithAgenda(Long collegiateId,
+                                           LocalDateTime scheduledDate,
+                                           List<Long> processIds,
+                                           List<Long> participantIds,
+                                           String description) {
 
         Collegiate collegiate = collegiateRepository.findById(collegiateId)
                 .orElseThrow(() -> new ResourceNotFoundException("Colegiado não encontrado com ID: " + collegiateId));
@@ -117,14 +129,24 @@ public class MeetingService {
                 Process process = processRepository.findById(processId)
                         .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado com ID: " + processId));
 
-                // VALIDAÇÃO ADICIONAL: Processo deve estar EM_ANALISE
+                // VALIDAÇÃO: Processo deve estar EM_ANALISE
                 if (process.getStatus() != StatusProcess.UNDER_ANALISYS) {
                     throw new IllegalStateException("Apenas processos em análise podem ser adicionados à pauta. Processo ID " + processId + " está com status: " + process.getStatus().getStatus());
                 }
 
-                // VALIDAÇÃO ADICIONAL: Relator deve ter votado
+                // VALIDAÇÃO: Relator deve ter votado
                 if (process.getRapporteurVote() == null) {
                     throw new IllegalStateException("Processo ID " + processId + " não pode ser adicionado à pauta pois o relator ainda não registrou sua decisão.");
+                }
+
+                // VALIDAÇÃO: Relator deve ser diferente de null
+                if (process.getProcessRapporteur() == null) {
+                    throw new IllegalStateException("Processo ID " + processId + " não possui Relator designado.");
+                }
+
+                // VALIDAÇÃO: Processo não deve estar em nenhuma outra reunião
+                if (process.getMeeting() != null) {
+                    throw new IllegalStateException("Processo ID " + processId + " já está vinculado a outra reunião (ID: " + process.getMeeting().getId() + ").");
                 }
 
                 processes.add(process);
@@ -148,13 +170,41 @@ public class MeetingService {
         Meeting meeting = new Meeting();
         meeting.setCollegiate(collegiate);
         meeting.setScheduledDate(scheduledDate);
-        meeting.setProcesses(processes);
-        meeting.setParticipants(participants);
         meeting.setCreatedAt(LocalDateTime.now());
-        meeting.setStatus(MeetingStatus.AGENDADA);
+        meeting.setOpenedAt(LocalDateTime.now());  // Registra o momento de abertura da reunião
+        meeting.setStatus(MeetingStatus.DISPONIVEL);
         meeting.setActive(false);
+        meeting.setParticipants(new ArrayList<>(participants));  // Copia a lista para evitar problemas
+        
+        // Define descrição - usa a fornecida ou gera automaticamente
+        if (description != null && !description.isEmpty()) {
+            meeting.setDescription(description);
+        } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            meeting.setDescription("Reunião do Colegiado - " + LocalDateTime.now().format(formatter));
+        }
+        
+        log.info("=== INICIANDO CRIAÇÃO DE REUNIÃO ===");
+        log.info("Processando {} processos e {} participantes", processes.size(), participants.size());
 
-        return meetingRepository.save(meeting);
+        // Vincula os processos à reunião ANTES de salvar
+        for (Process process : processes) {
+            process.setMeeting(meeting);
+        }
+        meeting.setProcesses(new ArrayList<>(processes));  // Copia a lista para evitar problemas
+        
+        log.info("=== INICIANDO CRIAÇÃO DE REUNIÃO COM {} PROCESSOS ===", processes.size());
+        
+        // Salva a reunião com todos os relacionamentos definidos em uma única operação
+        // CascadeType.ALL garante que processos também serão persistidos
+        Meeting savedMeeting = meetingRepository.save(meeting);
+        
+        log.info("Reunião ID {} criada com sucesso com {} processos e {} participantes", 
+                 savedMeeting.getId(), 
+                 savedMeeting.getProcesses().size(),
+                 savedMeeting.getParticipants().size());
+        
+        return savedMeeting;
     }
 
     @Transactional
@@ -179,7 +229,18 @@ public class MeetingService {
                 throw new IllegalStateException("O relator do processo (ID: " + processId + ") ainda não registrou sua decisão.");
             }
 
+            // VALIDAÇÃO: Relator deve ser diferente de null
+            if (process.getProcessRapporteur() == null) {
+                throw new IllegalStateException("Processo ID " + processId + " não possui Relator designado.");
+            }
+
+            // VALIDAÇÃO: Processo não deve estar em nenhuma outra reunião
+            if (process.getMeeting() != null && !process.getMeeting().getId().equals(meetingId)) {
+                throw new IllegalStateException("Processo ID " + processId + " já está vinculado a outra reunião (ID: " + process.getMeeting().getId() + ").");
+            }
+
             if (!meeting.getProcesses().contains(process)) {
+                process.setMeeting(meeting);
                 meeting.getProcesses().add(process);
             }
         }
@@ -206,6 +267,10 @@ public class MeetingService {
         return meetingRepository.save(meeting);
     }
 
+    /**
+     * REQFUNC 10: Inicia uma reunião (muda status para EM_ANDAMENTO)
+     * Validação: Apenas uma reunião pode estar ativa por vez
+     */
     @Transactional
     public Meeting startMeeting(Long meetingId) {
         meetingRepository.findByActiveTrue().ifPresent(activeMeeting -> {
@@ -218,21 +283,37 @@ public class MeetingService {
             throw new IllegalStateException("Não é possível iniciar uma reunião já finalizada.");
         }
 
+        if (meeting.getStatus() == MeetingStatus.EM_ANDAMENTO) {
+            throw new IllegalStateException("Esta reunião já está em andamento.");
+        }
+
         meeting.setActive(true);
-        meeting.setStatus(MeetingStatus.AGENDADA);
+        meeting.setStatus(MeetingStatus.EM_ANDAMENTO);
 
         return meetingRepository.save(meeting);
     }
 
     /**
-     * REQFUNC 12: Finaliza uma reunião, travando todas as alterações.
+     * REQFUNC 12: Finaliza uma reunião (muda status para FINALIZADA)
+     * 
+     * Validações:
+     * 1. Reunião deve estar EM_ANDAMENTO
+     * 2. Todos os processos da pauta devem estar apregoados (APPROVED ou REJECTED)
      */
     @Transactional
     public Meeting finalizeMeeting(Long meetingId) {
         Meeting meeting = findById(meetingId);
 
-        if (!meeting.isActive()) {
-            throw new IllegalStateException("Esta reunião não está ativa.");
+        if (meeting.getStatus() != MeetingStatus.EM_ANDAMENTO) {
+            throw new IllegalStateException("Apenas reuniões em andamento podem ser finalizadas. Status atual: " + meeting.getStatus().getStatus());
+        }
+
+        // VALIDAÇÃO: Todos os processos devem estar apregoados
+        boolean allProcessesAnnounced = meeting.getProcesses().stream()
+                .allMatch(p -> p.getStatus() == StatusProcess.APPROVED || p.getStatus() == StatusProcess.REJECTED);
+
+        if (!allProcessesAnnounced) {
+            throw new IllegalStateException("Não é possível finalizar a reunião. Existem processos ainda não apregoados. Todos os processos devem estar APROVADOS ou REJEITADOS.");
         }
 
         meeting.setActive(false);

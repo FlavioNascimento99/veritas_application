@@ -136,7 +136,7 @@
                     <td class="px-6 py-4 whitespace-nowrap">
                         <!-- Badge de status com cores diferenciadas -->
                         <span th:if="${meeting.status != null}"
-                              th:classappend="${meeting.status.name() == 'AGENDADA'} ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'"
+                              th:classappend="${meeting.status.name() == 'DISPONÍVEL'} ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'"
                               class="px-2 py-1 text-xs font-semibold rounded-full"
                               th:text="${meeting.status.status}">
                             </span>
@@ -147,6 +147,16 @@
                 </tr>
                 </tbody>
             </table>
+            <!-- Botão de Votação para Reuniões em Andamento -->
+            <div class="mt-4">
+                <div th:each="meeting : ${collegiateMeetings}" class="mb-2">
+                    <a th:if="${meeting.status.name() == 'EM_ANDAMENTO'}" 
+                       th:href="@{/dashboard/meetings/{id}/vote(id=${meeting.id})}"
+                       class="inline-block bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded text-sm">
+                        <i class="fas fa-vote-yea"></i> Votar na Reunião (ID: <span th:text="${meeting.id}"></span>)
+                    </a>
+                </div>
+            </div>
         </div>
 
         <div th:if="${collegiateMeetings == null or #lists.isEmpty(collegiateMeetings)}">

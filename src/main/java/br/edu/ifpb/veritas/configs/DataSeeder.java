@@ -434,6 +434,9 @@ public class DataSeeder implements CommandLineRunner {
      * 2. Têm relator que já votou (rapporteurVote != null)
      *
      * Estas validações são feitas automaticamente pelo MeetingService.
+     * 
+     * Este método é resiliente: tenta criar reuniões mesmo que não haja colegiado,
+     * criando um automaticamente se necessário.
      */
     private void seedMeetings() {
         log.info("Populando reuniões...");
@@ -443,12 +446,19 @@ public class DataSeeder implements CommandLineRunner {
             List<Process> processes = processService.findAllProcesses();
             List<Professor> professors = professorService.findAll();
 
-            if (collegiates.isEmpty() || processes.isEmpty() || professors.size() < 4) {
-                log.warn("⚠ Não há colegiados, processos ou professores suficientes para criar reuniões.");
+            if (processes.isEmpty() || professors.size() < 4) {
+                log.warn("⚠ Não há processos ou professores suficientes para criar reuniões.");
                 return;
             }
 
-            Collegiate collegiate = collegiates.get(0);
+            // Se não há colegiado, cria um automaticamente
+            Collegiate collegiate;
+            if (collegiates.isEmpty()) {
+                log.info("ℹ Nenhum colegiado encontrado. Criando colegiado padrão...");
+                collegiate = createDefaultCollegiate(professors);
+            } else {
+                collegiate = collegiates.get(0);
+            }
 
             // Filtra processos elegíveis para pauta (UNDER_ANALISYS + relator já votou)
             List<Process> eligibleProcesses = processes.stream()
@@ -462,46 +472,42 @@ public class DataSeeder implements CommandLineRunner {
             }
 
             try {
-                // REUNIÃO 1: Agendada para o futuro
-                List<Long> processIds1 = eligibleProcesses.subList(0, 2).stream()
+                // REUNIÃO 1: Próxima reunião (agendada para 7 dias no futuro)
+                List<Long> processIds1 = eligibleProcesses.subList(0, Math.min(2, eligibleProcesses.size())).stream()
                         .map(Process::getId)
                         .collect(Collectors.toList());
 
-                List<Long> participantIds1 = Arrays.asList(
-                        professors.get(0).getId(),  // Dr. João (Coordenador)
-                        professors.get(1).getId(),  // Dra. Maria
-                        professors.get(2).getId(),  // Dr. Carlos
-                        professors.get(3).getId()   // Dra. Ana
-                );
+                List<Long> participantIds1 = professors.subList(0, Math.min(4, professors.size())).stream()
+                        .map(Professor::getId)
+                        .collect(Collectors.toList());
 
                 Meeting meeting1 = meetingService.createMeetingWithAgenda(
                         collegiate.getId(),
                         LocalDateTime.now().plusDays(7),
                         processIds1,
-                        participantIds1
+                        participantIds1,
+                        "Reunião Ordinária do Colegiado - Pautas de Processo"
                 );
 
                 log.info("✓ Reunião AGENDADA criada (ID: {}) com {} processos e {} participantes",
                         meeting1.getId(), processIds1.size(), participantIds1.size());
 
-                // REUNIÃO 2: Já finalizada (histórico) - apenas se houver mais processos elegíveis
+                // REUNIÃO 2: Reunião recente (finalizada há 1 mês) - apenas se houver mais processos elegíveis
                 if (eligibleProcesses.size() >= 3) {
                     List<Long> processIds2 = eligibleProcesses.subList(2, Math.min(3, eligibleProcesses.size())).stream()
                             .map(Process::getId)
                             .collect(Collectors.toList());
 
-                    List<Long> participantIds2 = Arrays.asList(
-                            professors.get(0).getId(),
-                            professors.get(1).getId(),
-                            professors.get(2).getId(),
-                            professors.get(3).getId()
-                    );
+                    List<Long> participantIds2 = professors.subList(0, Math.min(4, professors.size())).stream()
+                            .map(Professor::getId)
+                            .collect(Collectors.toList());
 
                     Meeting meeting2 = meetingService.createMeetingWithAgenda(
                             collegiate.getId(),
                             LocalDateTime.now().minusMonths(1),
                             processIds2,
-                            participantIds2
+                            participantIds2,
+                            "Reunião Ordinária - Arquivo"
                     );
 
                     // Marca como finalizada (REQFUNC 12)
@@ -520,5 +526,26 @@ public class DataSeeder implements CommandLineRunner {
         } else {
             log.info("⚠ Reuniões já existem no banco. Pulando...");
         }
+    }
+
+    /**
+     * Método auxiliar: Cria um colegiado padrão com todos os professores disponíveis
+     * 
+     * Utilizado quando nenhum colegiado existe no banco, garantindo que reuniões
+     * possam ser criadas mesmo sem colegiados pré-existentes.
+     */
+    private Collegiate createDefaultCollegiate(List<Professor> professors) {
+        log.info("Criando colegiado padrão...");
+        
+        Collegiate collegiate = new Collegiate();
+        collegiate.setDescription("Colegiado de Ciência da Computação");
+        collegiate.setCreatedAt(LocalDateTime.now());
+        collegiate.setCollegiateMemberList(professors);
+        
+        Collegiate saved = collegiateService.create(collegiate);
+        log.info("✓ Colegiado padrão criado (ID: {}) com {} membros",
+                saved.getId(), professors.size());
+        
+        return saved;
     }
 }

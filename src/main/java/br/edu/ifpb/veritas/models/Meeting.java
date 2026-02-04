@@ -37,42 +37,40 @@ public class Meeting {
   private Long id;
 
   /**
-   * Deveríamos ter um título? pensando sobre
-   * poderíamos nomear, partindo do presuposto
-   * de que, podemos ou não buscar por determinadas
-   * reuniões, que não soa muito lógico pra mim
+   * Descrição/Título da reunião para identificação
    */
+  @Column(name = "description")
+  private String description;
 
   // Pertence a um Colegiado
   @ManyToOne
   @JoinColumn(name = "collegiate_id")
   private Collegiate collegiate; // 1 colegiado ao qual a reunião pertence
 
-  // Lista de Processos em pauta na reunião
-  @ManyToMany
-  @JoinTable(
-          name = "meeting_processes",
-          joinColumns = @JoinColumn(name = "meeting_id"),
-          inverseJoinColumns = @JoinColumn(name = "process_id")
-  )
+  // Lista de Processos em pauta na reunião (carregados via relação ManyToOne do Process)
+  @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private List<Process> processes; // 0..* processos em pauta
 
   @Column(name = "created_at")
   private LocalDateTime createdAt;
+
+  // REQFUNC: Data e hora em que a reunião foi aberta/iniciada
+  @Column(name = "opened_at")
+  private LocalDateTime openedAt;
 
   // REQFUNC 9: Data e hora em que a reunião está agendada para acontecer
   @Column(name = "scheduled_date")
   private LocalDateTime scheduledDate;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "status")
+  @Column(name = "status", columnDefinition = "VARCHAR(50) CHECK (status IN ('DISPONIVEL', 'EM_ANDAMENTO', 'FINALIZADA'))")
   private MeetingStatus status;
 
   // Acredito que a ata foi adiada foi adiada
   // para a próxima etapa do projeto
 
   // REQFUNC 09: Lista de professores escalados para a reunião
-  @ManyToMany
+  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
   @JoinTable(
           name = "meeting_participants",
           joinColumns = @JoinColumn(name = "meeting_id"),

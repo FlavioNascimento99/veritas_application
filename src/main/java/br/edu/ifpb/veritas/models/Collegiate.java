@@ -64,11 +64,11 @@ public class Collegiate {
   private List<Professor> collegiateMemberList;
 
   /**
-   * Log 1: Listagem de Processos de um determinado Colegiado realmente será necessário?
-   * 
-  @OneToMany(mappedBy = "collegiate", cascade = CascadeType.ALL)
-  private List<Meeting> collegiateMeetingsList;
-  */
+   * Relacionamento reverso: Reuniões deste colegiado
+   * Crítico para persistência - permite cascade delete e save
+   */
+  @OneToMany(mappedBy = "collegiate", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  private List<Meeting> meetings = new ArrayList<>();
   
   
   /**

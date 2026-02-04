@@ -153,12 +153,13 @@ public class VoteService {
      * Este voto acontece durante a reunião do colegiado.
      *
      * Validações:
-     * - Relator já deve ter votado
+     * - Relator já deve ter votado TODOS os processos da reunião
      * - Processo deve estar EM_ANALISE
      * - Professor não pode ser o relator
      * - Professor não pode votar duas vezes
      * - Reunião não pode estar finalizada
      * - Deve existir reunião ativa
+     * - Reunião deve estar em estado DISPONÍVEL
      */
     @Transactional
     public Vote registerMemberVote(Long processId, Long professorId,
@@ -188,6 +189,16 @@ public class VoteService {
         // Verifica se reunião está ativa
         Meeting activeMeeting = meetingRepository.findByActiveTrue()
                 .orElseThrow(() -> new IllegalStateException("Não há reunião ativa no momento."));
+
+        // VALIDAÇÃO: Reunião deve estar em estado DISPONIVEL
+        if (activeMeeting.getStatus() != MeetingStatus.DISPONIVEL) {
+            throw new IllegalStateException("A reunião não está disponível para votação. Status atual: " + activeMeeting.getStatus().getStatus());
+        }
+
+        // VALIDAÇÃO: Relator deve ter votado TODOS os processos da reunião
+        if (!hasRapporteurVotedAllProcesses(activeMeeting.getId())) {
+            throw new IllegalStateException("O relator ainda não votou todos os processos desta reunião. Aguarde que o relator finalize suas votações.");
+        }
 
         // Valida se processo está na pauta da reunião ativa
         boolean isInAgenda = activeMeeting.getProcesses().stream()
@@ -227,6 +238,15 @@ public class VoteService {
     }
 
     /**
+     * Sobrecarregação: Registra voto de membro SEM justificação obrigatória (REQFUNC 11)
+     * Usado quando membros votam em uma reunião ativa
+     */
+    @Transactional
+    public Vote registerMemberVote(Long processId, Long professorId, VoteType voteType) {
+        return registerMemberVote(processId, professorId, voteType, "");
+    }
+
+    /**
      * Verifica se reunião contendo o processo não está finalizada
      */
     private void validateMeetingNotFinalized(Long processId) {
@@ -243,15 +263,33 @@ public class VoteService {
     }
 
     /**
+     * Valida se todos os votos do relator foram registrados em uma reunião.
+     * Apenas após isso, os demais membros podem votar.
+     */
+    public boolean hasRapporteurVotedAllProcesses(Long meetingId) {
+        Meeting meeting = meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Reunião não encontrada."));
+
+        return meeting.getProcesses().stream()
+                .allMatch(p -> p.getRapporteurVote() != null);
+    }
+
+    /**
      * REQFUNC 11: Apregoa um processo e calcula seu resultado final automaticamente.
      *
      * Regra de cálculo:
      * - Conta votos COM RELATOR vs DIVERGENTE DO RELATOR
      * - Se maioria votou COM RELATOR → resultado = decisão do relator
      * - Se maioria votou DIVERGENTE → resultado = contrário à decisão do relator
-     * - Em caso de empate, prevalece o voto do relator (OBS.: não tenho certeza se é essa lógica mesmo em caso de empate)
+     * - Em caso de empate, prevalece o voto do relator
      *
-     * Atualiza o status do processo para DEFERIDO ou INDEFERIDO.
+     * Atualiza o status do processo para APPROVED ou REJECTED.
+     * 
+     * Validações:
+     * - Processo deve estar UNDER_ANALISYS
+     * - Relator já deve ter votado
+     * - Reunião deve estar EM_ANDAMENTO
+     * - Processo deve estar na pauta
      */
     @Transactional
     public Process announceProcess(Long processId) {
@@ -271,6 +309,11 @@ public class VoteService {
         // Valida se há uma reunião ativa
         Meeting activeMeeting = meetingRepository.findByActiveTrue()
                 .orElseThrow(() -> new IllegalStateException("Não há reunião ativa no momento."));
+
+        // Valida se reunião está EM_ANDAMENTO
+        if (activeMeeting.getStatus() != MeetingStatus.EM_ANDAMENTO) {
+            throw new IllegalStateException("Reunião não está em andamento. Status atual: " + activeMeeting.getStatus().getStatus());
+        }
 
         // Valida se o processo está na pauta da reunião ativa
         boolean isInAgenda = activeMeeting.getProcesses().stream()
