@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/layout}">
+<head>
+    <meta charset="UTF-8" />
+    <title th:text="${pageTitle}">Lista de Estudantes</title>
+    <th:block layout:fragment="head"></th:block>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container mx-auto p-4">
+        <h1 th:text="${pageTitle}">Lista de Estudantes</h1>
+
+        <table class="min-w-full bg-white">
+            <thead>
+            <tr>
+                <th class="px-4 py-2">Nome</th>
+                <th class="px-4 py-2">Login</th>
+                <th class="px-4 py-2">Matrícula</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="student : ${studentPage.content}">
+                <td class="border px-4 py-2" th:text="${student.name}">Nome</td>
+                <td class="border px-4 py-2" th:text="${student.login}">login</td>
+                <td class="border px-4 py-2" th:text="${student.register}">matrícula</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="mt-4 flex items-center space-x-2">
+            <a th:if="${navPage.currentPage > 0}"
+               th:href="@{/admin/students(page=${navPage.currentPage - 1},size=${navPage.pageSize})}"
+               class="px-3 py-1 bg-gray-200 rounded">Anterior</a>
+
+            <span th:each="i : ${#numbers.sequence(0, navPage.totalPages - 1)}">
+                <a th:href="@{/admin/students(page=${i},size=${navPage.pageSize})}"
+                   th:text="${i + 1}"
+                   th:class="${i == navPage.currentPage} ? 'px-3 py-1 bg-blue-600 text-white rounded' : 'px-3 py-1 bg-gray-100 rounded'">
+                    1
+                </a>
+            </span>
+
+            <a th:if="${navPage.currentPage + 1 < navPage.totalPages}"
+               th:href="@{/admin/students(page=${navPage.currentPage + 1},size=${navPage.pageSize})}"
+               class="px-3 py-1 bg-gray-200 rounded">Próximo</a>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts"></th:block>
+</body>
+</html>

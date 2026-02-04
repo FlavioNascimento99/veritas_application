@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title th:text="${pageTitle != null ? pageTitle : 'Veritas'}">Veritas</title>
+</head>
+<body>
+<div layout:fragment="content" class="min-h-[50vh] flex items-center justify-center p-8">
+    <div class="text-center">
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Veritas</h1>
+        <p class="text-gray-600 dark:text-gray-400 mb-6">Gestão de Processos Acadêmicos</p>
+        <a th:href="@{/}" class="inline-block px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors">
+            Ir para a página inicial
+        </a>
+    </div>
+</div>
+</body>
+</html>

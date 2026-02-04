@@ -1,0 +1,1137 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------------< br.edu.ifpb:veritas >-------------------------
+[INFO] Building veritas 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.2.6:run (default-cli) > test-compile @ veritas >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ veritas ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 25 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ veritas ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ veritas ---
+[INFO] skip non existing resourceDirectory C:\Users\Leidiana\Documents\PWEB2\veritas_application-camada-teste\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ veritas ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] <<< spring-boot:3.2.6:run (default-cli) < test-compile @ veritas <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.2.6:run (default-cli) @ veritas ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.6)
+
+2026-02-03T23:29:14.253-03:00  INFO 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.VeritasApplication   : Starting VeritasApplication using Java 21.0.8 with PID 5492 (C:\Users\Leidiana\Documents\PWEB2\veritas_application-camada-teste\target\classes started by Leidiana in C:\Users\Leidiana\Documents\PWEB2\veritas_application-camada-teste)
+2026-02-03T23:29:14.260-03:00  INFO 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.VeritasApplication   : No active profile set, falling back to 1 default profile: "default"
+2026-02-03T23:29:15.286-03:00  INFO 5492 --- [veritas] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-02-03T23:29:15.286-03:00  INFO 5492 --- [veritas] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-02-03T23:29:19.537-03:00  INFO 5492 --- [veritas] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-03T23:29:19.850-03:00  INFO 5492 --- [veritas] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 285 ms. Found 8 JPA repository interfaces.
+2026-02-03T23:29:23.196-03:00  INFO 5492 --- [veritas] [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8086 (http)
+2026-02-03T23:29:23.237-03:00  INFO 5492 --- [veritas] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-03T23:29:23.238-03:00  INFO 5492 --- [veritas] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.24]
+2026-02-03T23:29:23.424-03:00  INFO 5492 --- [veritas] [  restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-03T23:29:23.427-03:00  INFO 5492 --- [veritas] [  restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 8138 ms
+2026-02-03T23:29:24.617-03:00  INFO 5492 --- [veritas] [  restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-03T23:29:24.834-03:00  INFO 5492 --- [veritas] [  restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.8.Final
+2026-02-03T23:29:24.974-03:00  INFO 5492 --- [veritas] [  restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-03T23:29:25.805-03:00  INFO 5492 --- [veritas] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-03T23:29:25.909-03:00  INFO 5492 --- [veritas] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-03T23:29:26.524-03:00  INFO 5492 --- [veritas] [  restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@50e69af1
+2026-02-03T23:29:26.527-03:00  INFO 5492 --- [veritas] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-03T23:29:26.621-03:00  WARN 5492 --- [veritas] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-03T23:29:30.787-03:00  INFO 5492 --- [veritas] [  restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-03T23:29:31.536-03:00  INFO 5492 --- [veritas] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-03T23:29:33.158-03:00  INFO 5492 --- [veritas] [  restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-03T23:29:35.510-03:00  WARN 5492 --- [veritas] [  restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-03T23:29:37.127-03:00  INFO 5492 --- [veritas] [  restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-02-03T23:29:37.344-03:00  INFO 5492 --- [veritas] [  restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@3072049f, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@45c8f23, org.springframework.security.web.context.SecurityContextHolderFilter@6b09ba2f, org.springframework.security.web.header.HeaderWriterFilter@43bc549a, org.springframework.web.filter.CorsFilter@47da7047, org.springframework.security.web.authentication.logout.LogoutFilter@37e4088e, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@648aa609, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@558857bb, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@19964bfc, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@28eac777, org.springframework.security.web.access.ExceptionTranslationFilter@57ffaf35, org.springframework.security.web.access.intercept.AuthorizationFilter@7c1d78a4]
+2026-02-03T23:29:38.572-03:00  INFO 5492 --- [veritas] [  restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2026-02-03T23:29:38.771-03:00  INFO 5492 --- [veritas] [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8086 (http) with context path ''
+2026-02-03T23:29:38.810-03:00  INFO 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.VeritasApplication   : Started VeritasApplication in 26.089 seconds (process running for 28.541)
+2026-02-03T23:29:38.981-03:00  INFO 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.configs.DataSeeder   : ====== INICIANDO POPULAÇÃO DO BANCO DE DADOS ======
+2026-02-03T23:29:38.982-03:00  INFO 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.configs.DataSeeder   : Populando administradores...
+Hibernate: 
+    select
+        a1_0.id,
+        a1_0.is_active,
+        a1_0.tb_admin_login,
+        a1_0.tb_admin_name,
+        a1_0.tb_admin_password,
+        a1_0.tb_admin_phone_number,
+        a1_0.tb_admin_register 
+    from
+        tb_administrator a1_0
+2026-02-03T23:29:39.275-03:00  INFO 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.configs.DataSeeder   : ⚠ Administradores já existem no banco. Pulando...
+2026-02-03T23:29:39.275-03:00  INFO 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.configs.DataSeeder   : Populando assuntos de processos...
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.active,
+        s1_0.created_at,
+        s1_0.description,
+        s1_0.modified_at,
+        s1_0.title 
+    from
+        tb_subjects s1_0
+2026-02-03T23:29:39.312-03:00  INFO 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.configs.DataSeeder   : ⚠ Assuntos já existem no banco. Pulando...
+2026-02-03T23:29:39.312-03:00  INFO 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.configs.DataSeeder   : Populando professores...
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.is_coordinator,
+        p1_0.is_active,
+        p1_0.login,
+        p1_0.name,
+        p1_0.password,
+        p1_0.phone_number,
+        p1_0.register 
+    from
+        tb_professors p1_0
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.tb_courses_active,
+        cc1_0.id,
+        cc1_0.is_coordinator,
+        cc1_0.is_active,
+        cc1_0.login,
+        cc1_0.name,
+        cc1_0.password,
+        cc1_0.phone_number,
+        cc1_0.register,
+        c1_0.tb_courses_description,
+        c1_0.tb_courses_title 
+    from
+        tb_courses c1_0 
+    left join
+        tb_professors cc1_0 
+            on cc1_0.id=c1_0.tb_course_coordinator 
+    where
+        c1_0.tb_course_coordinator=?
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.tb_courses_active,
+        cc1_0.id,
+        cc1_0.is_coordinator,
+        cc1_0.is_active,
+        cc1_0.login,
+        cc1_0.name,
+        cc1_0.password,
+        cc1_0.phone_number,
+        cc1_0.register,
+        c1_0.tb_courses_description,
+        c1_0.tb_courses_title 
+    from
+        tb_courses c1_0 
+    left join
+        tb_professors cc1_0 
+            on cc1_0.id=c1_0.tb_course_coordinator 
+    where
+        c1_0.tb_course_coordinator=?
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.tb_courses_active,
+        cc1_0.id,
+        cc1_0.is_coordinator,
+        cc1_0.is_active,
+        cc1_0.login,
+        cc1_0.name,
+        cc1_0.password,
+        cc1_0.phone_number,
+        cc1_0.register,
+        c1_0.tb_courses_description,
+        c1_0.tb_courses_title 
+    from
+        tb_courses c1_0 
+    left join
+        tb_professors cc1_0 
+            on cc1_0.id=c1_0.tb_course_coordinator 
+    where
+        c1_0.tb_course_coordinator=?
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.tb_courses_active,
+        cc1_0.id,
+        cc1_0.is_coordinator,
+        cc1_0.is_active,
+        cc1_0.login,
+        cc1_0.name,
+        cc1_0.password,
+        cc1_0.phone_number,
+        cc1_0.register,
+        c1_0.tb_courses_description,
+        c1_0.tb_courses_title 
+    from
+        tb_courses c1_0 
+    left join
+        tb_professors cc1_0 
+            on cc1_0.id=c1_0.tb_course_coordinator 
+    where
+        c1_0.tb_course_coordinator=?
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.tb_courses_active,
+        cc1_0.id,
+        cc1_0.is_coordinator,
+        cc1_0.is_active,
+        cc1_0.login,
+        cc1_0.name,
+        cc1_0.password,
+        cc1_0.phone_number,
+        cc1_0.register,
+        c1_0.tb_courses_description,
+        c1_0.tb_courses_title 
+    from
+        tb_courses c1_0 
+    left join
+        tb_professors cc1_0 
+            on cc1_0.id=c1_0.tb_course_coordinator 
+    where
+        c1_0.tb_course_coordinator=?
+2026-02-03T23:29:39.361-03:00  INFO 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.configs.DataSeeder   : ⚠ Professores já existem no banco. Pulando...
+2026-02-03T23:29:39.361-03:00  INFO 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.configs.DataSeeder   : Populando estudantes...
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.current_course,
+        s1_0.is_active,
+        s1_0.login,
+        s1_0.name,
+        s1_0.password,
+        s1_0.phone_number,
+        s1_0.register 
+    from
+        tb_students s1_0
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.closed_at,
+        c1_0.created_at,
+        c1_0.description,
+        rs1_0.id,
+        cc1_0.id,
+        cc1_0.tb_courses_active,
+        cc2_0.id,
+        cc2_0.is_coordinator,
+        cc2_0.is_active,
+        cc2_0.login,
+        cc2_0.name,
+        cc2_0.password,
+        cc2_0.phone_number,
+        cc2_0.register,
+        cc1_0.tb_courses_description,
+        cc1_0.tb_courses_title,
+        rs1_0.is_active,
+        rs1_0.login,
+        rs1_0.name,
+        rs1_0.password,
+        rs1_0.phone_number,
+        rs1_0.register 
+    from
+        tb_collegiate c1_0 
+    left join
+        tb_students rs1_0 
+            on rs1_0.id=c1_0.collegiate_rep_student_id 
+    left join
+        tb_courses cc1_0 
+            on cc1_0.id=rs1_0.current_course 
+    left join
+        tb_professors cc2_0 
+            on cc2_0.id=cc1_0.tb_course_coordinator 
+    where
+        c1_0.collegiate_rep_student_id=?
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.closed_at,
+        c1_0.created_at,
+        c1_0.description,
+        rs1_0.id,
+        cc1_0.id,
+        cc1_0.tb_courses_active,
+        cc2_0.id,
+        cc2_0.is_coordinator,
+        cc2_0.is_active,
+        cc2_0.login,
+        cc2_0.name,
+        cc2_0.password,
+        cc2_0.phone_number,
+        cc2_0.register,
+        cc1_0.tb_courses_description,
+        cc1_0.tb_courses_title,
+        rs1_0.is_active,
+        rs1_0.login,
+        rs1_0.name,
+        rs1_0.password,
+        rs1_0.phone_number,
+        rs1_0.register 
+    from
+        tb_collegiate c1_0 
+    left join
+        tb_students rs1_0 
+            on rs1_0.id=c1_0.collegiate_rep_student_id 
+    left join
+        tb_courses cc1_0 
+            on cc1_0.id=rs1_0.current_course 
+    left join
+        tb_professors cc2_0 
+            on cc2_0.id=cc1_0.tb_course_coordinator 
+    where
+        c1_0.collegiate_rep_student_id=?
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.closed_at,
+        c1_0.created_at,
+        c1_0.description,
+        rs1_0.id,
+        cc1_0.id,
+        cc1_0.tb_courses_active,
+        cc2_0.id,
+        cc2_0.is_coordinator,
+        cc2_0.is_active,
+        cc2_0.login,
+        cc2_0.name,
+        cc2_0.password,
+        cc2_0.phone_number,
+        cc2_0.register,
+        cc1_0.tb_courses_description,
+        cc1_0.tb_courses_title,
+        rs1_0.is_active,
+        rs1_0.login,
+        rs1_0.name,
+        rs1_0.password,
+        rs1_0.phone_number,
+        rs1_0.register 
+    from
+        tb_collegiate c1_0 
+    left join
+        tb_students rs1_0 
+            on rs1_0.id=c1_0.collegiate_rep_student_id 
+    left join
+        tb_courses cc1_0 
+            on cc1_0.id=rs1_0.current_course 
+    left join
+        tb_professors cc2_0 
+            on cc2_0.id=cc1_0.tb_course_coordinator 
+    where
+        c1_0.collegiate_rep_student_id=?
+2026-02-03T23:29:39.388-03:00  INFO 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.configs.DataSeeder   : ⚠ Estudantes já existem no banco. Pulando...
+2026-02-03T23:29:39.389-03:00  INFO 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.configs.DataSeeder   : Populando colegiados...
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.closed_at,
+        c1_0.created_at,
+        c1_0.description,
+        c1_0.collegiate_rep_student_id 
+    from
+        tb_collegiate c1_0
+2026-02-03T23:29:39.400-03:00  INFO 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.configs.DataSeeder   : ⚠ Colegiados já existem no banco. Pulando...
+2026-02-03T23:29:39.401-03:00  INFO 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.configs.DataSeeder   : Populando processos...
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.created_at,
+        p1_0.description,
+        p1_0.distributed_at,
+        p1_0.document,
+        p1_0.document_filename,
+        p1_0.document_upload_date,
+        p1_0.number,
+        p1_0.interested_student_id,
+        p1_0.process_order,
+        p1_0.professor_rapporteur_id,
+        p1_0.rapporteur_justification,
+        p1_0.rapporteur_vote,
+        p1_0.solved_at,
+        p1_0.process_status,
+        p1_0.process_subject_id,
+        p1_0.title 
+    from
+        tb_processes p1_0
+Hibernate: 
+    select
+        s1_0.id,
+        cc1_0.id,
+        cc1_0.tb_courses_active,
+        cc2_0.id,
+        cc2_0.is_coordinator,
+        cc2_0.is_active,
+        cc2_0.login,
+        cc2_0.name,
+        cc2_0.password,
+        cc2_0.phone_number,
+        cc2_0.register,
+        cc1_0.tb_courses_description,
+        cc1_0.tb_courses_title,
+        s1_0.is_active,
+        s1_0.login,
+        s1_0.name,
+        s1_0.password,
+        s1_0.phone_number,
+        s1_0.register,
+        rc1_0.id,
+        rc1_0.closed_at,
+        rc1_0.created_at,
+        rc1_0.description 
+    from
+        tb_students s1_0 
+    left join
+        tb_courses cc1_0 
+            on cc1_0.id=s1_0.current_course 
+    left join
+        tb_professors cc2_0 
+            on cc2_0.id=cc1_0.tb_course_coordinator 
+    left join
+        tb_collegiate rc1_0 
+            on s1_0.id=rc1_0.collegiate_rep_student_id 
+    where
+        s1_0.id=?
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.active,
+        s1_0.created_at,
+        s1_0.description,
+        s1_0.modified_at,
+        s1_0.title 
+    from
+        tb_subjects s1_0 
+    where
+        s1_0.id=?
+Hibernate: 
+    select
+        s1_0.id,
+        cc1_0.id,
+        cc1_0.tb_courses_active,
+        cc2_0.id,
+        cc2_0.is_coordinator,
+        cc2_0.is_active,
+        cc2_0.login,
+        cc2_0.name,
+        cc2_0.password,
+        cc2_0.phone_number,
+        cc2_0.register,
+        cc1_0.tb_courses_description,
+        cc1_0.tb_courses_title,
+        s1_0.is_active,
+        s1_0.login,
+        s1_0.name,
+        s1_0.password,
+        s1_0.phone_number,
+        s1_0.register,
+        rc1_0.id,
+        rc1_0.closed_at,
+        rc1_0.created_at,
+        rc1_0.description 
+    from
+        tb_students s1_0 
+    left join
+        tb_courses cc1_0 
+            on cc1_0.id=s1_0.current_course 
+    left join
+        tb_professors cc2_0 
+            on cc2_0.id=cc1_0.tb_course_coordinator 
+    left join
+        tb_collegiate rc1_0 
+            on s1_0.id=rc1_0.collegiate_rep_student_id 
+    where
+        s1_0.id=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.is_coordinator,
+        ca1_0.id,
+        ca1_0.tb_courses_active,
+        ca1_0.tb_courses_description,
+        ca1_0.tb_courses_title,
+        p1_0.is_active,
+        p1_0.login,
+        p1_0.name,
+        p1_0.password,
+        p1_0.phone_number,
+        p1_0.register 
+    from
+        tb_professors p1_0 
+    left join
+        tb_courses ca1_0 
+            on p1_0.id=ca1_0.tb_course_coordinator 
+    where
+        p1_0.id=?
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.active,
+        s1_0.created_at,
+        s1_0.description,
+        s1_0.modified_at,
+        s1_0.title 
+    from
+        tb_subjects s1_0 
+    where
+        s1_0.id=?
+Hibernate: 
+    select
+        s1_0.id,
+        cc1_0.id,
+        cc1_0.tb_courses_active,
+        cc2_0.id,
+        cc2_0.is_coordinator,
+        cc2_0.is_active,
+        cc2_0.login,
+        cc2_0.name,
+        cc2_0.password,
+        cc2_0.phone_number,
+        cc2_0.register,
+        cc1_0.tb_courses_description,
+        cc1_0.tb_courses_title,
+        s1_0.is_active,
+        s1_0.login,
+        s1_0.name,
+        s1_0.password,
+        s1_0.phone_number,
+        s1_0.register,
+        rc1_0.id,
+        rc1_0.closed_at,
+        rc1_0.created_at,
+        rc1_0.description 
+    from
+        tb_students s1_0 
+    left join
+        tb_courses cc1_0 
+            on cc1_0.id=s1_0.current_course 
+    left join
+        tb_professors cc2_0 
+            on cc2_0.id=cc1_0.tb_course_coordinator 
+    left join
+        tb_collegiate rc1_0 
+            on s1_0.id=rc1_0.collegiate_rep_student_id 
+    where
+        s1_0.id=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.is_coordinator,
+        ca1_0.id,
+        ca1_0.tb_courses_active,
+        ca1_0.tb_courses_description,
+        ca1_0.tb_courses_title,
+        p1_0.is_active,
+        p1_0.login,
+        p1_0.name,
+        p1_0.password,
+        p1_0.phone_number,
+        p1_0.register 
+    from
+        tb_professors p1_0 
+    left join
+        tb_courses ca1_0 
+            on p1_0.id=ca1_0.tb_course_coordinator 
+    where
+        p1_0.id=?
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.active,
+        s1_0.created_at,
+        s1_0.description,
+        s1_0.modified_at,
+        s1_0.title 
+    from
+        tb_subjects s1_0 
+    where
+        s1_0.id=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.is_coordinator,
+        ca1_0.id,
+        ca1_0.tb_courses_active,
+        ca1_0.tb_courses_description,
+        ca1_0.tb_courses_title,
+        p1_0.is_active,
+        p1_0.login,
+        p1_0.name,
+        p1_0.password,
+        p1_0.phone_number,
+        p1_0.register 
+    from
+        tb_professors p1_0 
+    left join
+        tb_courses ca1_0 
+            on p1_0.id=ca1_0.tb_course_coordinator 
+    where
+        p1_0.id=?
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.active,
+        s1_0.created_at,
+        s1_0.description,
+        s1_0.modified_at,
+        s1_0.title 
+    from
+        tb_subjects s1_0 
+    where
+        s1_0.id=?
+2026-02-03T23:29:39.467-03:00  INFO 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.configs.DataSeeder   : ⚠ Processos já existem no banco. Pulando...
+2026-02-03T23:29:39.467-03:00  INFO 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.configs.DataSeeder   : Populando votos dos relatores (REQFUNC 5)...
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.created_at,
+        p1_0.description,
+        p1_0.distributed_at,
+        p1_0.document,
+        p1_0.document_filename,
+        p1_0.document_upload_date,
+        p1_0.number,
+        p1_0.interested_student_id,
+        p1_0.process_order,
+        p1_0.professor_rapporteur_id,
+        p1_0.rapporteur_justification,
+        p1_0.rapporteur_vote,
+        p1_0.solved_at,
+        p1_0.process_status,
+        p1_0.process_subject_id,
+        p1_0.title 
+    from
+        tb_processes p1_0
+Hibernate: 
+    select
+        s1_0.id,
+        cc1_0.id,
+        cc1_0.tb_courses_active,
+        cc2_0.id,
+        cc2_0.is_coordinator,
+        cc2_0.is_active,
+        cc2_0.login,
+        cc2_0.name,
+        cc2_0.password,
+        cc2_0.phone_number,
+        cc2_0.register,
+        cc1_0.tb_courses_description,
+        cc1_0.tb_courses_title,
+        s1_0.is_active,
+        s1_0.login,
+        s1_0.name,
+        s1_0.password,
+        s1_0.phone_number,
+        s1_0.register,
+        rc1_0.id,
+        rc1_0.closed_at,
+        rc1_0.created_at,
+        rc1_0.description 
+    from
+        tb_students s1_0 
+    left join
+        tb_courses cc1_0 
+            on cc1_0.id=s1_0.current_course 
+    left join
+        tb_professors cc2_0 
+            on cc2_0.id=cc1_0.tb_course_coordinator 
+    left join
+        tb_collegiate rc1_0 
+            on s1_0.id=rc1_0.collegiate_rep_student_id 
+    where
+        s1_0.id=?
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.active,
+        s1_0.created_at,
+        s1_0.description,
+        s1_0.modified_at,
+        s1_0.title 
+    from
+        tb_subjects s1_0 
+    where
+        s1_0.id=?
+Hibernate: 
+    select
+        s1_0.id,
+        cc1_0.id,
+        cc1_0.tb_courses_active,
+        cc2_0.id,
+        cc2_0.is_coordinator,
+        cc2_0.is_active,
+        cc2_0.login,
+        cc2_0.name,
+        cc2_0.password,
+        cc2_0.phone_number,
+        cc2_0.register,
+        cc1_0.tb_courses_description,
+        cc1_0.tb_courses_title,
+        s1_0.is_active,
+        s1_0.login,
+        s1_0.name,
+        s1_0.password,
+        s1_0.phone_number,
+        s1_0.register,
+        rc1_0.id,
+        rc1_0.closed_at,
+        rc1_0.created_at,
+        rc1_0.description 
+    from
+        tb_students s1_0 
+    left join
+        tb_courses cc1_0 
+            on cc1_0.id=s1_0.current_course 
+    left join
+        tb_professors cc2_0 
+            on cc2_0.id=cc1_0.tb_course_coordinator 
+    left join
+        tb_collegiate rc1_0 
+            on s1_0.id=rc1_0.collegiate_rep_student_id 
+    where
+        s1_0.id=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.is_coordinator,
+        ca1_0.id,
+        ca1_0.tb_courses_active,
+        ca1_0.tb_courses_description,
+        ca1_0.tb_courses_title,
+        p1_0.is_active,
+        p1_0.login,
+        p1_0.name,
+        p1_0.password,
+        p1_0.phone_number,
+        p1_0.register 
+    from
+        tb_professors p1_0 
+    left join
+        tb_courses ca1_0 
+            on p1_0.id=ca1_0.tb_course_coordinator 
+    where
+        p1_0.id=?
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.active,
+        s1_0.created_at,
+        s1_0.description,
+        s1_0.modified_at,
+        s1_0.title 
+    from
+        tb_subjects s1_0 
+    where
+        s1_0.id=?
+Hibernate: 
+    select
+        s1_0.id,
+        cc1_0.id,
+        cc1_0.tb_courses_active,
+        cc2_0.id,
+        cc2_0.is_coordinator,
+        cc2_0.is_active,
+        cc2_0.login,
+        cc2_0.name,
+        cc2_0.password,
+        cc2_0.phone_number,
+        cc2_0.register,
+        cc1_0.tb_courses_description,
+        cc1_0.tb_courses_title,
+        s1_0.is_active,
+        s1_0.login,
+        s1_0.name,
+        s1_0.password,
+        s1_0.phone_number,
+        s1_0.register,
+        rc1_0.id,
+        rc1_0.closed_at,
+        rc1_0.created_at,
+        rc1_0.description 
+    from
+        tb_students s1_0 
+    left join
+        tb_courses cc1_0 
+            on cc1_0.id=s1_0.current_course 
+    left join
+        tb_professors cc2_0 
+            on cc2_0.id=cc1_0.tb_course_coordinator 
+    left join
+        tb_collegiate rc1_0 
+            on s1_0.id=rc1_0.collegiate_rep_student_id 
+    where
+        s1_0.id=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.is_coordinator,
+        ca1_0.id,
+        ca1_0.tb_courses_active,
+        ca1_0.tb_courses_description,
+        ca1_0.tb_courses_title,
+        p1_0.is_active,
+        p1_0.login,
+        p1_0.name,
+        p1_0.password,
+        p1_0.phone_number,
+        p1_0.register 
+    from
+        tb_professors p1_0 
+    left join
+        tb_courses ca1_0 
+            on p1_0.id=ca1_0.tb_course_coordinator 
+    where
+        p1_0.id=?
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.active,
+        s1_0.created_at,
+        s1_0.description,
+        s1_0.modified_at,
+        s1_0.title 
+    from
+        tb_subjects s1_0 
+    where
+        s1_0.id=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.is_coordinator,
+        ca1_0.id,
+        ca1_0.tb_courses_active,
+        ca1_0.tb_courses_description,
+        ca1_0.tb_courses_title,
+        p1_0.is_active,
+        p1_0.login,
+        p1_0.name,
+        p1_0.password,
+        p1_0.phone_number,
+        p1_0.register 
+    from
+        tb_professors p1_0 
+    left join
+        tb_courses ca1_0 
+            on p1_0.id=ca1_0.tb_course_coordinator 
+    where
+        p1_0.id=?
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.active,
+        s1_0.created_at,
+        s1_0.description,
+        s1_0.modified_at,
+        s1_0.title 
+    from
+        tb_subjects s1_0 
+    where
+        s1_0.id=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.is_coordinator,
+        p1_0.is_active,
+        p1_0.login,
+        p1_0.name,
+        p1_0.password,
+        p1_0.phone_number,
+        p1_0.register 
+    from
+        tb_professors p1_0
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.tb_courses_active,
+        cc1_0.id,
+        cc1_0.is_coordinator,
+        cc1_0.is_active,
+        cc1_0.login,
+        cc1_0.name,
+        cc1_0.password,
+        cc1_0.phone_number,
+        cc1_0.register,
+        c1_0.tb_courses_description,
+        c1_0.tb_courses_title 
+    from
+        tb_courses c1_0 
+    left join
+        tb_professors cc1_0 
+            on cc1_0.id=c1_0.tb_course_coordinator 
+    where
+        c1_0.tb_course_coordinator=?
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.tb_courses_active,
+        cc1_0.id,
+        cc1_0.is_coordinator,
+        cc1_0.is_active,
+        cc1_0.login,
+        cc1_0.name,
+        cc1_0.password,
+        cc1_0.phone_number,
+        cc1_0.register,
+        c1_0.tb_courses_description,
+        c1_0.tb_courses_title 
+    from
+        tb_courses c1_0 
+    left join
+        tb_professors cc1_0 
+            on cc1_0.id=c1_0.tb_course_coordinator 
+    where
+        c1_0.tb_course_coordinator=?
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.tb_courses_active,
+        cc1_0.id,
+        cc1_0.is_coordinator,
+        cc1_0.is_active,
+        cc1_0.login,
+        cc1_0.name,
+        cc1_0.password,
+        cc1_0.phone_number,
+        cc1_0.register,
+        c1_0.tb_courses_description,
+        c1_0.tb_courses_title 
+    from
+        tb_courses c1_0 
+    left join
+        tb_professors cc1_0 
+            on cc1_0.id=c1_0.tb_course_coordinator 
+    where
+        c1_0.tb_course_coordinator=?
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.tb_courses_active,
+        cc1_0.id,
+        cc1_0.is_coordinator,
+        cc1_0.is_active,
+        cc1_0.login,
+        cc1_0.name,
+        cc1_0.password,
+        cc1_0.phone_number,
+        cc1_0.register,
+        c1_0.tb_courses_description,
+        c1_0.tb_courses_title 
+    from
+        tb_courses c1_0 
+    left join
+        tb_professors cc1_0 
+            on cc1_0.id=c1_0.tb_course_coordinator 
+    where
+        c1_0.tb_course_coordinator=?
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.tb_courses_active,
+        cc1_0.id,
+        cc1_0.is_coordinator,
+        cc1_0.is_active,
+        cc1_0.login,
+        cc1_0.name,
+        cc1_0.password,
+        cc1_0.phone_number,
+        cc1_0.register,
+        c1_0.tb_courses_description,
+        c1_0.tb_courses_title 
+    from
+        tb_courses c1_0 
+    left join
+        tb_professors cc1_0 
+            on cc1_0.id=c1_0.tb_course_coordinator 
+    where
+        c1_0.tb_course_coordinator=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.created_at,
+        p1_0.description,
+        p1_0.distributed_at,
+        p1_0.document,
+        p1_0.document_filename,
+        p1_0.document_upload_date,
+        p1_0.number,
+        p1_0.interested_student_id,
+        pc1_0.id,
+        cc1_0.id,
+        cc1_0.tb_courses_active,
+        cc2_0.id,
+        cc2_0.is_coordinator,
+        cc2_0.is_active,
+        cc2_0.login,
+        cc2_0.name,
+        cc2_0.password,
+        cc2_0.phone_number,
+        cc2_0.register,
+        cc1_0.tb_courses_description,
+        cc1_0.tb_courses_title,
+        pc1_0.is_active,
+        pc1_0.login,
+        pc1_0.name,
+        pc1_0.password,
+        pc1_0.phone_number,
+        pc1_0.register,
+        rc1_0.id,
+        rc1_0.closed_at,
+        rc1_0.created_at,
+        rc1_0.description,
+        p1_0.process_order,
+        pr1_0.id,
+        pr1_0.is_coordinator,
+        ca1_0.id,
+        ca1_0.tb_courses_active,
+        ca1_0.tb_courses_description,
+        ca1_0.tb_courses_title,
+        pr1_0.is_active,
+        pr1_0.login,
+        pr1_0.name,
+        pr1_0.password,
+        pr1_0.phone_number,
+        pr1_0.register,
+        p1_0.rapporteur_justification,
+        p1_0.rapporteur_vote,
+        p1_0.solved_at,
+        p1_0.process_status,
+        p1_0.process_subject_id,
+        s1_0.id,
+        s1_0.active,
+        s1_0.created_at,
+        s1_0.description,
+        s1_0.modified_at,
+        s1_0.title,
+        p1_0.title 
+    from
+        tb_processes p1_0 
+    join
+        tb_students pc1_0 
+            on pc1_0.id=p1_0.interested_student_id 
+    left join
+        tb_courses cc1_0 
+            on cc1_0.id=pc1_0.current_course 
+    left join
+        tb_professors cc2_0 
+            on cc2_0.id=cc1_0.tb_course_coordinator 
+    left join
+        tb_collegiate rc1_0 
+            on pc1_0.id=rc1_0.collegiate_rep_student_id 
+    left join
+        tb_professors pr1_0 
+            on pr1_0.id=p1_0.professor_rapporteur_id 
+    left join
+        tb_courses ca1_0 
+            on pr1_0.id=ca1_0.tb_course_coordinator 
+    join
+        tb_subjects s1_0 
+            on s1_0.id=p1_0.process_subject_id 
+    where
+        p1_0.id=?
+2026-02-03T23:29:39.566-03:00 ERROR 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.configs.DataSeeder   : ⚠ Erro ao popular votos dos relatores: Relator já registrou sua decisão para este processo.
+java.lang.IllegalStateException: Relator j� registrou sua decis�o para este processo.
+	at br.edu.ifpb.veritas.services.VoteService.registerRapporteurDecision(VoteService.java:135)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:354)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:392)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at br.edu.ifpb.veritas.services.VoteService$$SpringCGLIB$$0.registerRapporteurDecision(<generated>)
+	at br.edu.ifpb.veritas.configs.DataSeeder.seedRapporteurVotes(DataSeeder.java:372)
+	at br.edu.ifpb.veritas.configs.DataSeeder.run(DataSeeder.java:60)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:510)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at br.edu.ifpb.veritas.VeritasApplication.main(VeritasApplication.java:10)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:50)
+2026-02-03T23:29:39.572-03:00  INFO 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.configs.DataSeeder   : Populando reuniões...
+Hibernate: 
+    select
+        m1_0.id,
+        m1_0.is_active,
+        m1_0.collegiate_id,
+        m1_0.created_at,
+        m1_0.meeting_document,
+        m1_0.scheduled_date,
+        m1_0.status 
+    from
+        tb_meetings m1_0
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.closed_at,
+        c1_0.created_at,
+        c1_0.description,
+        rs1_0.id,
+        cc1_0.id,
+        cc1_0.tb_courses_active,
+        cc2_0.id,
+        cc2_0.is_coordinator,
+        cc2_0.is_active,
+        cc2_0.login,
+        cc2_0.name,
+        cc2_0.password,
+        cc2_0.phone_number,
+        cc2_0.register,
+        cc1_0.tb_courses_description,
+        cc1_0.tb_courses_title,
+        rs1_0.is_active,
+        rs1_0.login,
+        rs1_0.name,
+        rs1_0.password,
+        rs1_0.phone_number,
+        rs1_0.register 
+    from
+        tb_collegiate c1_0 
+    left join
+        tb_students rs1_0 
+            on rs1_0.id=c1_0.collegiate_rep_student_id 
+    left join
+        tb_courses cc1_0 
+            on cc1_0.id=rs1_0.current_course 
+    left join
+        tb_professors cc2_0 
+            on cc2_0.id=cc1_0.tb_course_coordinator 
+    where
+        c1_0.id=?
+2026-02-03T23:29:39.602-03:00  INFO 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.configs.DataSeeder   : ⚠ Reuniões já existem no banco. Pulando...
+2026-02-03T23:29:39.603-03:00  INFO 5492 --- [veritas] [  restartedMain] br.edu.ifpb.veritas.configs.DataSeeder   : ====== BANCO DE DADOS POPULADO COM SUCESSO ======
