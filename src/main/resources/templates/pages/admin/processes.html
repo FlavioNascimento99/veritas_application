@@ -89,29 +89,6 @@
                 </table>
             </div>
         </div>
-
-            <!-- Estatísticas -->
-        <div class="mt-8 grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-indigo-600">
-                <h3 class="text-gray-600 text-sm font-semibold uppercase tracking-wide">Total de Processos</h3>
-                <p class="text-3xl font-bold text-gray-900 mt-2" th:text="${processPage.totalElements}"></p>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-600">
-                <h3 class="text-gray-600 text-sm font-semibold uppercase tracking-wide">Processos Abertos (na página)</h3>
-                <p class="text-3xl font-bold text-gray-900 mt-2" th:text="${processPage.content.?[status.toString()=='WAITING']?size()}"></p>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-600">
-                <h3 class="text-gray-600 text-sm font-semibold uppercase tracking-wide">Processos Fechados (na página)</h3>
-                <p class="text-3xl font-bold text-gray-900 mt-2" th:text="${processPage.content.?[status.toString()=='APPROVED']?size()}"></p>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-600">
-                <h3 class="text-gray-600 text-sm font-semibold uppercase tracking-wide">Processos Rejeitados (na página)</h3>
-                <p class="text-3xl font-bold text-gray-900 mt-2" th:text="${processPage.content.?[status.toString()=='REJECTED']?size()}"></p>
-            </div>
-        </div>
     </div>
 </div>
 </body>

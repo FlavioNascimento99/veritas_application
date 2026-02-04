@@ -13,16 +13,16 @@
         <table class="min-w-full bg-white">
             <thead>
             <tr>
-                <th class="px-4 py-2">Nome</th>
-                <th class="px-4 py-2">Login</th>
-                <th class="px-4 py-2">Matrícula</th>
+                <th class="px-4 py-2 text-gray-700">Nome</th>
+                <th class="px-4 py-2 text-gray-700">Login</th>
+                <th class="px-4 py-2 text-gray-700">Matrícula</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="student : ${studentPage.content}">
-                <td class="border px-4 py-2" th:text="${student.name}">Nome</td>
-                <td class="border px-4 py-2" th:text="${student.login}">login</td>
-                <td class="border px-4 py-2" th:text="${student.register}">matrícula</td>
+                <td class="border px-4 py-2 text-gray-700" th:text="${student.name}">Nome</td>
+                <td class="border px-4 py-2 text-gray-700" th:text="${student.login}">login</td>
+                <td class="border px-4 py-2 text-gray-700" th:text="${student.register}">matrícula</td>
             </tr>
             </tbody>
         </table>
