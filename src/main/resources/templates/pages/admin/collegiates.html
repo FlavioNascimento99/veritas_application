@@ -63,7 +63,7 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-700">
-                                <span th:text="${#temporals.format(collegiate.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                                <span th:text="${#temporals.format(collegiate.createdAt, 'dd/MM/yyyy')}"></span>
                             </td>
                             <td class="px-6 py-4 text-sm">
                                 <span th:if="${collegiate.closedAt == null}" class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">

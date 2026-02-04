@@ -76,7 +76,7 @@ public class AdminController {
     @GetMapping("/students")
     public String listStudents(Model model,
                                @RequestParam(defaultValue = "0") int page,
-                               @RequestParam(defaultValue = "10") int size) {
+                               @RequestParam(defaultValue = "4") int size) {
         Page<Student> studentPage = studentService.findAll(PageRequest.of(page, size));
         NavPage nav = NavePageBuilder.newNavPage(studentPage.getNumber(), studentPage.getTotalElements(), studentPage.getTotalPages(), studentPage.getSize());
         model.addAttribute("studentPage", studentPage);
@@ -90,7 +90,7 @@ public class AdminController {
     @GetMapping("/processes")
     public String listProcesses(Model model,
                                 @RequestParam(defaultValue = "0") int page,
-                                @RequestParam(defaultValue = "10") int size) {
+                                @RequestParam(defaultValue = "4") int size) {
         Page<Process> processPage = processService.findAllProcesses(PageRequest.of(page, size));
         NavPage nav = NavePageBuilder.newNavPage(processPage.getNumber(), processPage.getTotalElements(), processPage.getTotalPages(), processPage.getSize());
         model.addAttribute("processPage", processPage);
@@ -100,11 +100,17 @@ public class AdminController {
         return "pages/admin/processes";
     }
 
-    // --- LISTAGENS DE USUÁRIOS (Professores e Estudantes) ---
+    // --- LISTAGENS DE PROFESSORES (PAGINADO) ---
     @GetMapping("/professors")
-    public String listProfessors(Model model) {
+    public String listProfessors(Model model,
+                                 @RequestParam(defaultValue = "0") int page,
+                                 @RequestParam(defaultValue = "4") int size) {
+        Page<Professor> professorPage = professorService.findAll(PageRequest.of(page, size));
+        NavPage nav = NavePageBuilder.newNavPage(professorPage.getNumber(), professorPage.getTotalElements(), professorPage.getTotalPages(), professorPage.getSize());
+        model.addAttribute("professorPage", professorPage);
+        model.addAttribute("professors", professorPage.getContent());
+        model.addAttribute("navPage", nav);
         model.addAttribute("students", studentService.findAll());
-        model.addAttribute("professors", professorService.findAll());
         model.addAttribute("pageTitle", "Gerenciar Usuários");
         return "pages/admin/manage-users";
     }

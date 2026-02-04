@@ -90,6 +90,32 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Paginação de Professores -->
+                    <div th:if="${navPage}" class="mt-6 flex justify-center items-center gap-2">
+                        <a th:if="${navPage.currentPage > 0}" th:href="@{/admin/professors(page=0)}" class="px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors">
+                            Primeira
+                        </a>
+                        <a th:if="${navPage.currentPage > 0}" th:href="@{/admin/professors(page=${navPage.currentPage - 1})}" class="px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors">
+                            Anterior
+                        </a>
+
+                        <span th:each="page : ${#numbers.sequence(0, navPage.totalPages - 1)}" class="inline-block">
+                            <a th:if="${page != navPage.currentPage}" th:href="@{/admin/professors(page=${page})}" class="px-3 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors mx-1">
+                                <span th:text="${page + 1}"></span>
+                            </a>
+                            <span th:if="${page == navPage.currentPage}" class="px-3 py-2 bg-indigo-600 text-white rounded mx-1">
+                                <span th:text="${page + 1}"></span>
+                            </span>
+                        </span>
+
+                        <a th:if="${navPage.currentPage < navPage.totalPages - 1}" th:href="@{/admin/professors(page=${navPage.currentPage + 1})}" class="px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors">
+                            Próxima
+                        </a>
+                        <a th:if="${navPage.currentPage < navPage.totalPages - 1}" th:href="@{/admin/professors(page=${navPage.totalPages - 1})}" class="px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors">
+                            Última
+                        </a>
+                    </div>
                 </div>
             </div>
 

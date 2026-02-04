@@ -76,7 +76,7 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-700">
-                                <span th:text="${#temporals.format(process.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                                <span th:text="${#temporals.format(process.createdAt, 'dd/MM/yyyy')}"></span>
                             </td>
                             <td class="px-6 py-4 text-sm">
                                 <a th:href="@{/processes/{id}(id=${process.id})}" 
@@ -88,6 +88,25 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        <!-- Paginação -->
+        <div class="mt-6 flex items-center space-x-2">
+            <a th:if="${navPage.currentPage > 0}"
+               th:href="@{/admin/processes(page=${navPage.currentPage - 1},size=${navPage.pageSize})}"
+               class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">Anterior</a>
+
+            <span th:each="i : ${#numbers.sequence(0, navPage.totalPages - 1)}">
+                <a th:href="@{/admin/processes(page=${i},size=${navPage.pageSize})}"
+                   th:text="${i + 1}"
+                   th:class="${i == navPage.currentPage} ? 'px-3 py-1 bg-indigo-600 text-white rounded' : 'px-3 py-1 bg-gray-100 rounded'">
+                    1
+                </a>
+            </span>
+
+            <a th:if="${navPage.currentPage + 1 < navPage.totalPages}"
+               th:href="@{/admin/processes(page=${navPage.currentPage + 1},size=${navPage.pageSize})}"
+               class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">Próximo</a>
         </div>
     </div>
 </div>

@@ -5,6 +5,8 @@ import br.edu.ifpb.veritas.models.Professor;
 import br.edu.ifpb.veritas.repositories.ProfessorRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,10 @@ public class ProfessorService {
 
     public List<Professor> findAll() {
         return professorRepository.findAll();
+    }
+
+    public Page<Professor> findAll(Pageable pageable) {
+        return professorRepository.findAll(pageable);
     }
 
     public Professor findById(Long id) {
