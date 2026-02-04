@@ -5,6 +5,7 @@ import java.util.List;
 
 import br.edu.ifpb.veritas.config.DecisionTypeConverter;
 import br.edu.ifpb.veritas.enums.DecisionType;
+import br.edu.ifpb.veritas.enums.ProcessRapporteurStatus;
 import br.edu.ifpb.veritas.enums.VoteType;
 import br.edu.ifpb.veritas.enums.StatusProcess;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -97,6 +98,14 @@ public class Process {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "meeting_id", nullable = true)
     private Meeting meeting;
+
+    /**
+     * Status do voto do relator (PENDING, VOTED, ABSTAINED)
+     * Diferente de rapporteurVote que é a decisão (DEFERIMENTO/INDEFERIMENTO)
+     */
+    @Column(name = "RAPPORTEUR_STATUS")
+    @Enumerated(EnumType.STRING)
+    private ProcessRapporteurStatus rapporteurStatus;
 
     /**
      * Status atual do processo no fluxo

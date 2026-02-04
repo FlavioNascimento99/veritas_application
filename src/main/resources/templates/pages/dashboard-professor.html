@@ -44,16 +44,18 @@
 
                     <!-- REQFUNC 5: Situação do Voto -->
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <!-- Precisa votar (processo sob análise e ainda não votou) -->
-                        <span th:if="${process.status.name() == 'UNDER_ANALISYS'}"
-                              class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">
-                                <i class="fas fa-exclamation-circle mr-1"></i>Aguarda Voto
-                            </span>
+                        <!-- Processo sob análise e professor é relator -->
+                        <span th:if="${process.status != null and process.status.name() == 'UNDER_ANALISYS' and process.processRapporteur != null and process.rapporteurStatus != null}"
+                              class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full"
+                              th:classappend="${process.rapporteurStatus.name() == 'VOTED'} ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'">
+                            <i th:class="${process.rapporteurStatus.name() == 'VOTED'} ? 'fas fa-check-circle mr-1' : 'fas fa-exclamation-circle mr-1'"></i>
+                            <span th:text="${process.rapporteurStatus.name() == 'VOTED'} ? 'Votado' : 'Aguarda Voto'"></span>
+                        </span>
 
                         <!-- Outros status -->
-                        <span th:if="${process.status.name() != 'UNDER_ANALISYS'}"
+                        <span th:if="${process.status == null or process.status.name() != 'UNDER_ANALISYS' or process.processRapporteur == null or process.rapporteurStatus == null}"
                               class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-600">
-                                <i class="fas fa-clock mr-1"></i>Não Aplicável
+                                <i class="fas fa-minus-circle mr-1"></i>Não Aplicável
                             </span>
                     </td>
 
