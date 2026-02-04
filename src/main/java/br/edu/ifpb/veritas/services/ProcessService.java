@@ -6,10 +6,13 @@ import br.edu.ifpb.veritas.models.Process;
 import br.edu.ifpb.veritas.models.Student;
 import br.edu.ifpb.veritas.models.Subject;
 import br.edu.ifpb.veritas.models.Professor;
+import br.edu.ifpb.veritas.models.Vote;
+import br.edu.ifpb.veritas.models.Meeting;
 import br.edu.ifpb.veritas.repositories.ProfessorRepository;
 import br.edu.ifpb.veritas.repositories.ProcessRepository;
 import br.edu.ifpb.veritas.repositories.StudentRepository;
 import br.edu.ifpb.veritas.repositories.SubjectRepository;
+import br.edu.ifpb.veritas.repositories.VoteRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,7 +25,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +35,7 @@ public class ProcessService {
     private final StudentRepository studentRepository;
     private final SubjectRepository subjectRepository;
     private final ProfessorRepository professorRepository;
+    private final VoteRepository voteRepository;
 
     // Tamanho máximo do arquivo: 5MB
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -324,5 +328,75 @@ public class ProcessService {
         Process process = findById(processId);
         return process.getStatus() == StatusProcess.UNDER_ANALISYS
                 && process.getProcessRapporteur() != null;
+    }
+
+    /**
+     * Lista todos os processos pendentes de voto para um professor específico
+     * Critério: Processo deve estar UNDER_ANALISYS, estar na mesma reunião do professor,
+     * estar associado a um colegiado onde o professor é membro, e o professor NÃO deve ter votado ainda
+     */
+    public List<Process> findPendingVotesByProfessor(Long professorId) {
+        professorRepository.findById(professorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com ID: " + professorId));
+
+        // Busca todos os processos em análise
+        List<Process> allUnderAnalysis = processRepository.findByStatus(StatusProcess.UNDER_ANALISYS);
+
+        // Filtra apenas aqueles em reunião ativa onde o professor é participante
+        // e que ainda não votou
+        return allUnderAnalysis.stream()
+                .filter(process -> {
+                    Meeting meeting = process.getMeeting();
+                    if (meeting == null || !meeting.isActive()) {
+                        return false;
+                    }
+                    // Verifica se professor é participante da reunião
+                    boolean isParticipant = meeting.getParticipants().stream()
+                            .anyMatch(p -> p.getId().equals(professorId));
+                    if (!isParticipant) {
+                        return false;
+                    }
+                    // Verifica se ainda não votou
+                    return !hasVotedProcess(process.getId(), professorId);
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Lista todos os processos já votados por um professor específico
+     * (histórico de votações)
+     */
+    public List<Process> findVotedProcessesByProfessor(Long professorId) {
+        professorRepository.findById(professorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com ID: " + professorId));
+
+        // Busca todos os votos do professor
+        List<Vote> professorVotes = voteRepository.findByProfessorId(professorId);
+
+        // Extrai os processos únicos desses votos e os retorna ordenados por data de voto (mais recentes primeiro)
+        return professorVotes.stream()
+                .map(Vote::getProcess)
+                .distinct()
+                .sorted((p1, p2) -> {
+                    // Ordena pelos votos mais recentes
+                    Vote v1 = professorVotes.stream()
+                            .filter(v -> v.getProcess().getId().equals(p1.getId()))
+                            .findFirst()
+                            .orElse(null);
+                    Vote v2 = professorVotes.stream()
+                            .filter(v -> v.getProcess().getId().equals(p2.getId()))
+                            .findFirst()
+                            .orElse(null);
+                    if (v1 == null || v2 == null) return 0;
+                    return v2.getVotedAt().compareTo(v1.getVotedAt());
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Verifica se um professor já votou em um processo específico
+     */
+    public boolean hasVotedProcess(Long processId, Long professorId) {
+        return voteRepository.findByProcessIdAndProfessorId(processId, professorId).isPresent();
     }
 }

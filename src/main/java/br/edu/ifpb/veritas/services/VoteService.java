@@ -116,7 +116,7 @@ public class VoteService {
         Process process = processRepository.findById(processId)
                 .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado com ID: " + processId));
 
-        Professor professor = professorRepository.findById(professorId)
+        professorRepository.findById(professorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com ID: " + professorId));
 
         // Valida se o professor é o relator do processo
@@ -417,6 +417,110 @@ public class VoteService {
 
     public boolean hasVoted(Long processId, Long professorId) {
         return voteRepository.findByProcessIdAndProfessorId(processId, professorId).isPresent();
+    }
+
+    /**
+     * MÉTODO SIMPLIFICADO PARA VOTAÇÃO DE PROFESSOR EM REUNIÃO
+     * 
+     * Registra o voto de um professor (membro do colegiado) em um processo
+     * de forma simplificada, validando apenas o essencial.
+     * 
+     * Validações:
+     * - Processo deve estar UNDER_ANALISYS
+     * - Professor não pode ser o relator
+     * - Professor não pode votar duas vezes
+     * - Reunião do processo deve estar ativa
+     */
+    @Transactional
+    public Vote registerProfessorVote(Long processId, Long professorId, VoteType voteType, String justification) {
+        Process process = processRepository.findById(processId)
+                .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado com ID: " + processId));
+
+        Professor professor = professorRepository.findById(professorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com ID: " + professorId));
+
+        // Valida se processo está em análise
+        if (process.getStatus() != StatusProcess.UNDER_ANALISYS) {
+            throw new IllegalStateException("Processo não está disponível para votação. Status atual: " + process.getStatus().getStatus());
+        }
+
+        // Valida que quem está votando NÃO é o relator
+        if (process.getProcessRapporteur() != null &&
+                process.getProcessRapporteur().getId().equals(professorId)) {
+            throw new IllegalStateException("O relator não pode votar como membro do colegiado.");
+        }
+
+        // Verifica se professor já votou
+        Optional<Vote> existingVote = voteRepository.findByProcessIdAndProfessorId(processId, professorId);
+        if (existingVote.isPresent()) {
+            throw new IllegalStateException("Professor já votou neste processo. Você não pode alterar seu voto.");
+        }
+
+        // Valida se processo está em reunião ativa
+        Meeting meeting = process.getMeeting();
+        if (meeting == null || !meeting.isActive()) {
+            throw new IllegalStateException("Processo não está em uma reunião ativa.");
+        }
+
+        // Valida se professor é participante da reunião
+        boolean isParticipant = meeting.getParticipants().stream()
+                .anyMatch(p -> p.getId().equals(professorId));
+        if (!isParticipant) {
+            throw new IllegalStateException("Professor não é participante da reunião.");
+        }
+
+        // Cria e salva o voto
+        Vote vote = new Vote();
+        vote.setProcess(process);
+        vote.setProfessor(professor);
+        vote.setVoteType(voteType);
+        vote.setJustification(justification != null ? justification : "");
+        vote.setAway(false);
+        vote.setVotedAt(LocalDateTime.now());
+
+        Vote savedVote = voteRepository.save(vote);
+
+        // LÓGICA: Verifica se todos os participantes votaram
+        // Se sim, calcula o resultado final automaticamente
+        checkAndFinalizeMeetingIfAllVoted(meeting.getId(), processId);
+
+        return savedVote;
+    }
+
+    /**
+     * Verifica se todos os participantes da reunião votaram em todos os processos
+     * Se sim, finaliza a votação do processo e calcula o resultado
+     */
+    private void checkAndFinalizeMeetingIfAllVoted(Long meetingId, Long processId) {
+        Meeting meeting = meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Reunião não encontrada."));
+
+        Process process = processRepository.findById(processId)
+                .orElseThrow(() -> new ResourceNotFoundException("Processo não encontrado."));
+
+        // Para cada processo da reunião, verifica se todos os participantes (exceto relator) votaram
+        int totalParticipants = meeting.getParticipants().size();
+        
+        // Conta votos para este processo (excluindo ausentes e relator)
+        List<Vote> votesForProcess = voteRepository.findByProcessId(processId);
+        long validVotes = votesForProcess.stream()
+                .filter(v -> !v.getAway() && !v.getProfessor().getId().equals(process.getProcessRapporteur().getId()))
+                .count();
+
+        // Se todos votaram (todos os participantes não relator votaram)
+        int nonRapporteurParticipants = totalParticipants - 1; // Todos menos relator
+        if (validVotes >= nonRapporteurParticipants) {
+            // Calcula resultado e finaliza
+            DecisionType result = calculateResult(processId);
+            
+            if (result == DecisionType.DEFERIMENTO) {
+                process.setStatus(StatusProcess.APPROVED);
+            } else {
+                process.setStatus(StatusProcess.REJECTED);
+            }
+            process.setSolvedAt(LocalDateTime.now());
+            processRepository.save(process);
+        }
     }
 
     /**

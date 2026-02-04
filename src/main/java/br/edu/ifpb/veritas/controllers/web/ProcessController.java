@@ -2,6 +2,7 @@ package br.edu.ifpb.veritas.controllers.web;
 
 import br.edu.ifpb.veritas.enums.DecisionType;
 import br.edu.ifpb.veritas.enums.StatusProcess;
+import br.edu.ifpb.veritas.enums.VoteType;
 import br.edu.ifpb.veritas.models.Process;
 import br.edu.ifpb.veritas.models.Professor;
 import br.edu.ifpb.veritas.models.Student;
@@ -181,12 +182,25 @@ public class ProcessController {
             boolean canVote = process.getStatus() == StatusProcess.UNDER_ANALISYS;
             model.addAttribute("canVote", canVote);
 
-            // Verifica se o RELATOR já votou
-            boolean hasVoted = process.getRapporteurVote() != null;
-            model.addAttribute("hasVoted", hasVoted);
-
-            // Adiciona os tipos de decisão para o formulário do relator
-            model.addAttribute("decisionTypes", DecisionType.values());
+            // Verifica se o RELATOR já votou (quando é relator)
+            if (isRapporteur) {
+                boolean hasVoted = process.getRapporteurVote() != null;
+                model.addAttribute("hasVoted", hasVoted);
+                // Adiciona os tipos de decisão para o formulário do relator
+                model.addAttribute("decisionTypes", DecisionType.values());
+            } else {
+                // Lógica para votação do colegiado (professor membro participante da reunião)
+                boolean isProfessorMember = process.getMeeting() != null &&
+                        process.getMeeting().getParticipants().stream()
+                                .anyMatch(p -> p.getId().equals(professor.getId()));
+                model.addAttribute("isProfessorMember", isProfessorMember);
+                
+                if (isProfessorMember) {
+                    boolean hasVotedProcess = processService.hasVotedProcess(process.getId(), professor.getId());
+                    model.addAttribute("hasVotedProcess", hasVotedProcess);
+                    model.addAttribute("canVoteProcess", canVote && !hasVotedProcess);
+                }
+            }
         }
 
         model.addAttribute("mainContent", "pages/process-detail :: content");
@@ -260,5 +274,45 @@ public class ProcessController {
         }
 
         return "redirect:/processes/" + processId;
+    }
+
+    // MÉTODO PARA VOTAÇÃO DE PROFESSOR (MEMBRO DO COLEGIADO)
+    // Registra o voto de um professor em um processo durante a reunião
+    @PostMapping("/{id}/vote-professor")
+    public String voteProfessor(
+            @PathVariable("id") Long processId,
+            @RequestParam("voteType") String voteTypeStr,
+            @RequestParam(value = "justification", required = false) String justification,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            // 1. Busca o professor logado
+            Professor professor = professorService.findByLogin(authentication.getName())
+                    .orElseThrow(() -> new IllegalArgumentException("Professor não encontrado."));
+
+            // 2. Converte o tipo de voto
+            VoteType voteType;
+            try {
+                voteType = VoteType.valueOf(voteTypeStr.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Tipo de voto inválido: " + voteTypeStr);
+                return "redirect:/processes/" + processId;
+            }
+
+            // 3. Registra o voto
+            voteService.registerProfessorVote(processId, professor.getId(), voteType, justification);
+
+            // 4. Mensagem de sucesso
+            redirectAttributes.addFlashAttribute("successMessage", "Voto registrado com sucesso!");
+
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Erro ao registrar voto: " + e.getMessage());
+        }
+
+        return "redirect:/dashboard";
     }
 }

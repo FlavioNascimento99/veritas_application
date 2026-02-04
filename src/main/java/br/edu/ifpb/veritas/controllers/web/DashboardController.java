@@ -124,6 +124,15 @@ public class DashboardController {
             // Professor comum (não coordenador)
             model.addAttribute("processes", processService.listByProfessor(professor.getId()));
 
+            // ========== NOVA FUNCIONALIDADE: Processos pendentes e votados ==========
+            // Processos pendentes de voto para este professor
+            List<Process> pendingVotes = processService.findPendingVotesByProfessor(professor.getId());
+            model.addAttribute("pendingVotes", pendingVotes);
+
+            // Processos já votados (histórico)
+            List<Process> votedProcesses = processService.findVotedProcessesByProfessor(professor.getId());
+            model.addAttribute("votedProcesses", votedProcesses);
+
             // Reuniões do professor
             List<Meeting> meetings = findCollegiateMeetingsForProfessor(professor.getId(), null);
             model.addAttribute("meetings", meetings);

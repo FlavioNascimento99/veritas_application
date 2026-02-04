@@ -96,7 +96,7 @@
                                 <i class="fas fa-download mr-2"></i>Baixar PDF
                             </a>
                             <!-- Botão de Remover (apenas se canUpload) -->
-                            <form th:if="${canUpload}" th:action="@{'/processes/' + ${process.id} + '/remove-document'}" method="post" class="inline">
+                            <form th:if="${canUpload != null and canUpload}" th:action="@{'/processes/' + ${process.id} + '/remove-document'}" method="post" class="inline">
                                 <button type="submit"
                                         onclick="return confirm('Tem certeza que deseja remover o documento?')"
                                         class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold">
@@ -109,7 +109,7 @@
             </div>
 
             <!-- Sem documento - opção de upload (apenas para dono e status WAITING) -->
-            <div th:if="${process.document == null and canUpload}" class="space-y-4">
+            <div th:if="${process.document == null and canUpload != null and canUpload}" class="space-y-4">
                 <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
                     <p class="text-yellow-700 flex items-center">
                         <i class="fas fa-info-circle mr-2"></i>
@@ -198,6 +198,129 @@
         </div>
 
         <!-- Seção de Votação -->
+        <!-- NOVA: Votação de Professor (Membro do Colegiado) -->
+        <div th:if="${loggedProfessor != null and !isRapporteur and isProfessorMember}" class="bg-white rounded-lg shadow-md p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                <i class="fas fa-vote-yea text-orange-600 mr-2"></i>Seu Voto
+            </h2>
+
+            <!-- Informação sobre a votação -->
+            <div class="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-lg mb-6">
+                <p class="text-blue-700 flex items-center">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    <strong>Como membro do colegiado:</strong> Você está votando se concorda ou discorda da decisão do relator.
+                </p>
+            </div>
+
+            <!-- Informação sobre a decisão do relator -->
+            <div class="bg-gray-50 p-6 rounded-lg mb-6 border-l-4" 
+                 th:classappend="${process.rapporteurVote != null and process.rapporteurVote.name() == 'DEFERIMENTO'} ? 'border-green-500' : 'border-red-500'">
+                <p class="text-sm text-gray-600 font-semibold uppercase mb-2">Decisão do Relator</p>
+                <div class="flex items-center gap-2">
+                    <i th:class="${process.rapporteurVote != null and process.rapporteurVote.name() == 'DEFERIMENTO'} ? 'fas fa-check-circle text-green-600' : 'fas fa-times-circle text-red-600'"
+                       class="text-2xl"></i>
+                    <span class="text-lg font-bold"
+                          th:text="${process.rapporteurVote != null ? process.rapporteurVote.valor : 'Aguardando...'}"
+                          th:classappend="${process.rapporteurVote != null and process.rapporteurVote.name() == 'DEFERIMENTO'} ? 'text-green-700' : 'text-red-700'"></span>
+                </div>
+                <p th:if="${process.rapporteurJustification}" class="text-sm text-gray-700 mt-3 italic border-t border-gray-300 pt-3">
+                    <strong>Justificativa:</strong> <span th:text="${process.rapporteurJustification}"></span>
+                </p>
+            </div>
+
+            <!-- Formulário de Votação -->
+            <div th:if="${canVoteProcess}" class="space-y-6">
+                <div class="bg-yellow-50 border-l-4 border-yellow-600 p-6 rounded-lg">
+                    <p class="text-yellow-700 flex items-center">
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        <strong>Importante:</strong> Seu voto não pode ser alterado após o envio.
+                    </p>
+                </div>
+
+                <form th:action="@{'/processes/' + ${process.id} + '/vote-professor'}" method="post" class="space-y-6">
+                    <!-- Tipo de Voto -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-4">Seu Voto *</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <label class="relative flex items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-green-50 hover:border-green-500 transition-all has-[:checked]:bg-green-50 has-[:checked]:border-green-600">
+                                <input type="radio" name="voteType" value="DEFERIDO" required class="sr-only peer">
+                                <div class="flex items-center space-x-3 w-full">
+                                    <div class="w-5 h-5 border-2 border-gray-300 rounded-full peer-checked:border-green-600 peer-checked:bg-green-600 flex items-center justify-center">
+                                        <div class="w-2 h-2 bg-white rounded-full hidden peer-checked:block"></div>
+                                    </div>
+                                    <div>
+                                        <span class="font-semibold text-green-700">
+                                            <i class="fas fa-thumbs-up mr-1"></i>CONCORDO
+                                        </span>
+                                        <p class="text-xs text-gray-500">Com a decisão do relator</p>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label class="relative flex items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-red-50 hover:border-red-500 transition-all has-[:checked]:bg-red-50 has-[:checked]:border-red-600">
+                                <input type="radio" name="voteType" value="INDEFERIDO" required class="sr-only peer">
+                                <div class="flex items-center space-x-3 w-full">
+                                    <div class="w-5 h-5 border-2 border-gray-300 rounded-full peer-checked:border-red-600 peer-checked:bg-red-600 flex items-center justify-center">
+                                        <div class="w-2 h-2 bg-white rounded-full hidden peer-checked:block"></div>
+                                    </div>
+                                    <div>
+                                        <span class="font-semibold text-red-700">
+                                            <i class="fas fa-thumbs-down mr-1"></i>DISCORDO
+                                        </span>
+                                        <p class="text-xs text-gray-500">Da decisão do relator</p>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Justificativa (Opcional) -->
+                    <div>
+                        <label for="professJustification" class="block text-sm font-bold text-gray-900 mb-2">
+                            Justificativa (Opcional)
+                        </label>
+                        <textarea id="professJustification" name="justification" rows="4" maxlength="500"
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent resize-none"
+                                  placeholder="Você pode justificar seu voto aqui (máximo 500 caracteres)..."></textarea>
+                        <p class="text-xs text-gray-500 mt-2">Máximo de 500 caracteres</p>
+                    </div>
+
+                    <!-- Botões -->
+                    <div class="flex gap-4 pt-4">
+                        <button type="submit" class="flex-1 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white font-bold py-3 px-6 rounded-lg transition-all">
+                            <i class="fas fa-check mr-2"></i>Enviar Voto
+                        </button>
+                        <a th:href="@{/dashboard}" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-3 px-6 rounded-lg transition-all text-center">
+                            <i class="fas fa-times mr-2"></i>Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Já votou -->
+            <div th:if="${hasVotedProcess}" class="bg-green-50 border-l-4 border-green-600 p-6 rounded-lg">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle text-green-600 text-3xl mr-4"></i>
+                    <div>
+                        <h3 class="text-green-900 font-bold text-lg">Voto Registrado</h3>
+                        <p class="text-green-700">Seu voto foi registrado com sucesso. Você pode visualizar os detalhes do processo.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Não pode votar -->
+            <div th:if="${!canVote}" class="bg-yellow-50 border-l-4 border-yellow-600 p-6 rounded-lg">
+                <div class="flex items-center">
+                    <i class="fas fa-info-circle text-yellow-600 text-3xl mr-4"></i>
+                    <div>
+                        <h3 class="text-yellow-900 font-bold text-lg">Votação Indisponível</h3>
+                        <p class="text-yellow-700">Este processo não está disponível para votação no momento.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção de Votação do Relator -->
         <div th:if="${loggedProfessor != null and isRapporteur}" class="bg-white rounded-lg shadow-md p-8 mb-8">
             <h2 class="text-2xl font-bold text-gray-900 mb-6">
                 <i class="fas fa-vote-yea text-indigo-600 mr-2"></i>Seção de Votação
@@ -295,7 +418,7 @@
                 <i class="fas fa-info-circle text-gray-600 text-3xl mr-4"></i>
                 <div>
                     <h3 class="text-gray-900 font-bold text-lg">Informação</h3>
-                    <p class="text-gray-700">Apenas o professor relator pode votar neste processo.</p>
+                    <p class="text-gray-700">Apenas o professor relator pode registrar a decisão inicial neste processo.</p>
                 </div>
             </div>
         </div>
