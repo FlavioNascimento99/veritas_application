@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -25,14 +27,7 @@ public interface ProcessRepository extends JpaRepository<Process, Long>, JpaSpec
 
   Optional<Process> findByTitle(String title);
 
-  /**
-   * Queries específicas
-   * 1. Busca por Processos em análise por determinado Professor.
-   * 2. Busca por Processos criados entre um determinado período.
-   * 3. Busca por Processos pendentes (a espera ou sob análise).
-   * 4. Busca por Processos finalizados por um determinado Professor.
-   * 5. Busca por Processos de determinado estudante.
-   */
+  // Queries específicas
   @Query("SELECT p FROM Process p WHERE p.processRapporteur.id = :professorId AND p.status = 'UNDER_ANALISYS'")
   List<Process> findProfessorIdleProcesses(@Param("professorId") Long professorId);
 
@@ -49,11 +44,18 @@ public interface ProcessRepository extends JpaRepository<Process, Long>, JpaSpec
       "ORDER BY p.createdAt DESC")
   List<Process> findLastProcessesFromStudent(@Param("studentId") Long studentId);
 
-  // Contadores (Interessante posteriomente para Relatórios)
+  // Contadores
   Long countByStatus(StatusProcess status);
-
   Long countByProcessCreator_IdAndStatus(Long studentId, StatusProcess status);
-
   List<Process> findByStatusIn(List<StatusProcess> statusProcess);
 
+  // ========== REQNAOFUNC 9: Métodos com Paginação ==========
+  // Busca processos por status com paginação
+  Page<Process> findByStatus(StatusProcess status, Pageable pageable);
+
+  // Busca processos por estudante criador com paginação
+  Page<Process> findByProcessCreator_Id(Long studentId, Pageable pageable);
+
+  // Busca processos por professor relator com paginação
+  Page<Process> findByProcessRapporteur_Id(Long professorId, Pageable pageable);
 }

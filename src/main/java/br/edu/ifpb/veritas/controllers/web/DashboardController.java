@@ -11,6 +11,10 @@ import br.edu.ifpb.veritas.models.Student;
 import br.edu.ifpb.veritas.services.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -45,90 +49,93 @@ public class DashboardController {
     private final VoteService voteService;
     private final CollegiateService collegiateService;
 
+    // Número máximo de processos por página (REQNAOFUNC 9)
+    private static final int PAGE_SIZE = 5;
+
+    // Dashboard principal com paginação para coordenador
     @GetMapping
-    public String dashboard(Model model, Authentication authentication,
-                            @RequestParam(required = false) String status,
-                            @RequestParam(required = false) Long studentId,
-                            @RequestParam(required = false) Long professorId,
-                            @RequestParam(required = false) String meetingStatus) {
+    public String dashboard(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long studentId,
+            @RequestParam(required = false) Long professorId,
+            Model model,
+            Authentication authentication
+    ) {
+        String login = authentication.getName();
 
-        model.addAttribute("pageTitle", "Dashboard");
-        model.addAttribute("activePage", "dashboard");
+        // ========== Verificar tipo de usuário ==========
 
-        List<String> roles = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
-
-        if (roles.contains("ROLE_ADMIN")) {
-            model.addAttribute("studentsCount", studentService.findAll().size());
-            model.addAttribute("professorsCount", professorService.findAll().size());
-            model.addAttribute("subjectsCount", subjectService.findAll().size());
-            model.addAttribute("processesCount", processService.findAllProcesses().size());
-
-            var recent = processService.findAllProcesses().stream()
-                    .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
-                    .limit(10)
-                    .toList();
-            model.addAttribute("recentProcesses", recent);
-            model.addAttribute("mainContent", "pages/dashboard-admin :: content");
-
-        } else if (roles.contains("ROLE_COORDINATOR")) {
-
-            Professor professor = professorService.findByLogin(authentication.getName())
-                    .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado."));
-
-            model.addAttribute("professor", professor);
-            model.addAttribute("professors", professorService.findAll());
-            model.addAttribute("students", studentService.findAll());
-
-            var filtered = processService.findAllFiltered(status, studentId, professorId);
-            model.addAttribute("allProcesses", filtered);
-            model.addAttribute("filterStatus", status);
-            model.addAttribute("filterStudentId", studentId);
-            model.addAttribute("filterProfessorId", professorId);
-            model.addAttribute("waitingProcesses", processService.findWaitingProcesses());
-            
-            // Carregar reuniões do colegiado
-            try {
-                Collegiate collegiate = collegiateService.findByProfessorId(professor.getId());
-                List<Meeting> collegiateMeetings = meetingService.findByCollegiateId(collegiate.getId());
-                model.addAttribute("collegiateMeetings", collegiateMeetings);
-            } catch (Exception e) {
-                model.addAttribute("collegiateMeetings", Collections.emptyList());
-            }
-            
-            model.addAttribute("mainContent", "pages/dashboard-coordinator :: content");
-
-        } else if (roles.contains("ROLE_PROFESSOR")) {
-            Professor professor = professorService.findByLogin(authentication.getName())
-                    .orElseThrow(() -> new IllegalArgumentException("Professor não encontrado."));
-
-            model.addAttribute("professor", professor);
-            model.addAttribute("processes", processService.listByProfessor(professor.getId()));
-            model.addAttribute("meetingStatuses", MeetingStatus.values());
-
-            List<Meeting> collegiateMeetings = findCollegiateMeetingsForProfessor(professor.getId(), meetingStatus);
-            model.addAttribute("collegiateMeetings", collegiateMeetings);
-            model.addAttribute("filterMeetingStatus", meetingStatus);
-
-            List<Meeting> scheduledParticipations = meetingService.findScheduledMeetingsByParticipant(professor.getId());
-            model.addAttribute("scheduledMeetings", scheduledParticipations);
-            model.addAttribute("mainContent", "pages/dashboard-professor :: content");
-
-        } else if (roles.contains("ROLE_STUDENT")) {
-            Student student = studentService.findByLogin(authentication.getName())
-                    .orElseThrow(() -> new IllegalArgumentException("Estudante não encontrado."));
+        // Verifica se é estudante
+        var studentOpt = studentService.findByLogin(login);
+        if (studentOpt.isPresent()) {
+            Student student = studentOpt.get();
             model.addAttribute("student", student);
-            model.addAttribute("processes", processService.listByStudentFiltered(student.getId(), status, null));
+            model.addAttribute("processes", processService.listByStudent(student.getId()));
             model.addAttribute("subjects", subjectService.findAll());
+            model.addAttribute("pageTitle", "Dashboard - Estudante");
+            model.addAttribute("activePage", "dashboard");
             model.addAttribute("mainContent", "pages/dashboard-student :: content");
-            model.addAttribute("filterStatus", status);
-
-        } else {
-            return "redirect:/login?error";
+            return "home";
         }
 
-        return "home";
+        // Verifica se é professor
+        var professorOpt = professorService.findByLogin(login);
+        if (professorOpt.isPresent()) {
+            Professor professor = professorOpt.get();
+            model.addAttribute("professor", professor);
+
+            // Se for coordenador, mostra dashboard do coordenador COM PAGINAÇÃO
+            if (Boolean.TRUE.equals(professor.getCoordinator())) {
+
+                // ========== REQNAOFUNC 9: Paginação ==========
+                // Cria objeto Pageable com ordenação por data de criação (mais recentes primeiro)
+                Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("createdAt").descending());
+
+                // Busca processos paginados com filtros
+                Page<Process> processPage = processService.findAllFilteredPaged(
+                        status, studentId, professorId, pageable
+                );
+
+                // Adiciona dados de paginação ao modelo
+                model.addAttribute("allProcesses", processPage.getContent());
+                model.addAttribute("currentPage", page);
+                model.addAttribute("totalPages", processPage.getTotalPages());
+                model.addAttribute("totalElements", processPage.getTotalElements());
+                model.addAttribute("hasNext", processPage.hasNext());
+                model.addAttribute("hasPrevious", processPage.hasPrevious());
+                model.addAttribute("pageSize", PAGE_SIZE);
+
+                // Mantém os filtros para a navegação entre páginas
+                model.addAttribute("filterStatus", status);
+                model.addAttribute("filterStudentId", studentId);
+                model.addAttribute("filterProfessorId", professorId);
+
+                // Dados para os dropdowns de filtro
+                model.addAttribute("professors", professorService.findAll());
+                model.addAttribute("students", studentService.findAll());
+
+                model.addAttribute("pageTitle", "Dashboard - Coordenador");
+                model.addAttribute("activePage", "dashboard");
+                model.addAttribute("mainContent", "pages/dashboard-coordinator :: content");
+                return "home";
+            }
+
+            // Professor comum (não coordenador)
+            model.addAttribute("processes", processService.listByProfessor(professor.getId()));
+
+            // Reuniões do professor
+            List<Meeting> meetings = findCollegiateMeetingsForProfessor(professor.getId(), null);
+            model.addAttribute("meetings", meetings);
+
+            model.addAttribute("pageTitle", "Dashboard - Professor");
+            model.addAttribute("activePage", "dashboard");
+            model.addAttribute("mainContent", "pages/dashboard-professor :: content");
+            return "home";
+        }
+
+        // Usuário não encontrado - redireciona para login
+        return "redirect:/login";
     }
 
     /**

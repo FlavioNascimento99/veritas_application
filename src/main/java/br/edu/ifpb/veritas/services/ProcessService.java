@@ -12,6 +12,8 @@ import br.edu.ifpb.veritas.repositories.StudentRepository;
 import br.edu.ifpb.veritas.repositories.SubjectRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -207,6 +209,43 @@ public class ProcessService {
         }
 
         return processRepository.findAll(spec);
+    }
+
+    // ========== REQNAOFUNC 9: Métodos com Paginação ==========
+
+    // Retorna todos os processos com paginação.
+    public Page<Process> findAllPaged(Pageable pageable) {
+        return processRepository.findAll(pageable);
+    }
+
+    // Retorna processos filtrados COM paginação
+    public Page<Process> findAllFilteredPaged(String status, Long studentId, Long professorId, Pageable pageable) {
+        Specification<Process> spec = Specification.where(null);
+
+        // Filtro por status
+        if (status != null && !status.isBlank()) {
+            try {
+                StatusProcess statusEnum = StatusProcess.valueOf(status.toUpperCase());
+                spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), statusEnum));
+            } catch (IllegalArgumentException e) {
+                // Ignora valores de status inválidos
+            }
+        }
+
+        // Filtro por estudante
+        if (studentId != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("processCreator").get("id"), studentId));
+        }
+
+        // Filtro por professor relator
+        if (professorId != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("processRapporteur").get("id"), professorId));
+        }
+
+        // Executa a consulta paginada com os filtros
+        return processRepository.findAll(spec, pageable);
     }
 
     public List<Process> findWaitingProcesses() {
