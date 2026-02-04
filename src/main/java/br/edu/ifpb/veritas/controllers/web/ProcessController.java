@@ -4,15 +4,20 @@ import br.edu.ifpb.veritas.enums.DecisionType;
 import br.edu.ifpb.veritas.enums.StatusProcess;
 import br.edu.ifpb.veritas.models.Process;
 import br.edu.ifpb.veritas.models.Professor;
+import br.edu.ifpb.veritas.models.Student;
 import br.edu.ifpb.veritas.services.ProcessService;
 import br.edu.ifpb.veritas.services.ProfessorService;
 import br.edu.ifpb.veritas.services.StudentService;
 import br.edu.ifpb.veritas.services.VoteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -25,20 +30,113 @@ public class ProcessController {
     private final VoteService voteService;
     private final ProfessorService professorService;
 
+    // REQFUNC 1 + REQFUNC 16: Criação de processo com upload opcional de PDF
     @PostMapping("/create")
     public String createProcess(
             @ModelAttribute Process process,
             @RequestParam Long subjectId,
+            @RequestParam(value = "documentFile", required = false) MultipartFile documentFile,
             Authentication authentication,
             RedirectAttributes redirectAttributes
     ) {
-        String studentLogin = authentication.getName();
-        var studentOpt = studentService.findByLogin(studentLogin);
-        var student = studentOpt.orElseThrow(() -> new IllegalArgumentException("Estudante não encontrado para o usuário autenticado."));
+        try {
+            String studentLogin = authentication.getName();
+            var studentOpt = studentService.findByLogin(studentLogin);
+            var student = studentOpt.orElseThrow(() ->
+                    new IllegalArgumentException("Estudante não encontrado para o usuário autenticado."));
 
-        processService.createProcess(process, student.getId(), subjectId);
-        redirectAttributes.addFlashAttribute("successMessage", "Processo criado com sucesso!");
+            // Cria o processo com ou sem documento
+            processService.createProcess(process, student.getId(), subjectId, documentFile);
+
+            // Mensagem de sucesso diferenciada
+            if (documentFile != null && !documentFile.isEmpty()) {
+                redirectAttributes.addFlashAttribute("successMessage",
+                        "Processo criado com sucesso! Documento anexado: " + documentFile.getOriginalFilename());
+            } else {
+                redirectAttributes.addFlashAttribute("successMessage", "Processo criado com sucesso!");
+            }
+
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Erro ao criar processo: " + e.getMessage());
+        }
+
         return "redirect:/dashboard";
+    }
+
+    // REQFUNC 16: Upload de documento para processo existente
+    @PostMapping("/{id}/upload")
+    public String uploadDocument(
+            @PathVariable("id") Long processId,
+            @RequestParam("documentFile") MultipartFile documentFile,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            Student student = studentService.findByLogin(authentication.getName())
+                    .orElseThrow(() -> new IllegalArgumentException("Estudante não encontrado."));
+
+            processService.uploadDocument(processId, student.getId(), documentFile);
+
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Documento anexado com sucesso: " + documentFile.getOriginalFilename());
+
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Erro ao anexar documento: " + e.getMessage());
+        }
+
+        return "redirect:/processes/" + processId;
+    }
+
+    // REQFUNC 16: Remove documento de um processo
+    @PostMapping("/{id}/remove-document")
+    public String removeDocument(
+            @PathVariable("id") Long processId,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            Student student = studentService.findByLogin(authentication.getName())
+                    .orElseThrow(() -> new IllegalArgumentException("Estudante não encontrado."));
+
+            processService.removeDocument(processId, student.getId());
+
+            redirectAttributes.addFlashAttribute("successMessage", "Documento removido com sucesso.");
+
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Erro ao remover documento: " + e.getMessage());
+        }
+
+        return "redirect:/processes/" + processId;
+    }
+
+    // REQFUNC 16: Download do documento PDF anexado ao processo
+    @GetMapping("/{id}/download")
+    public ResponseEntity<byte[]> downloadDocument(@PathVariable("id") Long processId) {
+        Process process = processService.findById(processId);
+
+        if (process.getDocument() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String filename = process.getDocumentFilename();
+        if (filename == null || filename.isBlank()) {
+            filename = "documento_processo_" + process.getNumber() + ".pdf";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + filename + "\"")
+                .body(process.getDocument());
     }
 
     @GetMapping("/{id}")
@@ -47,6 +145,25 @@ public class ProcessController {
         model.addAttribute("pageTitle", "Processo - " + (process.getTitle() != null ? process.getTitle() : process.getNumber()));
         model.addAttribute("activePage", "process");
         model.addAttribute("process", process);
+
+        // Verifica se é estudante (para mostrar opções de upload)
+        var studentOpt = studentService.findByLogin(authentication.getName());
+        if (studentOpt.isPresent()) {
+            Student student = studentOpt.get();
+            model.addAttribute("loggedStudent", student);
+
+            // Verifica se o estudante é o criador do processo
+            boolean isOwner = process.getProcessCreator().getId().equals(student.getId());
+            model.addAttribute("isOwner", isOwner);
+
+            // REQFUNC 16: Verifica se pode fazer upload (processo não distribuído)
+            boolean canUpload = isOwner && process.getStatus() == StatusProcess.WAITING;
+            model.addAttribute("canUpload", canUpload);
+
+            // Verifica se tem documento anexado
+            boolean hasDocument = process.getDocument() != null;
+            model.addAttribute("hasDocument", hasDocument);
+        }
 
         // ========== REQFUNC 5: Lógica de votação ==========
         // Verifica se o usuário logado é um professor
@@ -60,7 +177,7 @@ public class ProcessController {
                     process.getProcessRapporteur().getId().equals(professor.getId());
             model.addAttribute("isRapporteur", isRapporteur);
 
-            // Verifica se o processo está em análise (pode ser votado)
+            // Verifica se o processo está em análise
             boolean canVote = process.getStatus() == StatusProcess.UNDER_ANALISYS;
             model.addAttribute("canVote", canVote);
 
@@ -76,16 +193,11 @@ public class ProcessController {
         return "home";
     }
 
-    /**
-     * REQFUNC 5: Endpoint para registrar voto do RELATOR no processo
-     *
-     * O relator vota pelo DEFERIMENTO ou INDEFERIMENTO do processo,
-     * utilizando o enum DecisionType
-     */
+    // REQFUNC 5: Endpoint para registrar voto do RELATOR no processo
     @PostMapping("/{id}/vote")
     public String voteOnProcess(
             @PathVariable("id") Long processId,
-            @RequestParam("voteType") String voteTypeStr,  // Recebe como String para converter manualmente
+            @RequestParam("voteType") String voteTypeStr,
             @RequestParam("justification") String justification,
             Authentication authentication,
             RedirectAttributes redirectAttributes
