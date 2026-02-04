@@ -49,7 +49,6 @@ public class StudentService {
         currentStudent.setPhoneNumber(payload.getPhoneNumber());
         currentStudent.setLogin(payload.getLogin());
         currentStudent.setRegister(payload.getRegister());
-
         if (payload.getPassword() != null && !payload.getPassword().isEmpty()) {
             currentStudent.setPassword(passwordEncoder.encode(payload.getPassword()));
         }

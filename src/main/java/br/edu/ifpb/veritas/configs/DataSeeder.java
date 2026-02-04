@@ -55,7 +55,7 @@ public class DataSeeder implements CommandLineRunner {
         seedSubjects();
         seedProfessors();
         seedStudents();
-        seedCollegiates();
+        // seedCollegiates();
         seedProcesses();
         seedRapporteurVotes();  // ← IMPORTANTE: Votos dos relatores ANTES das reuniões
         seedMeetings();
@@ -241,27 +241,27 @@ public class DataSeeder implements CommandLineRunner {
      * SEED 5: Colegiados
      * Cria colegiados com membros (professores).
      */
-    private void seedCollegiates() {
-        log.info("Populando colegiados...");
+    // private void seedCollegiates() {
+    //     log.info("Populando colegiados...");
 
-        if (collegiateService.findAll().isEmpty()) {
-            List<Professor> allProfessors = professorService.findAll();
+    //     if (collegiateService.findAll().isEmpty()) {
+    //         List<Professor> allProfessors = professorService.findAll();
 
-            if (allProfessors.size() >= 4) {
-                Collegiate collegiate1 = new Collegiate();
-                collegiate1.setDescription("Colegiado de Ciência da Computação");
-                collegiate1.setCreatedAt(LocalDateTime.now().minusMonths(6));
-                collegiate1.setCollegiateMemberList(allProfessors.subList(0, 4));
-                collegiateService.create(collegiate1);
+    //         if (allProfessors.size() >= 4) {
+    //             Collegiate collegiate1 = new Collegiate();
+    //             collegiate1.setDescription("Colegiado de Ciência da Computação");
+    //             collegiate1.setCreatedAt(LocalDateTime.now().minusMonths(6));
+    //             collegiate1.setCollegiateMemberList(allProfessors.subList(0, 4));
+    //             collegiateService.create(collegiate1);
 
-                log.info("✓ 1 colegiado criado com {} membros", 4);
-            } else {
-                log.warn("⚠ Não há professores suficientes para criar colegiado.");
-            }
-        } else {
-            log.info("⚠ Colegiados já existem no banco. Pulando...");
-        }
-    }
+    //             log.info("✓ 1 colegiado criado com {} membros", 4);
+    //         } else {
+    //             log.warn("⚠ Não há professores suficientes para criar colegiado.");
+    //         }
+    //     } else {
+    //         log.info("⚠ Colegiados já existem no banco. Pulando...");
+    //     }
+    // }
 
     /**
      * SEED 6: Processos

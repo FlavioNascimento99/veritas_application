@@ -75,7 +75,7 @@ public class Student {
    * a partir de um Observer. 
    * 
    * Consultar: https://refactoring.guru/design-patterns/observer
-   */
   @OneToOne(mappedBy = "representativeStudent")
   private Collegiate representativeCollegiate;
+   */
 }

@@ -2,7 +2,6 @@ package br.edu.ifpb.veritas.services;
 
 import br.edu.ifpb.veritas.models.Administrator;
 import br.edu.ifpb.veritas.models.Professor;
-import br.edu.ifpb.veritas.models.Student;
 import br.edu.ifpb.veritas.repositories.AdminRepository;
 import br.edu.ifpb.veritas.repositories.ProfessorRepository;
 import br.edu.ifpb.veritas.repositories.StudentRepository;
@@ -23,6 +22,12 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final ProfessorRepository professorRepository;
     private final StudentRepository studentRepository;
 
+
+    /**
+     * 
+     * Esta Classe tem como Objetivo coletar, a partir do Username passada na interface de login
+     * o Nome do Usuário e seu poder de Acesso, se este é de nível Administrativo, como Professor ou Estudante.
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Administrator> admin = adminRepository.findByLogin(username);

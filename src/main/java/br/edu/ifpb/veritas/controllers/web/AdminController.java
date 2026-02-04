@@ -4,12 +4,20 @@ import br.edu.ifpb.veritas.models.Professor;
 import br.edu.ifpb.veritas.exceptions.ResourceNotFoundException;
 import br.edu.ifpb.veritas.models.Student;
 import br.edu.ifpb.veritas.models.Subject;
+import br.edu.ifpb.veritas.models.Collegiate;
+import br.edu.ifpb.veritas.models.Meeting;
+import br.edu.ifpb.veritas.dtos.CollegiateDTO;
+import br.edu.ifpb.veritas.dtos.CollegiateEditDTO;
 import br.edu.ifpb.veritas.services.ProfessorService;
 import br.edu.ifpb.veritas.services.StudentService;
 import br.edu.ifpb.veritas.services.SubjectService;
 import br.edu.ifpb.veritas.services.ProcessService;
 import br.edu.ifpb.veritas.services.CollegiateService;
+import br.edu.ifpb.veritas.services.MeetingService;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +33,7 @@ public class AdminController {
     private final SubjectService subjectService;
     private final ProcessService processService;
     private final CollegiateService collegiateService;
+    private final MeetingService meetingService;
 
     // --- CADASTRO DE ESTUDANTE ---
     @GetMapping("/students/new")
@@ -159,9 +168,67 @@ public class AdminController {
     @GetMapping("/collegiates")
     public String listCollegiates(Model model) {
         model.addAttribute("collegiates", collegiateService.findAll());
+        model.addAttribute("professors", professorService.findAll());
+        model.addAttribute("meetings", meetingService.findAll());
         model.addAttribute("pageTitle", "Gerenciar Colegiados");
         model.addAttribute("mainContent", "pages/admin/collegiates :: content");
         return "home";
+    }
+
+    @GetMapping("/collegiates/new")
+    public String showCollegiateForm(Model model) {
+        model.addAttribute("collegiate", new CollegiateDTO());
+        model.addAttribute("professors", professorService.findAll());
+        model.addAttribute("pageTitle", "Cadastrar Colegiado");
+        model.addAttribute("mainContent", "pages/admin/new-collegiate :: content");
+        return "home";
+    }
+
+    @GetMapping("/collegiates/{id}")
+    public String viewCollegiate(@PathVariable Long id, Model model) {
+        Collegiate collegiate = collegiateService.findById(id);
+        List<Meeting> meetings = meetingService.findByCollegiateId(id);
+        
+        model.addAttribute("collegiate", collegiate);
+        model.addAttribute("meetings", meetings);
+        model.addAttribute("pageTitle", "Visualizar Colegiado");
+        model.addAttribute("mainContent", "pages/admin/view-collegiate :: content");
+        return "home";
+    }
+
+    @GetMapping("/collegiates/{id}/edit")
+    public String showEditCollegiateForm(@PathVariable Long id, Model model) {
+        Collegiate collegiate = collegiateService.findById(id);
+        model.addAttribute("collegiate", collegiate);
+        model.addAttribute("professors", professorService.findAll());
+        model.addAttribute("processes", processService.findAllProcesses());
+        model.addAttribute("pageTitle", "Editar Colegiado");
+        model.addAttribute("mainContent", "pages/admin/edit-collegiate :: content");
+        return "home";
+    }
+
+    @PostMapping("/collegiates")
+    public String createCollegiate(@ModelAttribute CollegiateDTO collegiateDTO, RedirectAttributes redirectAttributes) {
+        try {
+            collegiateService.create(collegiateDTO);
+            redirectAttributes.addFlashAttribute("successMessage", "Colegiado cadastrado com sucesso!");
+        } catch (ResourceNotFoundException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/admin/collegiates/new";
+        }
+        return "redirect:/admin/collegiates";
+    }
+
+    @PostMapping("/collegiates/{id}")
+    public String updateCollegiate(@PathVariable Long id, @ModelAttribute CollegiateEditDTO collegiateDTO, RedirectAttributes redirectAttributes) {
+        try {
+            collegiateService.updateFromDTO(id, collegiateDTO);
+            redirectAttributes.addFlashAttribute("successMessage", "Colegiado atualizado com sucesso!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Erro ao atualizar colegiado: " + e.getMessage());
+            return "redirect:/admin/collegiates/" + id + "/edit";
+        }
+        return "redirect:/admin/collegiates/" + id;
     }
     
 }

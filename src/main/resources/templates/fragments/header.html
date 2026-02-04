@@ -11,10 +11,14 @@
 
             <!-- Menu Desktop -->
             <nav class="hidden md:flex items-center space-x-1">
-                <a th:href="@{/dashboard}" class="px-4 py-2 text-gray-700 hover:text-indigo-600 font-medium transition-colors duration-200">
+                <a sec:authorize="isAuthenticated()" th:href="@{/dashboard}" class="px-4 py-2 text-gray-700 hover:text-indigo-600 font-medium transition-colors duration-200">
                     <i class="fas fa-tachometer-alt mr-1"></i>Dashboard
                 </a>
+                <p sec:authorize="!isAuthenticated()" class="px-4 py-2 text-gray-700 hover:text-indigo-600 font-medium transition-colors duration-200">
+                    Entre em contato para mais informações.
+                </p>
             </nav>
+
 
             <!-- Menu Usuario -->
             <div class="flex items-center space-x-4">
@@ -40,7 +44,7 @@
                 </div>
                 
                 <!-- Dropdown Logout -->
-                <div class="relative group">
+                <div class="relative group" sec:authorize="isAuthenticated()">
                     <button class="inline-flex items-center px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200">
                         <i class="fas fa-chevron-down"></i>
                     </button>

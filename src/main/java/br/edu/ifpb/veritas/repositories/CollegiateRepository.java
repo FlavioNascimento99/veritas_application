@@ -8,11 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface CollegiateRepository extends JpaRepository<Collegiate, Long> {
-    Optional<Collegiate> findByRepresentativeStudentId(Long studentId);
-
-    // Busca colegiado a partir da reunião
-    Optional<Collegiate> findByCollegiateMeetingsListId(Long meetingId);
-
-    // Busca colegiado a partir do professor
+    // Optional<Collegiate> findByRepresentativeStudentId(Long studentId);
+    // Optional<Collegiate> findByCollegiateMeetingsListId(Long meetingId);
     Optional<Collegiate> findByCollegiateMemberListId(Long professorId);
 }

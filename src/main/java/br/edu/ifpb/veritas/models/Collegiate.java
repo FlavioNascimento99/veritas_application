@@ -1,3 +1,9 @@
+/**
+ * O Model Collegiate se trata de, um grupo de Professor's 
+ * que estarão dentro de uma determinada Meeting, decidindo 
+ * se, o Vote do Rapporteur é deferível ou não;
+ */
+
 package br.edu.ifpb.veritas.models;
 
 import java.time.LocalDateTime;
@@ -19,24 +25,31 @@ public class Collegiate {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+
+  /**
+   * Propriedades de criação e modificação.
+   * 
+   * LocalDateTime Structure
+   */
   @Column(name = "CREATED_AT")
   private LocalDateTime createdAt;
 
   @Column(name = "CLOSED_AT")
   private LocalDateTime closedAt;
 
+  /**
+   * Breve descritivo do Colegiado.
+  */
   @Column(name = "DESCRIPTION")
   private String description;
-
 
   /**
    * Rapporteur é o Professor/Relator do Processo.
    * Criada uma tabela com o ID do Professor em questão.
-    @ManyToOne
-    @JoinColumn(name = "PROFESSOR_ID")
-    private Professor rapporteur;
   */
-  
+  @ManyToOne
+  @JoinColumn(name = "PROFESSOR_ID")
+  private Professor rapporteur;
   
   /**
    * Log 1: Estou escervendo essa propriedade com a ideia de, Colegiado, nada mais é 
@@ -53,18 +66,18 @@ public class Collegiate {
   /**
    * Log 1: Listagem de Processos de um determinado Colegiado realmente será necessário?
    * 
-  */
   @OneToMany(mappedBy = "collegiate", cascade = CascadeType.ALL)
   private List<Meeting> collegiateMeetingsList;
+  */
   
   
   /**
    * Relacionamento com aluno representante
    * 
-   */
   @OneToOne
   @JoinColumn(name = "COLLEGIATE_REP_STUDENT_ID", nullable = true)
   private Student representativeStudent;
+   */
 
   /**
    * Log 1: Listagem de processos sob análise pelo colegiado.
